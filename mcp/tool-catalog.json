@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 587,
+  "totalOperations": 588,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -4589,6 +4589,16 @@
       "path": "/v1/uploads",
       "flags": [
         "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-media",
+      "operationId": "atc-media.usage.get",
+      "method": "GET",
+      "path": "/v1/usage",
+      "flags": [
+        "READ_SAFE"
       ],
       "exposed": false
     },

@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-media's openapi.yaml (15 total).
+ * One operationId-keyed method per operation in atc-media's openapi.yaml (16 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -54,6 +54,7 @@ export function createClient(config: ClientConfig) {
     "atc-media.ops.metrics": (init: FetchOptions<operations["atc-media.ops.metrics"]>) => client.GET("/metrics", init),
     "atc-media.ops.ready": (init: FetchOptions<operations["atc-media.ops.ready"]>) => client.GET("/ready", init),
     "atc-media.tickets.create": (init: FetchOptions<operations["atc-media.tickets.create"]>) => client.POST("/v1/uploads", init),
+    "atc-media.usage.get": (init: FetchOptions<operations["atc-media.usage.get"]>) => client.GET("/v1/usage", init),
   } as const;
 }
 

@@ -87,6 +87,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Storage used by the calling key, and its limits */
+        get: operations["atc-media.usage.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/files": {
         parameters: {
             query?: never;
@@ -635,6 +652,34 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    "atc-media.usage.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        keyId: string;
+                        /** @description Bytes of the key's live files (each file counts its full size */
+                        usedBytes: number;
+                        /** @description `KEY_QUOTA_BYTES` or `DEFAULT_QUOTA_BYTES`; null = unlimited. */
+                        quotaBytes: number | null;
+                        maxUploadBytes: number;
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
         };
     };
     "atc-media.files.list": {

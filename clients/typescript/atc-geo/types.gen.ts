@@ -542,6 +542,17 @@ export interface components {
         ReadyResponse: {
             /** @enum {string} */
             status: "ok" | "unavailable";
+            /** @description State of the IP database (present when ready). A stale database keeps answering; the flag is for you. */
+            ipDatabase?: {
+                configured?: boolean;
+                loaded?: boolean;
+                /** Format: date-time */
+                builtAt?: string | null;
+                /** @description Days since the database was built. */
+                ageDays?: number | null;
+                /** @description True when ageDays exceeds MMDB_MAX_AGE_DAYS (0 = never). */
+                stale?: boolean;
+            };
             /** @description Present only when status is "unavailable". */
             error?: string;
         };
