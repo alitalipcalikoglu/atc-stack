@@ -17,6 +17,7 @@ import { Stack } from '../src/stack.js';
  *   backup   --root <dir> --dir <snapshot dir>                     (default dir: <root>/backups/<timestamp>)
  *   restore  <snapshot dir> --root <dir> --service <id>             (default: every service the snapshot covers)
  *   maintenance <service>   --root <dir>                            (one-shot; today: media only)
+ *   mcp:config [--read-only | --full] [--print]                     (MCP keys + mcp.env + .mcp.json)
  *   compose  [--port-offset n] --root <dir>                         (writes compose/docker-compose.yml + env files)
  *   load     [--url http://127.0.0.1:3000] [--duration 10] [--concurrency 10] [--routes "GET /health,..."] [--json]
  *   release:prepare|release:verify|release:publish <version>        (see README, "Releasing")
@@ -99,6 +100,13 @@ export class Cli {
         console.log(JSON.stringify(r));
         return r.errors ? 1 : 0;
       }
+      case 'mcp:config': {
+        const r = stack.mcpConfig({ readOnly: flags['read-only'] === true ? true : flags.full === true ? false : undefined });
+        if (flags.print) { console.log(JSON.stringify(r.json, null, 2)); return 0; }
+        console.log(`wrote ${r.envPath} and ${r.jsonPath} (${r.readOnly ? 'read-only keys' : 'full MCP keys'}; 0600, they hold API keys)`);
+        if (r.changed.length) console.log(`keys changed on: ${r.changed.join(', ')} -- restart them ("npm run up") before using the MCP server`);
+        return 0;
+      }
       case 'compose': {
         const offset = flags['port-offset'] === undefined ? 0 : Number(flags['port-offset']);
         if (!Number.isInteger(offset) || offset < 0 || offset > 60_000) throw new Error('--port-offset must be an integer from 0 to 60000');
@@ -133,7 +141,7 @@ export class Cli {
         return 0;
       }
       default:
-        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | compose [--port-offset n] | load [--url u] [--duration s] [--concurrency n] [--routes "GET /p,..."] [--json] | release:prepare|release:verify|release:publish <version>');
+        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | mcp:config [--read-only|--full] [--print] | compose [--port-offset n] | load [--url u] [--duration s] [--concurrency n] [--routes "GET /p,..."] [--json] | release:prepare|release:verify|release:publish <version>');
         return 2;
     }
   }

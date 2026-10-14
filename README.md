@@ -135,7 +135,8 @@ directory — no HTTP route, no new auth system; see [atc-media/README.md](../at
    - every service that issues keys (`*_API_KEYS`) gets an entry per holder: `atc-console` (role `read` for audit, default elsewhere), `atc-gateway` (auth, media, notify), `atc-auth` (notify), `atc-scheduler` (flags `write`, notify, webhook-out `publish`);
    - holders receive the same secret: console `*_API_KEY` variables and `GATEWAY_METRICS_TOKEN`, gateway `AUTH_API_KEY`/`MEDIA_API_KEY`/`NOTIFY_API_KEY`, auth `NOTIFY_API_KEY`, scheduler `TARGET_KEYS`.
 4. **Files**: `atc-gateway/routes.json` (auth, media, JWKS through the gateway) and `atc-console/services.json` (every service with its local URL and key variable).
-5. **First admin**: username `admin` (or `--admin-username`) with a generated password, printed once. Nothing is created when an administrator already exists.
+5. **MCP**: an `atc-mcp` key on every service that has MCP tools, and the untracked, 0600 `mcp.env` and `.mcp.json` here (see "MCP server").
+6. **First admin**: username `admin` (or `--admin-username`) with a generated password, printed once. Nothing is created when an administrator already exists.
 
 Running `setup` again is safe: existing secrets, keys and any value you edited by hand are kept; only placeholders and missing entries are filled. Delete a line from a `.env` to get the stack's default back. Console's adapter-node application is rebuilt on every setup boundary so a build artifact left by an older source checkout is never accepted as current.
 
@@ -271,6 +272,7 @@ kept in `.release/v<version>.json` (untracked), so a failed step can simply be r
 | `Stack` | `src/stack.js` | `setup`, `up`, `down`, `dev`, `status`, `matrix`, `backup`, `restore`, `maintenance`, first admin |
 | `Snapshot` | `src/snapshot.js` | Whole-workspace backup creation and validated restore |
 | `Release` | `src/release.js` | `release:prepare`, `release:verify`, `release:publish` |
+| `McpConfig` | `src/mcp-config.js` | `atc-mcp` keys per service, `mcp.env`, `.mcp.json` |
 | `Compose`, `ComposeContext` | `src/compose.js` | `compose`: docker-compose.yml, env files and config for containers |
 | `LoadTest` | `src/load-test.js` | `load`: fetch loops per route, latency percentiles, errors |
 | `Cli` | `bin/stack.js` | Argument parsing |
@@ -279,11 +281,29 @@ kept in `.release/v<version>.json` (untracked), so a failed step can simply be r
 
 [`mcp/`](mcp/README.md) is one local STDIO [Model Context Protocol](https://modelcontextprotocol.io) server over the generated typed clients: 153 tools, read tools for every service plus safe writes (create, update, enqueue, publish, start an export, render a stored document, create a monitor or a payment intent). Nothing destructive or irreversible is exposed (no delete, purge, refund, cancel, restore, revoke, rotate or key/role change); atc-auth is read-only with secrets filtered; atc-console only answers the status probe. `mcp/tool-policy.mjs` holds the per-service decision with a reason for every excluded write class.
 
+### Configuration is generated
+
+`npm run setup` issues a dedicated `atc-mcp` key on every service that has tools, with the smallest role that covers them (`read` for audit and auth, `admin` for queue, status and backup, `write` for payments, `readwrite` elsewhere; notify and media keys have no roles), and writes two files at the root of this checkout:
+
+- `mcp.env`: `STACK_MCP_<SERVICE>_BASE_URL` for every service and `STACK_MCP_<SERVICE>_API_KEY` for every service with tools.
+- `.mcp.json`: the standard `mcpServers` entry (`command: node`, `args: [--experimental-strip-types, --disable-warning=ExperimentalWarning, <this checkout>/mcp/bin/stack-mcp.js]`, `env` from `mcp.env`).
+
+`npm run mcp:config` re-issues the keys and rewrites both files without a full setup; `-- --read-only` switches every MCP key to `read` (role-less notify and media get no key, and ratelimit's peek check needs more than `read`, so it answers 403), `-- --full` switches back, and the choice is kept by later setups. `-- --print` prints the `.mcp.json` document. A role change edits the service's `.env`: restart it (`npm run up`) before using the MCP server.
+
+> **The two files hold API keys.** They are written owner-only (0600) and ignored by git. Do not commit them, paste them into tickets, or copy them to another machine; run `npm run mcp:config` there instead. Prefer `--read-only` when the agent does not need to write.
+
+### Adding it to a client
+
+Install the server's own dependencies once: `cd mcp && npm install`.
+
+- **Claude Code**, user scope: `claude mcp add-json atc-stack "$(node -e "console.log(JSON.stringify(require('./.mcp.json').mcpServers['atc-stack']))")"` (run in this checkout). For the project scope, Claude Code reads `.mcp.json` from the folder it is started in: start it here, or copy the file to your project root (it stays untracked; keep it out of git there too).
+- **Claude Desktop**: merge the `mcpServers.atc-stack` entry from `.mcp.json` into `claude_desktop_config.json` (macOS `~/Library/Application Support/Claude/`, Windows `%APPDATA%\Claude\`) and restart the app.
+- **Other MCP clients** (Cursor, VS Code, Windsurf, Zed, any SDK client): use the same `command`, `args` and `env` from `.mcp.json` as a STDIO server; most accept the `mcpServers` shape as it is.
+
+Node 22.13+ must be on `PATH` as `node` for the client that starts the server.
+
 ```bash
-cd mcp && npm install
-STACK_MCP_QUEUE_BASE_URL=http://127.0.0.1:3016 STACK_MCP_QUEUE_API_KEY=<key> \
-  node --experimental-strip-types --disable-warning=ExperimentalWarning bin/stack-mcp.js
-npm run mcp:test                         # from atc-stack/: policy, catalog, allowlist and boundary checks
+npm run mcp:test                         # policy, catalog, allowlist and boundary checks
 STACK_INTEGRATION=1 npm run mcp:e2e      # real services and a real MCP client over STDIO
 npm run mcp:catalog                      # regenerate the tools and catalog after a spec or policy change
 ```

@@ -10,6 +10,7 @@ import { SERVICES } from './manifest.js';
 import { SetupContext } from './setup-context.js';
 import { Snapshot } from './snapshot.js';
 import { Installer } from './installer.js';
+import { McpConfig } from './mcp-config.js';
 
 /**
  * One row of {@link Stack#matrix}: reachability plus a defensively-parsed `/v1/info`.
@@ -72,9 +73,30 @@ export class Stack {
     }
     const ctx = new SetupContext({ root: this.root, host, local, run: (id, argv) => this.#run(join(this.root, id), argv), log: this.log });
     await ctx.compute();
+    // The MCP server's own keys, issued with the other keys so every service .env carries them.
+    const mcp = new McpConfig({ stackDir: this.stackDir });
+    const mcpEnv = mcp.issue(ctx, { readOnly: mcp.savedReadOnly() });
     ctx.save((path, text) => { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, text); this.log(`wrote ${path.replace(`${this.root}/`, '')}`); });
+    const files = mcp.write(mcpEnv);
+    this.log(`wrote ${files.envPath} and ${files.jsonPath} (0600; MCP keys)`);
     const admin = await this.#firstAdmin(adminUsername, adminPassword);
     return { services: SERVICES.map((s) => ({ id: s.id, url: ctx.url(s.id) })), admin };
+  }
+
+  /**
+   * Issue (or re-role) the MCP server's keys and rewrite mcp.env and .mcp.json, without a full
+   * setup. Services whose key list changed need a restart (`npm run up`) to accept the new key.
+   * @param {{ host?: string, readOnly?: boolean }} [o] `readOnly` undefined keeps the saved mode.
+   */
+  mcpConfig({ host = '127.0.0.1', readOnly } = {}) {
+    const ctx = new SetupContext({ root: this.root, host, local: true, run: () => { throw new Error('mcp:config runs no commands'); }, log: this.log });
+    const mcp = new McpConfig({ stackDir: this.stackDir });
+    const mode = readOnly ?? mcp.savedReadOnly();
+    const before = new Map(SERVICES.filter((s) => s.keysVar).map((s) => [s.id, ctx.env(s.id).get(/** @type {string} */ (s.keysVar))]));
+    const env = mcp.issue(ctx, { readOnly: mode });
+    const changed = SERVICES.filter((s) => s.keysVar && ctx.env(s.id).get(/** @type {string} */ (s.keysVar)) !== before.get(s.id)).map((s) => s.id);
+    ctx.save((path, text) => { if (changed.some((id) => path === join(this.root, id, '.env'))) writeFileSync(path, text); });
+    return { ...mcp.write(env), readOnly: mode, changed, json: mcp.json(env) };
   }
 
   /**

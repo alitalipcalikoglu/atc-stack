@@ -200,3 +200,41 @@ test('server mode keeps secure defaults and operator URLs', async () => {
   assert.equal(ctx.env('atc-auth').get('NOTIFY_URL'), 'http://10.0.0.5:3001');
   rmSync(root2, { recursive: true, force: true });
 });
+
+test('MCP config: an atc-mcp key per service with tools, smallest role, re-roled for read-only; 0600 mcp.env and .mcp.json', async () => {
+  const { McpConfig } = await import('../src/mcp-config.js');
+  const { Stack } = await import('../src/stack.js');
+  const { statSync } = await import('node:fs');
+  const stackDir = mkdtempSync(join(tmpdir(), 'atc-stack-mcp-'));
+  try {
+    const stack = new Stack({ root, stackDir, log: () => {} });
+    const keyOf = (/** @type {string} */ id) => {
+      const s = /** @type {any} */ (SERVICES.find((x) => x.id === id));
+      const entry = (EnvFile.load(join(root, id, '.env')).get(s.keysVar) ?? '').split(',').find((e) => e.startsWith(`${McpConfig.HOLDER}:`));
+      return entry ? { secret: entry.split(':')[1], role: entry.split(':')[2] ?? '' } : null;
+    };
+    const full = stack.mcpConfig({ readOnly: false });
+    assert.equal(full.readOnly, false);
+    for (const [id, r] of Object.entries(McpConfig.ROLES)) assert.equal(keyOf(id)?.role, r.full ?? '', `${id} full role`);
+    assert.deepEqual([keyOf('atc-queue')?.role, keyOf('atc-status')?.role, keyOf('atc-backup')?.role, keyOf('atc-payments')?.role, keyOf('atc-ratelimit')?.role, keyOf('atc-auth')?.role], ['admin', 'admin', 'admin', 'write', 'readwrite', 'read']);
+    assert.equal(keyOf('atc-console'), null, 'the console issues no MCP key');
+    const env = EnvFile.load(join(stackDir, 'mcp.env')).toObject();
+    assert.deepEqual([env.STACK_MCP_QUEUE_BASE_URL, env.STACK_MCP_QUEUE_API_KEY, env.STACK_MCP_WEBHOOK_OUT_API_KEY, env.STACK_MCP_CONSOLE_BASE_URL, env.STACK_MCP_READ_ONLY], ['http://127.0.0.1:3016', keyOf('atc-queue')?.secret, keyOf('atc-webhook-out')?.secret, 'http://127.0.0.1:3004', 'false']);
+    const json = JSON.parse(readFileSync(join(stackDir, '.mcp.json'), 'utf8'));
+    assert.deepEqual([json.mcpServers['atc-stack'].command, json.mcpServers['atc-stack'].args], ['node', ['--experimental-strip-types', '--disable-warning=ExperimentalWarning', join(stackDir, 'mcp', 'bin', 'stack-mcp.js')]]);
+    assert.deepEqual(json.mcpServers['atc-stack'].env, env);
+    for (const f of ['mcp.env', '.mcp.json']) assert.equal(statSync(join(stackDir, f)).mode & 0o777, 0o600, f);
+    const queueSecret = keyOf('atc-queue')?.secret;
+
+    const ro = stack.mcpConfig({ readOnly: true });
+    assert.ok(ro.changed.includes('atc-queue') && !ro.changed.includes('atc-audit'), 'only re-roled services change');
+    assert.deepEqual([keyOf('atc-queue')?.role, keyOf('atc-queue')?.secret, keyOf('atc-payments')?.role], ['read', queueSecret, 'read'], 'same secret, read role');
+    const roEnv = EnvFile.load(join(stackDir, 'mcp.env')).toObject();
+    assert.deepEqual([roEnv.STACK_MCP_NOTIFY_API_KEY, roEnv.STACK_MCP_MEDIA_API_KEY, roEnv.STACK_MCP_READ_ONLY], [undefined, undefined, 'true'], 'role-less services get no key in read-only mode');
+    assert.equal(stack.mcpConfig().readOnly, true, 'the saved mode is kept');
+    assert.equal(stack.mcpConfig({ readOnly: false }).readOnly, false);
+    assert.equal(keyOf('atc-queue')?.role, 'admin');
+  } finally {
+    rmSync(stackDir, { recursive: true, force: true });
+  }
+});

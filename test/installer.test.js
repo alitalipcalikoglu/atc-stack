@@ -58,6 +58,7 @@ function harness(f, overrides = {}) {
 
 // Repositories that may be missing from the supported release because they were added to the catalog
 // after it; the next release manifest takes them from the catalog (Release.manifest). Empty it after that.
+/** @type {string[]} */
 const UNRELEASED = [];
 
 test('canonical catalog contains exactly the 21 official sibling repositories and the release descriptor covers each released one once', () => {
