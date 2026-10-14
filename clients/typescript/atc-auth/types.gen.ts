@@ -169,7 +169,7 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Update a user's name or status
+         * Update a user's name, email address or status
          * @description Requires an API key with the `write` role. Setting `status: "disabled"` revokes every active session for the user as part of the same transaction.
          */
         patch: operations["atc-auth.users.patch"];
@@ -427,6 +427,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/users/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id. */
+                id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Everything stored about one person (data-subject request)
+         * @description Profile, active sessions and the security events with their addresses; never the password hash.
+         */
+        get: operations["atc-auth.users.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/users/{id}/anonymize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id. */
+                id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Erase the person, keep the account row (irreversible)
+         * @description Requires an API key with the `write` role. The address becomes `anonymized-<id>@anonymized.invalid`, the name, password, sessions and tokens are removed, the account is disabled and the addresses recorded in the user's events are cleared. The id stays, so events and references in other services still resolve.
+         */
+        post: operations["atc-auth.users.anonymize"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/email/change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask to change the email address (confirmation goes to the new address)
+         * @description The user proves the password. A mail with a link goes to the NEW address; nothing changes until it is used. Always `202`, also when the new address is already taken (no hint). `401 INVALID_CREDENTIALS` for a wrong email or password, `400 INVALID_ARGUMENT` when the new address equals the current one.
+         */
+        post: operations["atc-auth.email.change"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/email/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm the new email address with the emailed token
+         * @description The address changes and counts as verified; the old address is told. Single use (`401 INVALID_TOKEN`), `409 EMAIL_TAKEN` if someone took it meanwhile.
+         */
+        post: operations["atc-auth.email.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -533,8 +619,23 @@ export interface components {
         };
         UserPatchRequest: {
             name?: string | null;
+            /**
+             * Format: email
+             * @description Sets the address directly: it becomes unverified and a verification mail goes to it (`409 EMAIL_TAKEN`).
+             */
+            email?: string;
             /** @enum {string} */
             status?: "active" | "disabled";
+        };
+        ChangeEmailRequest: {
+            /**
+             * Format: email
+             * @description Current address.
+             */
+            email: string;
+            password: string;
+            /** Format: email */
+            newEmail: string;
         };
         LoginRequest: {
             email: components["schemas"]["Email"];
@@ -1530,6 +1631,123 @@ export interface operations {
             };
             /** @description UNAUTHORIZED (missing/invalid API key), INVALID_TOKEN (`X-Access-Token` missing, malformed, expired, or its session/account no longer active), or INVALID_CREDENTIALS (`currentPassword` is wrong). */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.users.export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id. */
+                id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        exportedAt: string;
+                        user: Record<string, never>;
+                        sessions: Record<string, never>[];
+                        events: Record<string, never>[];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["UserNotFound"];
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.users.anonymize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id. */
+                id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Anonymized. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["UserNotFound"];
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.email.change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthorized"];
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.email.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenRequest"];
+            };
+        };
+        responses: {
+            /** @description OK. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description EMAIL_TAKEN. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

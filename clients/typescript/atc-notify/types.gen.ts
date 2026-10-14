@@ -262,6 +262,8 @@ export interface components {
         Message: {
             /** Format: uuid */
             id: string;
+            /** @description Id of the API key that created the message (the caller's own key unless it has the `admin` role). */
+            keyId: string;
             /** @enum {string} */
             channel: "email";
             status: components["schemas"]["MessageStatus"];

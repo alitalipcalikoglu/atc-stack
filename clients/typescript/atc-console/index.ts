@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (231 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (235 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -53,9 +53,11 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-audit.events.list": (init: FetchOptions<operations["atc-console.atc-audit.events.list"]>) => client.GET("/api/services/{sid}/atc-audit/events", init),
     "atc-console.atc-audit.stats.get": (init: FetchOptions<operations["atc-console.atc-audit.stats.get"]>) => client.GET("/api/services/{sid}/atc-audit/stats", init),
     "atc-console.atc-auth.jwks.get": (init: FetchOptions<operations["atc-console.atc-auth.jwks.get"]>) => client.GET("/api/services/{sid}/atc-auth/jwks", init),
+    "atc-console.atc-auth.users.anonymize": (init: FetchOptions<operations["atc-console.atc-auth.users.anonymize"]>) => client.POST("/api/services/{sid}/atc-auth/users/{id}/anonymize", init),
     "atc-console.atc-auth.users.create": (init: FetchOptions<operations["atc-console.atc-auth.users.create"]>) => client.POST("/api/services/{sid}/atc-auth/users", init),
     "atc-console.atc-auth.users.delete": (init: FetchOptions<operations["atc-console.atc-auth.users.delete"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}", init),
     "atc-console.atc-auth.users.events": (init: FetchOptions<operations["atc-console.atc-auth.users.events"]>) => client.GET("/api/services/{sid}/atc-auth/users/{id}/events", init),
+    "atc-console.atc-auth.users.export": (init: FetchOptions<operations["atc-console.atc-auth.users.export"]>) => client.GET("/api/services/{sid}/atc-auth/users/{id}/export", init),
     "atc-console.atc-auth.users.get": (init: FetchOptions<operations["atc-console.atc-auth.users.get"]>) => client.GET("/api/services/{sid}/atc-auth/users/{id}", init),
     "atc-console.atc-auth.users.list": (init: FetchOptions<operations["atc-console.atc-auth.users.list"]>) => client.GET("/api/services/{sid}/atc-auth/users", init),
     "atc-console.atc-auth.users.passwordResetEmail": (init: FetchOptions<operations["atc-console.atc-auth.users.passwordResetEmail"]>) => client.POST("/api/services/{sid}/atc-auth/users/{id}/password-reset-email", init),
@@ -149,11 +151,13 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-notify.messages.send": (init: FetchOptions<operations["atc-console.atc-notify.messages.send"]>) => client.POST("/api/services/{sid}/atc-notify/messages", init),
     "atc-console.atc-notify.templates.list": (init: FetchOptions<operations["atc-console.atc-notify.templates.list"]>) => client.GET("/api/services/{sid}/atc-notify/templates", init),
     "atc-console.atc-payments.events.list": (init: FetchOptions<operations["atc-console.atc-payments.events.list"]>) => client.GET("/api/services/{sid}/atc-payments/provider-events", init),
+    "atc-console.atc-payments.payments.anonymize": (init: FetchOptions<operations["atc-console.atc-payments.payments.anonymize"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/anonymize", init),
     "atc-console.atc-payments.payments.cancel": (init: FetchOptions<operations["atc-console.atc-payments.payments.cancel"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/cancel", init),
     "atc-console.atc-payments.payments.get": (init: FetchOptions<operations["atc-console.atc-payments.payments.get"]>) => client.GET("/api/services/{sid}/atc-payments/payments/{id}", init),
     "atc-console.atc-payments.payments.list": (init: FetchOptions<operations["atc-console.atc-payments.payments.list"]>) => client.GET("/api/services/{sid}/atc-payments/payments", init),
     "atc-console.atc-payments.payments.refund": (init: FetchOptions<operations["atc-console.atc-payments.payments.refund"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/refunds", init),
     "atc-console.atc-payments.payments.sync": (init: FetchOptions<operations["atc-console.atc-payments.payments.sync"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/sync", init),
+    "atc-console.atc-payments.reconciliation.run": (init: FetchOptions<operations["atc-console.atc-payments.reconciliation.run"]>) => client.POST("/api/services/{sid}/atc-payments/reconciliation", init),
     "atc-console.atc-payments.stats.get": (init: FetchOptions<operations["atc-console.atc-payments.stats.get"]>) => client.GET("/api/services/{sid}/atc-payments/stats", init),
     "atc-console.atc-queue.messages.delete": (init: FetchOptions<operations["atc-console.atc-queue.messages.delete"]>) => client.DELETE("/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}", init),
     "atc-console.atc-queue.messages.enqueue": (init: FetchOptions<operations["atc-console.atc-queue.messages.enqueue"]>) => client.POST("/api/services/{sid}/atc-queue/queues/{id}/messages", init),

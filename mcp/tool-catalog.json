@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 577,
+  "totalOperations": 587,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -167,6 +167,28 @@
         "READ_SAFE"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-auth",
+      "operationId": "atc-auth.email.change",
+      "method": "POST",
+      "path": "/v1/auth/email/change",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-auth",
+      "operationId": "atc-auth.email.confirm",
+      "method": "POST",
+      "path": "/v1/auth/email/confirm",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -379,6 +401,17 @@
     },
     {
       "service": "atc-auth",
+      "operationId": "atc-auth.users.anonymize",
+      "method": "POST",
+      "path": "/v1/users/{id}/anonymize",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-auth",
       "operationId": "atc-auth.users.create",
       "method": "POST",
       "path": "/v1/users",
@@ -395,6 +428,17 @@
       "path": "/v1/users/{id}",
       "flags": [
         "DESTRUCTIVE",
+        "HIGH_RISK"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-auth",
+      "operationId": "atc-auth.users.export",
+      "method": "GET",
+      "path": "/v1/users/{id}/export",
+      "flags": [
+        "READ_SAFE",
         "HIGH_RISK"
       ],
       "exposed": false
@@ -767,6 +811,18 @@
     },
     {
       "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.anonymize",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/anonymize",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
       "operationId": "atc-console.atc-auth.users.create",
       "method": "POST",
       "path": "/api/services/{sid}/atc-auth/users",
@@ -794,6 +850,18 @@
       "operationId": "atc-console.atc-auth.users.events",
       "method": "GET",
       "path": "/api/services/{sid}/atc-auth/users/{id}/events",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.export",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/export",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -1924,6 +1992,18 @@
     },
     {
       "service": "atc-console",
+      "operationId": "atc-console.atc-payments.payments.anonymize",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/payments/{id}/anonymize",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
       "operationId": "atc-console.atc-payments.payments.cancel",
       "method": "POST",
       "path": "/api/services/{sid}/atc-payments/payments/{id}/cancel",
@@ -1976,6 +2056,18 @@
       "operationId": "atc-console.atc-payments.payments.sync",
       "method": "POST",
       "path": "/api/services/{sid}/atc-payments/payments/{id}/sync",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.reconciliation.run",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/reconciliation",
       "flags": [
         "MUTATION",
         "OPERATOR",
@@ -4673,6 +4765,16 @@
     },
     {
       "service": "atc-payments",
+      "operationId": "atc-payments.payments.anonymize",
+      "method": "POST",
+      "path": "/v1/payments/{id}/anonymize",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-payments",
       "operationId": "atc-payments.payments.cancel",
       "method": "POST",
       "path": "/v1/payments/{id}/cancel",
@@ -4732,6 +4834,16 @@
         "OPERATOR"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.reconciliation.run",
+      "method": "POST",
+      "path": "/v1/reconciliation",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-payments",
@@ -6432,7 +6544,8 @@
           "ops": [
             "atc-auth.users.create",
             "atc-auth.users.patch",
-            "atc-auth.users.delete"
+            "atc-auth.users.delete",
+            "atc-auth.users.anonymize"
           ],
           "reason": "Account changes are identity administration; read-only by decision."
         },
@@ -6443,6 +6556,19 @@
             "atc-auth.logout"
           ],
           "reason": "Revoking sessions signs people out and cannot be undone."
+        },
+        {
+          "ops": [
+            "atc-auth.users.export"
+          ],
+          "reason": "Everything stored about one person (addresses included): a data-subject request for a human."
+        },
+        {
+          "ops": [
+            "atc-auth.email.change",
+            "atc-auth.email.confirm"
+          ],
+          "reason": "End-user flows: the first takes a password, the second a mailed token."
         },
         {
           "ops": [
@@ -6704,6 +6830,18 @@
             "atc-payments.payments.cancel"
           ],
           "reason": "Moves or stops real money; irreversible."
+        },
+        {
+          "ops": [
+            "atc-payments.payments.anonymize"
+          ],
+          "reason": "Erases customer data here and at Stripe; irreversible."
+        },
+        {
+          "ops": [
+            "atc-payments.reconciliation.run"
+          ],
+          "reason": "Reads Stripe once per payment and can repair (write); a deliberate operator action."
         },
         {
           "ops": [

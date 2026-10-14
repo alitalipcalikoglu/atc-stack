@@ -182,6 +182,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/payments/{id}/anonymize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PaymentParam"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Remove the person from a payment (write; irreversible)
+         * @description Clears customer e-mail, description and metadata here and at Stripe (receipt e-mail, description, metadata keys). Amounts, status and the ledger stay. Stripe is called first; a provider failure changes nothing.
+         */
+        post: operations["atc-payments.payments.anonymize"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Compare payments created in a window with Stripe (write)
+         * @description Reads each payment (at most 200, oldest first) from Stripe and lists those whose status or refunded amount differ. With `repair`, every differing payment is synced.
+         */
+        post: operations["atc-payments.reconciliation.run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/payments/{id}/sync": {
         parameters: {
             query?: never;
@@ -639,6 +681,20 @@ export interface operations {
         parameters: {
             query?: {
                 status?: components["schemas"]["Status"];
+                /** @description Customer e-mail address */
+                email?: string;
+                currency?: string;
+                /** @description Minor units */
+                minAmount?: string;
+                /** @description Minor units */
+                maxAmount?: string;
+                /** @description Created at or after. */
+                from?: string;
+                /** @description Created before. */
+                to?: string;
+                /** @description With metaValue */
+                metaKey?: string;
+                metaValue?: string;
                 /** @description 1-100, default 50. */
                 limit?: string;
                 /** @description `nextCursor` of the previous page. */
@@ -767,6 +823,79 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderError"];
+            503: components["responses"]["Disabled"];
+        };
+    };
+    "atc-payments.payments.anonymize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PaymentParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The payment after clearing. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            502: components["responses"]["ProviderError"];
+            503: components["responses"]["Disabled"];
+        };
+    };
+    "atc-payments.reconciliation.run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date-time */
+                    from: string;
+                    /** Format: date-time */
+                    to: string;
+                    /** @default false */
+                    repair?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        checked: number;
+                        /** @description More payments than the 200 checked lie in the window. */
+                        truncated: boolean;
+                        mismatches: {
+                            id?: string;
+                            local?: Record<string, never>;
+                            provider?: Record<string, never>;
+                        }[];
+                        repaired: number;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             502: components["responses"]["ProviderError"];
             503: components["responses"]["Disabled"];
         };

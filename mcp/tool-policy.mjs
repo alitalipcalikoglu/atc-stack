@@ -28,8 +28,10 @@ export const POLICY = {
   'atc-auth': {
     tools: ['atc-auth.users.list', 'atc-auth.users.get', 'atc-auth.sessions.list', 'atc-auth.events.list'],
     excluded: [
-      { ops: ['atc-auth.users.create', 'atc-auth.users.patch', 'atc-auth.users.delete'], reason: 'Account changes are identity administration; read-only by decision.' },
+      { ops: ['atc-auth.users.create', 'atc-auth.users.patch', 'atc-auth.users.delete', 'atc-auth.users.anonymize'], reason: 'Account changes are identity administration; read-only by decision.' },
       { ops: ['atc-auth.sessions.revokeAll', 'atc-auth.sessions.revokeOne', 'atc-auth.logout'], reason: 'Revoking sessions signs people out and cannot be undone.' },
+      { ops: ['atc-auth.users.export'], reason: 'Everything stored about one person (addresses included): a data-subject request for a human.' },
+      { ops: ['atc-auth.email.change', 'atc-auth.email.confirm'], reason: 'End-user flows: the first takes a password, the second a mailed token.' },
       { ops: ['atc-auth.login', 'atc-auth.refresh', 'atc-auth.introspect'], reason: 'End-user credential flows: they take passwords or tokens and mint secrets.' },
       { ops: ['atc-auth.password.change', 'atc-auth.password.forgot', 'atc-auth.password.reset', 'atc-auth.emailVerification.resend', 'atc-auth.emailVerification.verify'], reason: 'Password and verification flows act for an end user and send mail; forgot/resend must stay enumeration-resistant.' },
     ],
@@ -87,6 +89,8 @@ export const POLICY = {
     tools: ['atc-payments.payments.list', 'atc-payments.payments.get', 'atc-payments.ledger.list', 'atc-payments.events.list', 'atc-payments.stats.get', 'atc-payments.payments.create', 'atc-payments.payments.sync'],
     excluded: [
       { ops: ['atc-payments.refunds.create', 'atc-payments.payments.cancel'], reason: 'Moves or stops real money; irreversible.' },
+      { ops: ['atc-payments.payments.anonymize'], reason: 'Erases customer data here and at Stripe; irreversible.' },
+      { ops: ['atc-payments.reconciliation.run'], reason: 'Reads Stripe once per payment and can repair (write); a deliberate operator action.' },
       { ops: ['atc-payments.webhooks.stripe'], reason: 'Stripe-only endpoint authenticated by its signature.' },
     ],
   },

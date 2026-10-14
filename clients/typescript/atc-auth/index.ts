@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-auth's openapi.yaml (24 total).
+ * One operationId-keyed method per operation in atc-auth's openapi.yaml (28 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -39,6 +39,8 @@ export function createClient(config: ClientConfig) {
     credentials: config.credentials,
   });
   return {
+    "atc-auth.email.change": (init: FetchOptions<operations["atc-auth.email.change"]>) => client.POST("/v1/auth/email/change", init),
+    "atc-auth.email.confirm": (init: FetchOptions<operations["atc-auth.email.confirm"]>) => client.POST("/v1/auth/email/confirm", init),
     "atc-auth.emailVerification.resend": (init: FetchOptions<operations["atc-auth.emailVerification.resend"]>) => client.POST("/v1/auth/verify-email/resend", init),
     "atc-auth.emailVerification.verify": (init: FetchOptions<operations["atc-auth.emailVerification.verify"]>) => client.POST("/v1/auth/verify-email", init),
     "atc-auth.events.list": (init: FetchOptions<operations["atc-auth.events.list"]>) => client.GET("/v1/users/{id}/events", init),
@@ -58,8 +60,10 @@ export function createClient(config: ClientConfig) {
     "atc-auth.sessions.list": (init: FetchOptions<operations["atc-auth.sessions.list"]>) => client.GET("/v1/users/{id}/sessions", init),
     "atc-auth.sessions.revokeAll": (init: FetchOptions<operations["atc-auth.sessions.revokeAll"]>) => client.DELETE("/v1/users/{id}/sessions", init),
     "atc-auth.sessions.revokeOne": (init: FetchOptions<operations["atc-auth.sessions.revokeOne"]>) => client.DELETE("/v1/users/{id}/sessions/{sid}", init),
+    "atc-auth.users.anonymize": (init: FetchOptions<operations["atc-auth.users.anonymize"]>) => client.POST("/v1/users/{id}/anonymize", init),
     "atc-auth.users.create": (init: FetchOptions<operations["atc-auth.users.create"]>) => client.POST("/v1/users", init),
     "atc-auth.users.delete": (init: FetchOptions<operations["atc-auth.users.delete"]>) => client.DELETE("/v1/users/{id}", init),
+    "atc-auth.users.export": (init: FetchOptions<operations["atc-auth.users.export"]>) => client.GET("/v1/users/{id}/export", init),
     "atc-auth.users.get": (init: FetchOptions<operations["atc-auth.users.get"]>) => client.GET("/v1/users/{id}", init),
     "atc-auth.users.list": (init: FetchOptions<operations["atc-auth.users.list"]>) => client.GET("/v1/users", init),
     "atc-auth.users.patch": (init: FetchOptions<operations["atc-auth.users.patch"]>) => client.PATCH("/v1/users/{id}", init),
