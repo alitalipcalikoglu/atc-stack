@@ -64,12 +64,12 @@ test('projectState rewrite is idempotent on the current file and moves every rel
 
 test('evidence carries the matrix, tests and install results', () => {
   const tags = { 'atc-stack': { tagObject: 'a', commit: 'b' }, 'atc-service-core': { tagObject: 'c', commit: 'd' } };
-  const state = { version: '9.9.9', previous: '9.9.8', tests: { 'atc-stack': 1 }, steps: { docker: 17, candidateInstall: { readiness: '17/17' }, defaultInstall: { readiness: '17/17' } } };
+  const state = { version: '9.9.9', previous: '9.9.8', tests: { 'atc-stack': 1 }, steps: { docker: 18, candidateInstall: { readiness: '18/18' }, defaultInstall: { readiness: '18/18' } } };
   const evidence = Release.evidence(state, tags, '2030-01-01');
   assert.deepEqual(evidence.releaseMatrix.map((e) => e.repo), ['atc-service-core', 'atc-stack']);
   assert.equal(evidence.publication.stackTagCommit, 'b');
   assert.equal(evidence.supersedes, '9.9.8');
-  assert.match(evidence.tests.docker, /^17\/17 /);
+  assert.match(evidence.tests.docker, /^18\/18 /);
 });
 
 test('prepare refuses to start without release notes or on a dirty workspace, and never pushes then', async () => {

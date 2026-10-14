@@ -9,13 +9,13 @@ import { parse as parseYaml } from 'yaml';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(HERE, '..', '..', '..');
-const SERVICES = ['atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink', 'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue'];
+const SERVICES = ['atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink', 'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue', 'atc-backup'];
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
 /** @typedef {{ service: string, operationId: string, method: string, path: string, flags: string[], exposedInPhase3: boolean }} CatalogEntry */
 /** @type {{ totalOperations: number, entries: CatalogEntry[] }} */
 const catalog = JSON.parse(await readFile(path.join(HERE, '..', 'tool-catalog.json'), 'utf8'));
 
-test('catalog accounts for every canonical operation, with the expected total derived from the 17 specs', async () => {
+test('catalog accounts for every canonical operation, with the expected total derived from the 18 specs', async () => {
   let expected = 0;
   for (const service of SERVICES) {
     const spec = parseYaml(await readFile(path.join(WORKSPACE_ROOT, service, 'openapi.yaml'), 'utf8'));

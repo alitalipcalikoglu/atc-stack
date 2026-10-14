@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 498,
+  "totalOperations": 522,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -433,6 +433,160 @@
       "exposedInPhase3": false
     },
     {
+      "service": "atc-backup",
+      "operationId": "atc-backup.backups.delete",
+      "method": "DELETE",
+      "path": "/v1/backups/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.backups.download",
+      "method": "GET",
+      "path": "/v1/backups/{id}/download",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.backups.get",
+      "method": "GET",
+      "path": "/v1/backups/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.backups.list",
+      "method": "GET",
+      "path": "/v1/backups",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.backups.restore",
+      "method": "POST",
+      "path": "/v1/backups/{id}/restore",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.backups.verify",
+      "method": "POST",
+      "path": "/v1/backups/{id}/verify",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.sources.backup",
+      "method": "POST",
+      "path": "/v1/sources/{id}/backups",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.sources.get",
+      "method": "GET",
+      "path": "/v1/sources/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.sources.list",
+      "method": "GET",
+      "path": "/v1/sources",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-backup",
+      "operationId": "atc-backup.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
       "service": "atc-console",
       "operationId": "atc-console.activity.list",
       "method": "GET",
@@ -718,6 +872,114 @@
       "path": "/api/services/{sid}/atc-auth/users/{id}",
       "flags": [
         "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-backup/backups/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.file",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-backup/backups/{id}/file",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-backup/backups/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-backup/backups",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.restore",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-backup/backups/{id}/restore",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.verify",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-backup/backups/{id}/verify",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.sources.backup",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-backup/sources/{id}/backups",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.sources.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-backup/sources",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-backup/stats",
+      "flags": [
+        "READ_SAFE",
         "OPERATOR",
         "POOR_MCP_FIT"
       ],

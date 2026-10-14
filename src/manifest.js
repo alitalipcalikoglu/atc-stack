@@ -33,10 +33,17 @@
 const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_KEY: String(c.issue('atc-audit', id, 'write')) });
 
 /**
- * Media must accept export files: append the text data types to whatever the operator allows.
+ * Media must accept export files and database backups: append those types to whatever the operator allows.
  * @param {string} list
  */
-const withExportTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson'])].join(',');
+const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3'])].join(',');
+
+/** Each service's SQLite file under its folder (its DB_PATH default); atc-backup reads them in place. */
+const DATA_FILES = {
+  'atc-notify': 'notify.db', 'atc-auth': 'auth.db', 'atc-media': 'media.db', 'atc-audit': 'audit.db', 'atc-shortlink': 'shortlink.db', 'atc-flags': 'flags.db',
+  'atc-scheduler': 'scheduler.db', 'atc-webhook-out': 'webhook-out.db', 'atc-search': 'search.db', 'atc-ratelimit': 'ratelimit.db', 'atc-geo': 'geo.db',
+  'atc-content': 'content.db', 'atc-export': 'export.db', 'atc-render': 'render.db', 'atc-queue': 'queue.db', 'atc-console': 'console.db',
+};
 
 /** @type {Service[]} */
 export const SERVICES = [
@@ -60,7 +67,7 @@ export const SERVICES = [
     id: 'atc-media', port: 3003, keysVar: 'MEDIA_API_KEYS',
     env: (c) => ({
       ...auditEnv(c, 'atc-media'), PUBLIC_BASE_URL: c.publicUrl('atc-media'), SIGNING_SECRET: c.secret('atc-media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('atc-media', 'CORS_ORIGINS', c.url('atc-gateway')),
-      ALLOWED_TYPES: withExportTypes(c.keep('atc-media', 'ALLOWED_TYPES', 'image/jpeg,image/png,image/webp,image/gif,image/avif,application/pdf')),
+      ALLOWED_TYPES: withDataTypes(c.keep('atc-media', 'ALLOWED_TYPES', 'image/jpeg,image/png,image/webp,image/gif,image/avif,application/pdf')),
     }),
     console: { type: 'atc-media', label: 'Media', keyEnv: 'MEDIA_API_KEY' },
   },
@@ -145,6 +152,17 @@ export const SERVICES = [
     console: { type: 'atc-queue', label: 'Queues', keyEnv: 'QUEUE_API_KEY' },
   },
   {
+    id: 'atc-backup', port: 3017, keysVar: 'BACKUP_API_KEYS',
+    env: (c) => ({
+      ...auditEnv(c, 'atc-backup'),
+      BACKUP_SOURCES: Object.entries(DATA_FILES).map(([id, file]) => `${id}=../${id}/data/${file}`).join(','),
+      // Off-host copies: every successful backup also goes to media as a private file.
+      MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-backup'),
+      ALLOW_LIVE_RESTORE: c.keep('atc-backup', 'ALLOW_LIVE_RESTORE', 'false'),
+    }),
+    console: { type: 'atc-backup', label: 'Backups', keyEnv: 'BACKUP_API_KEY' },
+  },
+  {
     id: 'atc-gateway', port: 3000,
     env: (c) => ({
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
@@ -176,4 +194,5 @@ export const SERVICES = [
 export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({
   'atc-audit': 'readwrite', // reads events and forwards its own log
   'atc-queue': 'admin', // manages queues, purges and redrives dead letters
+  'atc-backup': 'admin', // runs, downloads, verifies, restores and deletes backups
 });

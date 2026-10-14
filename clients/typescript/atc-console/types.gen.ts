@@ -78,7 +78,7 @@ export interface paths {
         };
         /**
          * Service identity and capabilities.
-         * @description The one operational route console takes from the shared `registerInfo` helper, so its shape is identical across all 17 services.
+         * @description The one operational route console takes from the shared `registerInfo` helper, so its shape is identical across all 18 services.
          */
         get: operations["atc-console.info.get"];
         put?: never;
@@ -3936,6 +3936,198 @@ export interface paths {
          *     Recorded in console's own activity log (`GET /api/audit`).
          */
         delete: operations["atc-console.atc-queue.messages.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Backup totals, failing and stale sources.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `GET /v1/stats`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-backup.stats.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sources with their newest backup.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `GET /v1/sources`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-backup.sources.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/sources/{id}/backups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Back up a source now.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `POST /v1/sources/{id}/backups`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-backup.sources.backup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/backups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Backups, newest first.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `GET /v1/backups`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-backup.backups.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/backups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One backup.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `GET /v1/backups/{id}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-backup.backups.get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a backup and its file.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `DELETE /v1/backups/{id}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        delete: operations["atc-console.atc-backup.backups.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/backups/{id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Re-check a backup's checksum and integrity.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `POST /v1/backups/{id}/verify`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-backup.backups.verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/backups/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a backup to a file or over the live database.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `POST /v1/backups/{id}/restore`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-backup.backups.restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-backup/backups/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the backup file through the console.
+         * @description Typed pass-through to the **backup** service instance named by `sid` — console relays this to its `GET /v1/backups/{id}/download`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        get: operations["atc-console.atc-backup.backups.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -11831,6 +12023,300 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.stats.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the backup service's own `GET /v1/stats` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.sources.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the backup service's own `GET /v1/sources` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.sources.backup": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the backup service's own `POST /v1/sources/{id}/backups` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.backups.list": {
+        parameters: {
+            query?: {
+                source?: string;
+                status?: "running" | "ok" | "failed";
+                limit?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the backup service's own `GET /v1/backups` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.backups.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the backup service's own `GET /v1/backups/{id}` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.backups.delete": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done. console discards backup's response body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.backups.verify": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the backup service's own `POST /v1/backups/{id}/verify` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.backups.restore": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    target?: string;
+                    overwrite?: boolean;
+                    live?: boolean;
+                    confirm?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the backup service's own `POST /v1/backups/{id}/restore` response body, relayed unchanged. See the backup service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-backup.backups.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The backup file, streamed from the backup service as an attachment with `cache-control: no-store`, `content-security-policy: default-src 'none'; sandbox` and the service's `X-Checksum-SHA256`. */
+            200: {
+                headers: {
+                    "X-Checksum-SHA256"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.sqlite3": string;
+                };
             };
             400: components["responses"]["ValidationFailed"];
             401: components["responses"]["Unauthenticated"];

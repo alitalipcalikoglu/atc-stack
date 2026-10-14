@@ -1,0 +1,20 @@
+{
+  "service": "atc-backup",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/sources" },
+    { "method": "GET", "path": "/v1/sources/{id}" },
+    { "method": "POST", "path": "/v1/sources/{id}/backups" },
+    { "method": "GET", "path": "/v1/backups" },
+    { "method": "GET", "path": "/v1/backups/{id}" },
+    { "method": "DELETE", "path": "/v1/backups/{id}" },
+    { "method": "GET", "path": "/v1/backups/{id}/download" },
+    { "method": "POST", "path": "/v1/backups/{id}/verify" },
+    { "method": "POST", "path": "/v1/backups/{id}/restore" },
+    { "method": "GET", "path": "/v1/stats" }
+  ]
+}
