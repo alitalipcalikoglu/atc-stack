@@ -262,7 +262,9 @@ test('MCP config: an atc-mcp key per service with tools, smallest role, re-roled
 
 test('keys: list shows holders and roles without secrets; rotate replaces one key on both sides and nothing else', async () => {
   const { Stack } = await import('../src/stack.js');
-  const stack = new Stack({ root, stackDir: mkdtempSync(join(tmpdir(), 'atc-stack-keys-')), log: () => {}, exec: async () => ({ code: 0, out: '' }) });
+  const keysDir = mkdtempSync(join(tmpdir(), 'atc-stack-keys-'));
+  writeFileSync(join(keysDir, 'mcp.env'), 'STACK_MCP_READ_ONLY=false\n'); // the workspace was set up with full MCP keys; a fresh stack dir would default to read-only
+  const stack = new Stack({ root, stackDir: keysDir, log: () => {}, exec: async () => ({ code: 0, out: '' }) });
   const list = stack.listKeys();
   assert.ok(list.some((k) => k.issuer === 'atc-media' && k.holder === 'atc-gateway'));
   assert.equal(JSON.stringify(list).match(/[0-9a-f]{64}/), null, 'no secrets in the listing');

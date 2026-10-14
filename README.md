@@ -295,14 +295,14 @@ kept in `.release/v<version>.json` (untracked), so a failed step can simply be r
 
 ### Configuration is generated
 
-`npm run setup` issues a dedicated `atc-mcp` key on every service that has tools, with the smallest role that covers them (`read` for audit and auth, `admin` for queue, status and backup, `write` for payments, `readwrite` elsewhere; notify and media keys have no roles), and writes two files at the root of this checkout:
+`npm run setup` issues a dedicated `atc-mcp` key on every service that has tools. A first setup is **read-only**: every key is a `read` key, and write access is an explicit `npm run mcp:config -- --full`. The full roles are the smallest that cover the tools (`read` for audit and auth, `admin` for queue, status and backup, `write` for payments, `readwrite` elsewhere; notify and media keys have no roles), and writes two files at the root of this checkout:
 
 - `mcp.env`: `STACK_MCP_<SERVICE>_BASE_URL` for every service and `STACK_MCP_<SERVICE>_API_KEY` for every service with tools.
 - `.mcp.json`: the standard `mcpServers` entry (`command: node`, `args: [--experimental-strip-types, --disable-warning=ExperimentalWarning, <this checkout>/mcp/bin/stack-mcp.js]`, `env` from `mcp.env`).
 
-`npm run mcp:config` re-issues the keys and rewrites both files without a full setup; `-- --read-only` switches every MCP key to `read` (role-less notify and media get no key, and ratelimit's peek check needs more than `read`, so it answers 403), `-- --full` switches back, and the choice is kept by later setups. `-- --print` prints the `.mcp.json` document. A role change edits the service's `.env`: restart it (`npm run up`) before using the MCP server.
+`npm run mcp:config` re-issues the keys and rewrites both files without a full setup; `-- --read-only` switches every MCP key to `read` (role-less notify and media get no key, and ratelimit's peek check needs more than `read`, so it answers 403; this is the default of a first setup), `-- --full` gives the write roles, and the choice is kept by later setups. `-- --print` prints the `.mcp.json` document. A role change edits the service's `.env`: restart it (`npm run up`) before using the MCP server.
 
-> **The two files hold API keys.** They are written owner-only (0600) and ignored by git. Do not commit them, paste them into tickets, or copy them to another machine; run `npm run mcp:config` there instead. Prefer `--read-only` when the agent does not need to write.
+> **The two files hold API keys.** They are written owner-only (0600) and ignored by git. Do not commit them, paste them into tickets, or copy them to another machine; run `npm run mcp:config` there instead. Keep the default read-only mode unless the agent needs to write.
 
 ### Adding it to a client
 

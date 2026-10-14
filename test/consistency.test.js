@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -35,5 +36,17 @@ test('consistency: error bodies are { error: { code, message } } in every servic
     const m = /^    (Error[A-Za-z]*):.*\n?((?:      .*\n)*)/m.exec(spec);
     assert.ok(m, `${s.id}: no Error schema in components`);
     assert.ok(/\bcode\b/.test(m[0]) && /\bmessage\b/.test(m[0]) && /\berror\b/.test(m[0]), `${s.id}: the ${m[1]} schema must describe { error: { code, message } }`);
+  }
+});
+
+test('mcp config: a first setup is read-only, a saved full mode stays full', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'atc-mcp-default-'));
+  try {
+    const mcp = new McpConfig({ stackDir: dir });
+    assert.equal(mcp.savedReadOnly(), true);
+    writeFileSync(mcp.envPath, 'STACK_MCP_READ_ONLY=false\n');
+    assert.equal(mcp.savedReadOnly(), false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });

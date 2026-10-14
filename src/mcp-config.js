@@ -50,9 +50,10 @@ export class McpConfig {
   get envPath() { return join(this.stackDir, McpConfig.ENV_FILE); }
   get jsonPath() { return join(this.stackDir, McpConfig.JSON_FILE); }
 
-  /** The mode chosen last time (kept by setup), from the existing mcp.env. */
+  /** The mode chosen last time (kept by setup), from the existing mcp.env. A first setup is read-only: write access is an explicit `--full`. */
   savedReadOnly() {
-    return existsSync(this.envPath) && /^STACK_MCP_READ_ONLY=true$/m.test(readFileSync(this.envPath, 'utf8'));
+    if (!existsSync(this.envPath)) return true;
+    return /^STACK_MCP_READ_ONLY=true$/m.test(readFileSync(this.envPath, 'utf8'));
   }
 
   /** @param {string} id */
