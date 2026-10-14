@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 376,
+  "totalOperations": 418,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -716,6 +716,222 @@
       "operationId": "atc-console.atc-auth.users.update",
       "method": "PATCH",
       "path": "/api/services/{sid}/atc-auth/users/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.keys.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/keys/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.keys.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/keys/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.keys.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/keys",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.keys.upsert",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/keys/{sub}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.locales.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/locales/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.locales.upsert",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/locales/{sub}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.namespaces.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-content/namespaces",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.namespaces.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.namespaces.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.namespaces.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.namespaces.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.releases.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/releases/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.releases.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/releases",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.releases.publish",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/publish",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.releases.rollback",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/rollback",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.translations.export",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/export/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-content.translations.import",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/import",
       "flags": [
         "MUTATION",
         "OPERATOR",
@@ -2308,6 +2524,250 @@
         "MUTATION",
         "OPERATOR",
         "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.bundles.get",
+      "method": "GET",
+      "path": "/v1/bundles/{ns}/{locale}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.keys.delete",
+      "method": "DELETE",
+      "path": "/v1/namespaces/{ns}/keys/{key}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.keys.get",
+      "method": "GET",
+      "path": "/v1/namespaces/{ns}/keys/{key}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.keys.list",
+      "method": "GET",
+      "path": "/v1/namespaces/{ns}/keys",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.keys.upsert",
+      "method": "PUT",
+      "path": "/v1/namespaces/{ns}/keys/{key}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.locales.delete",
+      "method": "DELETE",
+      "path": "/v1/namespaces/{ns}/locales/{locale}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.locales.upsert",
+      "method": "PUT",
+      "path": "/v1/namespaces/{ns}/locales/{locale}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.namespaces.create",
+      "method": "POST",
+      "path": "/v1/namespaces",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.namespaces.delete",
+      "method": "DELETE",
+      "path": "/v1/namespaces/{ns}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.namespaces.get",
+      "method": "GET",
+      "path": "/v1/namespaces/{ns}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.namespaces.list",
+      "method": "GET",
+      "path": "/v1/namespaces",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.namespaces.update",
+      "method": "PATCH",
+      "path": "/v1/namespaces/{ns}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.releases.get",
+      "method": "GET",
+      "path": "/v1/namespaces/{ns}/releases/{number}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.releases.list",
+      "method": "GET",
+      "path": "/v1/namespaces/{ns}/releases",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.releases.publish",
+      "method": "POST",
+      "path": "/v1/namespaces/{ns}/publish",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.releases.rollback",
+      "method": "POST",
+      "path": "/v1/namespaces/{ns}/rollback",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.translations.export",
+      "method": "GET",
+      "path": "/v1/namespaces/{ns}/export/{locale}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-content",
+      "operationId": "atc-content.translations.import",
+      "method": "POST",
+      "path": "/v1/namespaces/{ns}/import",
+      "flags": [
+        "MUTATION"
       ],
       "exposedInPhase3": false
     },

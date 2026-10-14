@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (156 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (174 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -63,6 +63,24 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-auth.users.revokeAllSessions": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeAllSessions"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions", init),
     "atc-console.atc-auth.users.revokeSession": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeSession"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions/{sub}", init),
     "atc-console.atc-auth.users.update": (init: FetchOptions<operations["atc-console.atc-auth.users.update"]>) => client.PATCH("/api/services/{sid}/atc-auth/users/{id}", init),
+    "atc-console.atc-content.keys.delete": (init: FetchOptions<operations["atc-console.atc-content.keys.delete"]>) => client.DELETE("/api/services/{sid}/atc-content/namespaces/{id}/keys/{sub}", init),
+    "atc-console.atc-content.keys.get": (init: FetchOptions<operations["atc-console.atc-content.keys.get"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/keys/{sub}", init),
+    "atc-console.atc-content.keys.list": (init: FetchOptions<operations["atc-console.atc-content.keys.list"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/keys", init),
+    "atc-console.atc-content.keys.upsert": (init: FetchOptions<operations["atc-console.atc-content.keys.upsert"]>) => client.PUT("/api/services/{sid}/atc-content/namespaces/{id}/keys/{sub}", init),
+    "atc-console.atc-content.locales.delete": (init: FetchOptions<operations["atc-console.atc-content.locales.delete"]>) => client.DELETE("/api/services/{sid}/atc-content/namespaces/{id}/locales/{sub}", init),
+    "atc-console.atc-content.locales.upsert": (init: FetchOptions<operations["atc-console.atc-content.locales.upsert"]>) => client.PUT("/api/services/{sid}/atc-content/namespaces/{id}/locales/{sub}", init),
+    "atc-console.atc-content.namespaces.create": (init: FetchOptions<operations["atc-console.atc-content.namespaces.create"]>) => client.POST("/api/services/{sid}/atc-content/namespaces", init),
+    "atc-console.atc-content.namespaces.delete": (init: FetchOptions<operations["atc-console.atc-content.namespaces.delete"]>) => client.DELETE("/api/services/{sid}/atc-content/namespaces/{id}", init),
+    "atc-console.atc-content.namespaces.get": (init: FetchOptions<operations["atc-console.atc-content.namespaces.get"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}", init),
+    "atc-console.atc-content.namespaces.list": (init: FetchOptions<operations["atc-console.atc-content.namespaces.list"]>) => client.GET("/api/services/{sid}/atc-content/namespaces", init),
+    "atc-console.atc-content.namespaces.update": (init: FetchOptions<operations["atc-console.atc-content.namespaces.update"]>) => client.PATCH("/api/services/{sid}/atc-content/namespaces/{id}", init),
+    "atc-console.atc-content.releases.get": (init: FetchOptions<operations["atc-console.atc-content.releases.get"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/releases/{sub}", init),
+    "atc-console.atc-content.releases.list": (init: FetchOptions<operations["atc-console.atc-content.releases.list"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/releases", init),
+    "atc-console.atc-content.releases.publish": (init: FetchOptions<operations["atc-console.atc-content.releases.publish"]>) => client.POST("/api/services/{sid}/atc-content/namespaces/{id}/publish", init),
+    "atc-console.atc-content.releases.rollback": (init: FetchOptions<operations["atc-console.atc-content.releases.rollback"]>) => client.POST("/api/services/{sid}/atc-content/namespaces/{id}/rollback", init),
+    "atc-console.atc-content.stats.get": (init: FetchOptions<operations["atc-console.atc-content.stats.get"]>) => client.GET("/api/services/{sid}/atc-content/stats", init),
+    "atc-console.atc-content.translations.export": (init: FetchOptions<operations["atc-console.atc-content.translations.export"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/export/{sub}", init),
+    "atc-console.atc-content.translations.import": (init: FetchOptions<operations["atc-console.atc-content.translations.import"]>) => client.POST("/api/services/{sid}/atc-content/namespaces/{id}/import", init),
     "atc-console.atc-flags.environments.list": (init: FetchOptions<operations["atc-console.atc-flags.environments.list"]>) => client.GET("/api/services/{sid}/atc-flags/environments", init),
     "atc-console.atc-flags.envs.copy": (init: FetchOptions<operations["atc-console.atc-flags.envs.copy"]>) => client.POST("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}/copy", init),
     "atc-console.atc-flags.envs.update": (init: FetchOptions<operations["atc-console.atc-flags.envs.update"]>) => client.PATCH("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}", init),
