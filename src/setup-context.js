@@ -136,7 +136,7 @@ export class SetupContext {
   consoleServicesJson() {
     return {
       services: this.consoleServices().map((s) => {
-        const c = /** @type {NonNullable<import('./manifest.js').Service['atc-console']>} */ (s.console);
+        const c = /** @type {NonNullable<import('./manifest.js').Service['console']>} */ (s.console);
         return { id: s.id, type: c.type, label: c.label, url: this.url(s.id), ...(c.keyEnv ? { apiKeyEnv: c.keyEnv } : {}), ...(c.metricsTokenEnv ? { metricsTokenEnv: c.metricsTokenEnv } : {}), ...(c.polling ? { polling: c.polling } : {}) };
       }),
     };
