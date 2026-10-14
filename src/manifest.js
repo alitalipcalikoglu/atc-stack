@@ -247,6 +247,7 @@ export const SERVICES = [
 /** Roles the console's key needs per service; everything else gets the issuer's default role. */
 export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({
   'atc-audit': 'readwrite', // reads events and forwards its own log
+  'atc-notify': 'admin', // sees the messages every other service sent, and retries them
   'atc-queue': 'admin', // manages queues, purges and redrives dead letters
   'atc-backup': 'admin', // runs, downloads, verifies, restores and deletes backups
   'atc-status': 'admin', // creates, changes, checks and deletes monitors

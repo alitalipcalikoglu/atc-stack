@@ -68,6 +68,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.equal(env('atc-console').FLAGS_API_KEY, keys('atc-flags', 'FLAGS_API_KEYS')['atc-console'].secret);
   assert.equal(keys('atc-audit', 'AUDIT_API_KEYS')['atc-console'].role, 'readwrite');
   assert.equal(env('atc-console').AUDIT_API_KEY, keys('atc-audit', 'AUDIT_API_KEYS')['atc-console'].secret);
+  assert.equal(keys('atc-notify', 'NOTIFY_API_KEYS')['atc-console'].role, 'admin', 'the console sees every sender\'s messages');
   assert.equal(env('atc-audit').ANCHOR_PRIVATE_KEY_PATH, './keys/anchor-private.pem', 'chain anchors are on by default');
   assert.equal(env('atc-console').WEBHOOK_OUT_API_KEY, keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-console'].secret);
   assert.equal(env('atc-console').SEARCH_API_KEY, keys('atc-search', 'SEARCH_API_KEYS')['atc-console'].secret);
