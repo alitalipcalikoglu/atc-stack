@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (228 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (231 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -64,6 +64,7 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-auth.users.revokeSession": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeSession"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions/{sub}", init),
     "atc-console.atc-auth.users.update": (init: FetchOptions<operations["atc-console.atc-auth.users.update"]>) => client.PATCH("/api/services/{sid}/atc-auth/users/{id}", init),
     "atc-console.atc-backup.backups.delete": (init: FetchOptions<operations["atc-console.atc-backup.backups.delete"]>) => client.DELETE("/api/services/{sid}/atc-backup/backups/{id}", init),
+    "atc-console.atc-backup.backups.drill": (init: FetchOptions<operations["atc-console.atc-backup.backups.drill"]>) => client.POST("/api/services/{sid}/atc-backup/backups/{id}/drill", init),
     "atc-console.atc-backup.backups.file": (init: FetchOptions<operations["atc-console.atc-backup.backups.file"]>) => client.GET("/api/services/{sid}/atc-backup/backups/{id}/file", init),
     "atc-console.atc-backup.backups.get": (init: FetchOptions<operations["atc-console.atc-backup.backups.get"]>) => client.GET("/api/services/{sid}/atc-backup/backups/{id}", init),
     "atc-console.atc-backup.backups.list": (init: FetchOptions<operations["atc-console.atc-backup.backups.list"]>) => client.GET("/api/services/{sid}/atc-backup/backups", init),
@@ -222,6 +223,8 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-shortlink.links.stats": (init: FetchOptions<operations["atc-console.atc-shortlink.links.stats"]>) => client.GET("/api/services/{sid}/atc-shortlink/links/{id}/stats", init),
     "atc-console.atc-shortlink.links.update": (init: FetchOptions<operations["atc-console.atc-shortlink.links.update"]>) => client.PATCH("/api/services/{sid}/atc-shortlink/links/{id}", init),
     "atc-console.atc-shortlink.stats.get": (init: FetchOptions<operations["atc-console.atc-shortlink.stats.get"]>) => client.GET("/api/services/{sid}/atc-shortlink/stats", init),
+    "atc-console.atc-status.alerts.ack": (init: FetchOptions<operations["atc-console.atc-status.alerts.ack"]>) => client.POST("/api/services/{sid}/atc-status/alerts/{id}/ack", init),
+    "atc-console.atc-status.alerts.list": (init: FetchOptions<operations["atc-console.atc-status.alerts.list"]>) => client.GET("/api/services/{sid}/atc-status/alerts", init),
     "atc-console.atc-status.incidents.list": (init: FetchOptions<operations["atc-console.atc-status.incidents.list"]>) => client.GET("/api/services/{sid}/atc-status/incidents", init),
     "atc-console.atc-status.monitors.check": (init: FetchOptions<operations["atc-console.atc-status.monitors.check"]>) => client.POST("/api/services/{sid}/atc-status/monitors/{id}/check", init),
     "atc-console.atc-status.monitors.checks": (init: FetchOptions<operations["atc-console.atc-status.monitors.checks"]>) => client.GET("/api/services/{sid}/atc-status/monitors/{id}/checks", init),

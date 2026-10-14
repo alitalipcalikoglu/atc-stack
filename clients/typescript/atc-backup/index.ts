@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-backup's openapi.yaml (15 total).
+ * One operationId-keyed method per operation in atc-backup's openapi.yaml (16 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -41,6 +41,7 @@ export function createClient(config: ClientConfig) {
   return {
     "atc-backup.backups.delete": (init: FetchOptions<operations["atc-backup.backups.delete"]>) => client.DELETE("/v1/backups/{id}", init),
     "atc-backup.backups.download": (init: FetchOptions<operations["atc-backup.backups.download"]>) => client.GET("/v1/backups/{id}/download", init),
+    "atc-backup.backups.drill": (init: FetchOptions<operations["atc-backup.backups.drill"]>) => client.POST("/v1/backups/{id}/drill", init),
     "atc-backup.backups.get": (init: FetchOptions<operations["atc-backup.backups.get"]>) => client.GET("/v1/backups/{id}", init),
     "atc-backup.backups.list": (init: FetchOptions<operations["atc-backup.backups.list"]>) => client.GET("/v1/backups", init),
     "atc-backup.backups.restore": (init: FetchOptions<operations["atc-backup.backups.restore"]>) => client.POST("/v1/backups/{id}/restore", init),

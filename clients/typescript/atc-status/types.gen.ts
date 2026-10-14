@@ -261,6 +261,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/hooks/webhook-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Receive a signed webhook-out delivery; ops.* events become alerts (no API key, HMAC signature) */
+        post: operations["atc-status.hooks.webhook-out"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Operational alerts, newest first */
+        get: operations["atc-status.alerts.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/alerts/{id}/ack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Acknowledge an alert (admin) */
+        post: operations["atc-status.alerts.ack"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/ping/{id}/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                token: string;
+            };
+            cookie?: never;
+        };
+        /** Same as POST */
+        get: operations["atc-status.ping.get"];
+        put?: never;
+        /**
+         * A heartbeat from a monitored job (no API key; the path token is the credential)
+         * @description Records the ping. A monitor with an open incident is checked at once and recovers on the ping. GET does the same, for curl and wget.
+         */
+        post: operations["atc-status.ping.post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stats": {
         parameters: {
             query?: never;
@@ -297,9 +374,22 @@ export interface components {
         MonitorSettings: {
             name?: string;
             description?: string;
+            /**
+             * @description Fixed at creation; default `http`. `tcp` and `tls` take an https URL with host and port as `url` (only host and port are used). `heartbeat` has no target: the monitored job pings `/v1/ping/{id}/{token}` within `intervalSec` plus `graceSec`.
+             * @enum {string}
+             */
+            kind?: "http" | "tcp" | "tls" | "heartbeat";
             url?: string;
             /** @enum {string} */
             method?: "GET" | "HEAD";
+            /** @description http with GET only: text the first KiB of the body must contain. */
+            expectText?: string | null;
+            /** @description tls only, default 14: fail when the certificate expires within this many days. */
+            warnDays?: number;
+            /** @description heartbeat only, default 60: how late a ping may be. */
+            graceSec?: number;
+            /** @description heartbeat only: issue a new ping token (shown once in the response); the old one stops working. */
+            rotateToken?: boolean;
             intervalSec?: number;
             /** @description Not more than the interval. */
             timeoutMs?: number;
@@ -312,11 +402,22 @@ export interface components {
         };
         Monitor: {
             id?: string;
+            /** @enum {string} */
+            kind?: "http" | "tcp" | "tls" | "heartbeat";
             name?: string;
             description?: string;
-            url?: string;
-            /** @enum {string} */
-            method?: "GET" | "HEAD";
+            /** @description null for heartbeat monitors. */
+            url?: string | null;
+            /**
+             * @description null unless kind is http.
+             * @enum {string|null}
+             */
+            method?: "GET" | "HEAD" | null;
+            expectText?: string | null;
+            warnDays?: number | null;
+            graceSec?: number | null;
+            /** Format: date-time */
+            lastPingAt?: string | null;
             intervalSec?: number;
             timeoutMs?: number;
             expectStatus?: number[];
@@ -348,6 +449,28 @@ export interface components {
             status?: number | null;
             latencyMs?: number;
             error?: string | null;
+        };
+        Alert: {
+            id?: string;
+            type?: string;
+            key?: string;
+            /** @enum {string} */
+            severity?: "info" | "warning" | "critical";
+            title?: string;
+            message?: string;
+            data?: Record<string, never>;
+            source?: string | null;
+            count?: number;
+            /** Format: date-time */
+            firstAt?: string;
+            /** Format: date-time */
+            lastAt?: string;
+            /** @enum {string} */
+            state?: "open" | "acked";
+            /** Format: date-time */
+            ackedAt?: string | null;
+            ackedBy?: string | null;
+            notifyError?: string | null;
         };
         Incident: {
             id?: string;
@@ -421,6 +544,10 @@ export interface components {
                 "application/json": {
                     created: boolean;
                     monitor: components["schemas"]["Monitor"];
+                    /** @description Heartbeat monitors on create or rotateToken, once. */
+                    pingToken?: string;
+                    /** @description `/v1/ping/{id}/{token}` for the same cases. */
+                    pingPath?: string;
                 };
             };
         };
@@ -500,6 +627,8 @@ export interface operations {
                         checker: "running" | "stopped";
                         /** @enum {string} */
                         notify: "enabled" | "disabled";
+                        /** @enum {string} */
+                        alertHook: "enabled" | "disabled";
                     };
                 };
             };
@@ -864,6 +993,169 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    "atc-status.hooks.webhook-out": {
+        parameters: {
+            query?: never;
+            header: {
+                "x-webhook-signature": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    id?: string;
+                    type: string;
+                    createdAt?: string;
+                    data?: Record<string, never>;
+                };
+            };
+        };
+        responses: {
+            /** @description Accepted. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        outcome: "alerted" | "repeated" | "ignored";
+                        id: string | null;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            /** @description The signature does not match or the timestamp is stale. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The hook is disabled (no ALERT_HOOK_SECRET). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "atc-status.alerts.list": {
+        parameters: {
+            query?: {
+                state?: "open" | "acked";
+                limit?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Alert"][];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    "atc-status.alerts.ack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The acknowledged alert. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        alert: components["schemas"]["Alert"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-status.ping.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recorded. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No heartbeat monitor with that id and token (or it is paused). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "atc-status.ping.post": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recorded. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No heartbeat monitor with that id and token (or it is paused). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "atc-status.stats.get": {
         parameters: {
             query?: never;
@@ -888,6 +1180,8 @@ export interface operations {
                         paused: number;
                         openIncidents: number;
                         incidents24h: number;
+                        openAlerts: number;
+                        criticalAlerts: number;
                         notify: boolean;
                     };
                 };

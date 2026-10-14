@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 568,
+  "totalOperations": 577,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -454,6 +454,16 @@
     },
     {
       "service": "atc-backup",
+      "operationId": "atc-backup.backups.drill",
+      "method": "POST",
+      "path": "/v1/backups/{id}/drill",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-backup",
       "operationId": "atc-backup.backups.get",
       "method": "GET",
       "path": "/v1/backups/{id}",
@@ -884,6 +894,18 @@
       "path": "/api/services/{sid}/atc-backup/backups/{id}",
       "flags": [
         "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-backup.backups.drill",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-backup/backups/{id}/drill",
+      "flags": [
+        "MUTATION",
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
@@ -2786,6 +2808,30 @@
       "operationId": "atc-console.atc-shortlink.stats.get",
       "method": "GET",
       "path": "/api/services/{sid}/atc-shortlink/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.alerts.ack",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-status/alerts/{id}/ack",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.alerts.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/alerts",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -5877,6 +5923,26 @@
     },
     {
       "service": "atc-status",
+      "operationId": "atc-status.alerts.ack",
+      "method": "POST",
+      "path": "/v1/alerts/{id}/ack",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.alerts.list",
+      "method": "GET",
+      "path": "/v1/alerts",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-status",
       "operationId": "atc-status.health.get",
       "method": "GET",
       "path": "/health",
@@ -5885,6 +5951,16 @@
         "OPERATOR"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.hooks.webhook-out",
+      "method": "POST",
+      "path": "/v1/hooks/webhook-out",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6017,6 +6093,26 @@
         "READ_SAFE"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.ping.get",
+      "method": "GET",
+      "path": "/v1/ping/{id}/{token}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.ping.post",
+      "method": "POST",
+      "path": "/v1/ping/{id}/{token}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6390,6 +6486,12 @@
             "atc-backup.backups.delete"
           ],
           "reason": "Restore overwrites files (or a live database); delete is irreversible."
+        },
+        {
+          "ops": [
+            "atc-backup.backups.drill"
+          ],
+          "reason": "Unpacks the whole backup to a scratch place; heavy file work, run from the console or the schedule."
         },
         {
           "ops": [
@@ -6808,9 +6910,24 @@
         "atc-status.incidents.get",
         "atc-status.stats.get",
         "atc-status.page.summary",
+        "atc-status.alerts.list",
+        "atc-status.alerts.ack",
         "atc-status.monitors.upsert"
       ],
       "excluded": [
+        {
+          "ops": [
+            "atc-status.hooks.webhook-out"
+          ],
+          "reason": "Signed machine endpoint for atc-webhook-out deliveries."
+        },
+        {
+          "ops": [
+            "atc-status.ping.post",
+            "atc-status.ping.get"
+          ],
+          "reason": "Heartbeat from a monitored job; the path token is the credential."
+        },
         {
           "ops": [
             "atc-status.monitors.delete"

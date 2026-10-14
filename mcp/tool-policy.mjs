@@ -39,6 +39,7 @@ export const POLICY = {
     excluded: [
       { ops: ['atc-backup.sources.backup'], reason: 'A new backup runs retention, which can delete the oldest kept backup.' },
       { ops: ['atc-backup.backups.restore', 'atc-backup.backups.delete'], reason: 'Restore overwrites files (or a live database); delete is irreversible.' },
+      { ops: ['atc-backup.backups.drill'], reason: 'Unpacks the whole backup to a scratch place; heavy file work, run from the console or the schedule.' },
       { ops: ['atc-backup.backups.download'], reason: 'Streams a whole database (secrets included) as binary.' },
     ],
   },
@@ -132,8 +133,10 @@ export const POLICY = {
     ],
   },
   'atc-status': {
-    tools: ['atc-status.monitors.list', 'atc-status.monitors.get', 'atc-status.monitors.checks', 'atc-status.incidents.list', 'atc-status.incidents.get', 'atc-status.stats.get', 'atc-status.page.summary', 'atc-status.monitors.upsert'],
+    tools: ['atc-status.monitors.list', 'atc-status.monitors.get', 'atc-status.monitors.checks', 'atc-status.incidents.list', 'atc-status.incidents.get', 'atc-status.stats.get', 'atc-status.page.summary', 'atc-status.alerts.list', 'atc-status.alerts.ack', 'atc-status.monitors.upsert'],
     excluded: [
+      { ops: ['atc-status.hooks.webhook-out'], reason: 'Signed machine endpoint for atc-webhook-out deliveries.' },
+      { ops: ['atc-status.ping.post', 'atc-status.ping.get'], reason: 'Heartbeat from a monitored job; the path token is the credential.' },
       { ops: ['atc-status.monitors.delete'], reason: 'Irreversible (checks and incidents go with it).' },
       { ops: ['atc-status.monitors.check'], reason: 'Can open an incident and send alert e-mails.' },
       { ops: ['atc-status.page.get'], reason: 'HTML; page.summary has the same data.' },

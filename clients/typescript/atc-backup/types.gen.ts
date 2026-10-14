@@ -220,6 +220,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/backups/{id}/drill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["BackupParam"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore drill (admin)
+         * @description Unpacks the backup into a scratch place under RESTORE_DIR as a real restore would (decrypting first when needed), reads it back (row counts of every table, or every archive entry) and removes the scratch copy. The outcome is recorded on the backup (`drill`); a failed drill publishes `ops.backup.failed`. Runs automatically every `DRILL_INTERVAL_HOURS` for the newest backup of each source.
+         */
+        post: operations["atc-backup.backups.drill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/backups/{id}/verify": {
         parameters: {
             query?: never;
@@ -300,6 +322,13 @@ export interface components {
             status?: "running" | "ok" | "failed";
             /** @enum {string} */
             trigger?: "schedule" | "manual" | "pre-restore";
+            /**
+             * @description `tar.gz` for tree sources.
+             * @enum {string}
+             */
+            format?: "sqlite" | "tar.gz";
+            /** @description The stored file is AES-256-GCM encrypted (`.enc`); `npm run decrypt` opens it. */
+            encrypted?: boolean;
             file?: string | null;
             size?: number | null;
             sha256?: string | null;
@@ -315,6 +344,13 @@ export interface components {
             /** Format: date-time */
             verifiedAt?: string | null;
             verified?: boolean | null;
+            drill?: {
+                /** Format: date-time */
+                at?: string;
+                ok?: boolean;
+                /** @description Table row counts (database) or entry count (tree), or the error. */
+                detail?: Record<string, never>;
+            } | null;
             media?: {
                 fileId?: string | null;
                 error?: string | null;
@@ -322,6 +358,16 @@ export interface components {
         };
         Source: {
             id?: string;
+            /**
+             * @description `sqlite`: online database backup. `tree`: a file or directory packed into a tar.gz.
+             * @enum {string}
+             */
+            kind?: "sqlite" | "tree";
+            lastDrill?: {
+                /** Format: date-time */
+                at?: string;
+                ok?: boolean;
+            } | null;
             /** @description Base name of the live file; the full path is not exposed. */
             file?: string;
             exists?: boolean;
@@ -713,6 +759,36 @@ export interface operations {
             409: components["responses"]["Conflict"];
         };
     };
+    "atc-backup.backups.drill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["BackupParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Result. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        backup: components["schemas"]["Backup"];
+                        ok: boolean;
+                        detail: Record<string, never>;
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
     "atc-backup.backups.verify": {
         parameters: {
             query?: never;
@@ -826,6 +902,11 @@ export interface operations {
                         retentionDays: number;
                         media: boolean;
                         liveRestore: boolean;
+                        /** @description Backups are encrypted at rest (BACKUP_ENCRYPTION_KEY). */
+                        encrypted: boolean;
+                        drillIntervalHours: number;
+                        /** @description Sources whose newest restore drill failed. */
+                        drillFailing: string[];
                     };
                 };
             };

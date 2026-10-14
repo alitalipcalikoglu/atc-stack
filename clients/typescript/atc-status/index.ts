@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-status's openapi.yaml (16 total).
+ * One operationId-keyed method per operation in atc-status's openapi.yaml (21 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -39,7 +39,10 @@ export function createClient(config: ClientConfig) {
     credentials: config.credentials,
   });
   return {
+    "atc-status.alerts.ack": (init: FetchOptions<operations["atc-status.alerts.ack"]>) => client.POST("/v1/alerts/{id}/ack", init),
+    "atc-status.alerts.list": (init: FetchOptions<operations["atc-status.alerts.list"]>) => client.GET("/v1/alerts", init),
     "atc-status.health.get": (init: FetchOptions<operations["atc-status.health.get"]>) => client.GET("/health", init),
+    "atc-status.hooks.webhook-out": (init: FetchOptions<operations["atc-status.hooks.webhook-out"]>) => client.POST("/v1/hooks/webhook-out", init),
     "atc-status.incidents.get": (init: FetchOptions<operations["atc-status.incidents.get"]>) => client.GET("/v1/incidents/{id}", init),
     "atc-status.incidents.list": (init: FetchOptions<operations["atc-status.incidents.list"]>) => client.GET("/v1/incidents", init),
     "atc-status.info.get": (init: FetchOptions<operations["atc-status.info.get"]>) => client.GET("/v1/info", init),
@@ -53,6 +56,8 @@ export function createClient(config: ClientConfig) {
     "atc-status.openapi": (init: FetchOptions<operations["atc-status.openapi"]>) => client.GET("/openapi.yaml", init),
     "atc-status.page.get": (init: FetchOptions<operations["atc-status.page.get"]>) => client.GET("/status", init),
     "atc-status.page.summary": (init: FetchOptions<operations["atc-status.page.summary"]>) => client.GET("/status/summary.json", init),
+    "atc-status.ping.get": (init: FetchOptions<operations["atc-status.ping.get"]>) => client.GET("/v1/ping/{id}/{token}", init),
+    "atc-status.ping.post": (init: FetchOptions<operations["atc-status.ping.post"]>) => client.POST("/v1/ping/{id}/{token}", init),
     "atc-status.ready.get": (init: FetchOptions<operations["atc-status.ready.get"]>) => client.GET("/ready", init),
     "atc-status.stats.get": (init: FetchOptions<operations["atc-status.stats.get"]>) => client.GET("/v1/stats", init),
   } as const;

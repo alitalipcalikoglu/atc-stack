@@ -279,7 +279,7 @@ kept in `.release/v<version>.json` (untracked), so a failed step can simply be r
 
 ## MCP server
 
-[`mcp/`](mcp/README.md) is one local STDIO [Model Context Protocol](https://modelcontextprotocol.io) server over the generated typed clients: 153 tools, read tools for every service plus safe writes (create, update, enqueue, publish, start an export, render a stored document, create a monitor or a payment intent). Nothing destructive or irreversible is exposed (no delete, purge, refund, cancel, restore, revoke, rotate or key/role change); atc-auth is read-only with secrets filtered; atc-console only answers the status probe. `mcp/tool-policy.mjs` holds the per-service decision with a reason for every excluded write class.
+[`mcp/`](mcp/README.md) is one local STDIO [Model Context Protocol](https://modelcontextprotocol.io) server over the generated typed clients: 155 tools, read tools for every service plus safe writes (create, update, enqueue, publish, start an export, render a stored document, create a monitor or a payment intent). Nothing destructive or irreversible is exposed (no delete, purge, refund, cancel, restore, revoke, rotate or key/role change); atc-auth is read-only with secrets filtered; atc-console only answers the status probe. `mcp/tool-policy.mjs` holds the per-service decision with a reason for every excluded write class.
 
 ### Configuration is generated
 
