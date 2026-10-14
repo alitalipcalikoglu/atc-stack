@@ -1,6 +1,6 @@
 # ATC-WEB Project State
 
-Last source verification: 2026-10-14 (v1.14.0). This is a concise living handoff, not a specification or
+Last source verification: 2026-10-14 (v1.14.1). This is a concise living handoff, not a specification or
 history log.
 
 ## Purpose and update rules
@@ -49,30 +49,30 @@ state update is necessarily newer.
 
 | Repository | Role | Verified development HEAD | Immutable current release | State / note |
 |---|---|---|---|---|
-| atc-audit | HTTP service: append-only audit log | `09f69a667047f29e4664210e6c568985e91345fb` | `v1.14.0` → `09f69a667047f29e4664210e6c568985e91345fb` | HEAD at release |
-| atc-auth | HTTP service: identity and tokens | `a8866c0aea890649b70975cf15fdbbb10fb0c5c5` | `v1.14.0` → `a8866c0aea890649b70975cf15fdbbb10fb0c5c5` | HEAD at release; silent resend/forgot; session revoke requires `write` |
-| atc-console | HTTP service: administration UI/API | `a8610589a3cce3fd0e9ea85dc5320cd2ddede3a7` | `v1.14.0` → `a8610589a3cce3fd0e9ea85dc5320cd2ddede3a7` | SvelteKit; `fastify` dev-only for service-core JSDoc types |
-| atc-flags | HTTP service: feature flags/settings | `bc63784aa0c371d4452d8449cbbdd9d9a3f150c6` | `v1.14.0` → `bc63784aa0c371d4452d8449cbbdd9d9a3f150c6` | HEAD at release |
-| atc-gateway | HTTP service: public edge | `89e4b70b81c7345337fd88603f7a7817f9149cba` | `v1.14.0` → `89e4b70b81c7345337fd88603f7a7817f9149cba` | Independent package-version oracle |
-| atc-geo | HTTP service: geolocation/reference data | `5e97da6da2e9c978bc65157a0c551d84717e6b98` | `v1.14.0` → `5e97da6da2e9c978bc65157a0c551d84717e6b98` | Canonical country dataset included |
-| atc-media | HTTP service: uploads and delivery | `354f32c77a2fc202d5784a69fb724ccd28cd4360` | `v1.14.0` → `354f32c77a2fc202d5784a69fb724ccd28cd4360` | HEAD at release; ticket audited by hash |
-| atc-notify | HTTP service: queued notifications | `b498a38aa171554da1a321d7b88020b216b1d11a` | `v1.14.0` → `b498a38aa171554da1a321d7b88020b216b1d11a` | HEAD at release |
-| atc-ratelimit | HTTP service: policies and quotas | `e0a3632de28e73cf718a9b7fdfb8362c456f968c` | `v1.14.0` → `e0a3632de28e73cf718a9b7fdfb8362c456f968c` | HEAD at release |
-| atc-scheduler | HTTP service: scheduled HTTP jobs | `ec727ff8677d430de9faf19cd87200166442f664` | `v1.14.0` → `ec727ff8677d430de9faf19cd87200166442f664` | HEAD at release; job audit meta redacted |
-| atc-search | HTTP service: SQLite FTS search | `1487151cec6ed157c34008b3aca5b93984ddd413` | `v1.14.0` → `1487151cec6ed157c34008b3aca5b93984ddd413` | HEAD at release |
-| atc-service-core | Shared runtime package | `c94dd7ee73b0604a469121503e515078287a5773` | `v1.14.0` → `c94dd7ee73b0604a469121503e515078287a5773` | HEAD at release; unified version |
-| atc-shortlink | HTTP service: short links and QR | `b07ae867acbaeec7fd15aec025762a91b6c22155` | `v1.14.0` → `b07ae867acbaeec7fd15aec025762a91b6c22155` | HEAD at release |
-| atc-stack | Installer/orchestrator/release management | `72a13784cc1171d2ba9a80d7408198882288cf27` | `v1.14.0` → `72a13784cc1171d2ba9a80d7408198882288cf27` | v1.14.0 published and verified; pre-current-update baseline |
-| atc-webhook-out | HTTP service: durable outbound webhooks | `4897dd219a0840811efbe69c654405762343dfb4` | `v1.14.0` → `4897dd219a0840811efbe69c654405762343dfb4` | HEAD at release; subscription audit meta redacted |
+| atc-audit | HTTP service: append-only audit log | `41888ad2bd62dc12535024ca84778558a65b484b` | `v1.14.1` → `41888ad2bd62dc12535024ca84778558a65b484b` | HEAD at release |
+| atc-auth | HTTP service: identity and tokens | `76e6754a4e7560ea290b205ae88e40904820262d` | `v1.14.1` → `76e6754a4e7560ea290b205ae88e40904820262d` | HEAD at release; silent resend/forgot; session revoke requires `write` |
+| atc-console | HTTP service: administration UI/API | `5357b66676182c5422b5d57c96148c841af2b922` | `v1.14.1` → `5357b66676182c5422b5d57c96148c841af2b922` | SvelteKit; `fastify` dev-only for service-core JSDoc types |
+| atc-flags | HTTP service: feature flags/settings | `29fd2667822e02393610e2cf1cc22ea729516a1c` | `v1.14.1` → `29fd2667822e02393610e2cf1cc22ea729516a1c` | HEAD at release |
+| atc-gateway | HTTP service: public edge | `a988edab07a26c5735b4c091c4a1f23d0a44c51d` | `v1.14.1` → `a988edab07a26c5735b4c091c4a1f23d0a44c51d` | Independent package-version oracle |
+| atc-geo | HTTP service: geolocation/reference data | `f8866e47cf8e5de5969fdc05c4b46faf82f3a7e5` | `v1.14.1` → `f8866e47cf8e5de5969fdc05c4b46faf82f3a7e5` | Canonical country dataset included |
+| atc-media | HTTP service: uploads and delivery | `d8e6b1a34951f8007f3c8d1e936a170efd5c37b7` | `v1.14.1` → `d8e6b1a34951f8007f3c8d1e936a170efd5c37b7` | HEAD at release; ticket audited by hash |
+| atc-notify | HTTP service: queued notifications | `de95f9fa2860f98fc5c771db7e8ae56e2a31790a` | `v1.14.1` → `de95f9fa2860f98fc5c771db7e8ae56e2a31790a` | HEAD at release |
+| atc-ratelimit | HTTP service: policies and quotas | `e99c1d495f502e55724a87b44b61914c31bef548` | `v1.14.1` → `e99c1d495f502e55724a87b44b61914c31bef548` | HEAD at release |
+| atc-scheduler | HTTP service: scheduled HTTP jobs | `23ac5830773214afdcfa0b4d6092df644bc94526` | `v1.14.1` → `23ac5830773214afdcfa0b4d6092df644bc94526` | HEAD at release; job audit meta redacted |
+| atc-search | HTTP service: SQLite FTS search | `fcdf93d985779eb53e96384db783bfbd730ceb76` | `v1.14.1` → `fcdf93d985779eb53e96384db783bfbd730ceb76` | HEAD at release |
+| atc-service-core | Shared runtime package | `d0ad58dfcea072cabc070e21833a3c01392655ff` | `v1.14.1` → `d0ad58dfcea072cabc070e21833a3c01392655ff` | HEAD at release; unified version |
+| atc-shortlink | HTTP service: short links and QR | `c9416fc9844ada301cbafdb7f942b9ddbf9abab7` | `v1.14.1` → `c9416fc9844ada301cbafdb7f942b9ddbf9abab7` | HEAD at release |
+| atc-stack | Installer/orchestrator/release management | `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a` | `v1.14.1` → `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a` | v1.14.1 published and verified; pre-current-update baseline |
+| atc-webhook-out | HTTP service: durable outbound webhooks | `c7083127db8db21efb1d374f5074e6a4fdd2c46f` | `v1.14.1` → `c7083127db8db21efb1d374f5074e6a4fdd2c46f` | HEAD at release; subscription audit meta redacted |
 
 ## Immutable releases
 
-- Supported production suite: all 15 repositories at `v1.14.0`, every one named `atc-<name>`.
-- `atc-stack` `v1.14.0` peels to `72a13784cc1171d2ba9a80d7408198882288cf27`;
-  `atc-service-core` `v1.14.0` peels to `c94dd7ee73b0604a469121503e515078287a5773`.
-- Historical suite tags `v1.0.0` to `v1.13.0` and `atc-service-core` tags `v1.11.1` to `v1.13.0` remain
+- Supported production suite: all 15 repositories at `v1.14.1`, every one named `atc-<name>`.
+- `atc-stack` `v1.14.1` peels to `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a`;
+  `atc-service-core` `v1.14.1` peels to `d0ad58dfcea072cabc070e21833a3c01392655ff`.
+- Historical suite tags `v1.0.0` to `v1.14.0` and `atc-service-core` tags `v1.11.1` to `v1.13.0` remain
   immutable; their manifests use the pre-rename names, which GitHub redirects.
-- The authoritative install matrix is `installation-manifests/v1.14.0.json`, selected by
+- The authoritative install matrix is `installation-manifests/v1.14.1.json`, selected by
   `installation-manifests/supported.json`. Historical manifests are immutable. Never move tags.
 
 ## Current suite contract
@@ -406,6 +406,15 @@ deliberately unchanged. Audit accepts a hyphen in the first action segment. `sha
 MCP SDK `1.32.1` close two high advisories. Candidate and fresh default installs matched 14/14 and
 reached 13/13 ready with 14/14 reuse; `v1.13.0` tags were verified unchanged.
 
+Release `v1.14.1` is published and verified (`releases/v1.14.1.json`). It completes the rename
+(`/v1/info` schema ids, Console type/docs enums and tags, docs, examples, Docker names) and fixes
+Console icons, an update-toast effect loop after redeploys, ranked-list overflow and action
+wrapping, plus Stack output column widths. The layout probe lives at
+`atc-console/scripts/overflow-probe.js`. Verification covered every suite, all smokes, an 18-page
+visual check at 1280/375 px, workspace `setup`/`dev` (second setup byte-identical), 13/13 Docker
+images healthy as non-root with clean SIGTERM exits, and candidate/default installs at 14/14 and
+13/13 ready.
+
 ## Known debt and deliberate migration deltas
 
 1. **Range:** the current media-byte path does not forward inbound `Range` downstream. M0 freezes
@@ -420,6 +429,9 @@ reached 13/13 ready with 14/14 reuse; `v1.13.0` tags were verified unchanged.
 4. **Swagger bundle size:** local Swagger UI remains a 1,425,215-byte lazy production chunk. It is
    not an application entry, is not eagerly downloaded on ordinary pages, and remains accepted
    until a separately justified optimization.
+5. **Console narrow-screen navigation:** below 768 px the Console uses a scrollable bottom bar whose
+   last label can be cut off; the workspace admin-panel rule asks for an off-canvas sidebar drawer.
+   Not changed in `v1.14.1`.
 
 ## Operational constraints
 
