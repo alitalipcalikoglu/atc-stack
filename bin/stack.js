@@ -2,7 +2,9 @@
 import './../src/quiet.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SERVICES } from '../src/manifest.js';
 import { Release } from '../src/release.js';
+import { REPOSITORIES } from '../src/repository-catalog.js';
 import { Stack } from '../src/stack.js';
 
 /**
@@ -52,10 +54,10 @@ export class Cli {
         console.log(`mode:         ${r.mode} (${r.ref})`);
         console.log(`workspace:    ${r.root}`);
         console.log(`repositories: ${r.cloned.length} clone, ${r.reused.length} reuse`);
-        console.log(`dependencies: ${r.dryRun ? 'planned for 17 repositories' : `${r.dependencies.length} installed`}`);
+        console.log(`dependencies: ${r.dryRun ? `planned for ${REPOSITORIES.length} repositories` : `${r.dependencies.length} installed`}`);
         console.log(`configuration:${r.configured ? ' complete' : ' planned'}`);
         console.log(`startup:      ${r.dryRun ? 'planned' : r.started ? (r.splitWorkers ? 'PM2 split workers' : 'PM2 combined') : 'skipped (--no-start)'}`);
-        console.log(`ready:        ${r.started ? `${r.ready}/13` : 'not checked'}`);
+        console.log(`ready:        ${r.started ? `${r.ready}/${SERVICES.length}` : 'not checked'}`);
         if (r.adminCreated) console.log('administrator: created (password not printed; use the value supplied with --admin-password, or reset it with the console admin CLI)');
         if (r.dryRun) for (const [id, commit] of Object.entries(r.commits)) console.log(`  ${id.padEnd(Math.max(...Object.keys(r.commits).map((k) => k.length)))} ${commit}`);
         return 0;

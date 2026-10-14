@@ -434,8 +434,9 @@ export class Release {
       }
       if (reuse) {
         const again = await this.#run(stack, ['node', 'bin/stack.js', 'install:all', ...args], env);
-        if (!/repositories: 0 clone, 14 reuse/.test(again.out)) throw new ReleaseError('the second install did not reuse every repository');
-        Object.assign(result, { reuse: `0 clone, 14 reuse, ${Release.#ready(again.out)} ready` });
+        const reused = `repositories: 0 clone, ${REPOSITORIES.length} reuse`;
+        if (!again.out.includes(reused)) throw new ReleaseError('the second install did not reuse every repository');
+        Object.assign(result, { reuse: `0 clone, ${REPOSITORIES.length} reuse, ${Release.#ready(again.out)} ready` });
       }
       return result;
     } finally {
