@@ -242,9 +242,8 @@ test('notify: real old-schema (v2) fixture with an existing queued message migra
   });
 });
 
-test('console: real old-schema (v1) fixture with an existing admin migrates through a real process to the current schema, the email becomes a username, login still works, totp_seal_state sealed', { skip }, async () => {
+test('console: real old-schema (v3) fixture with an existing admin migrates through a real process to the current schema (service scope column), login still works, totp_seal_state sealed', { skip }, async () => {
   const { PasswordHasher } = await import(pathToFileURL(join(workspaceRoot, 'atc-console', 'src', 'crypto', 'password.js')).href);
-  const email = 'admin@example.test';
   const password = 'correct horse battery staple 9';
   const passwordHash = await new PasswordHasher({ logN: 14 }).hash(password);
 
@@ -254,8 +253,8 @@ test('console: real old-schema (v1) fixture with an existing admin migrates thro
     seed: (db) => {
       const id = '22222222-2222-4222-8222-222222222222';
       const now = Date.now();
-      db.prepare(`INSERT INTO admins (id, email, name, password_hash, role, created_at, updated_at) VALUES (?, ?, 'Harness Admin', ?, 'admin', ?, ?)`)
-        .run(id, email, passwordHash, now, now);
+      db.prepare(`INSERT INTO admins (id, username, name, password_hash, role, created_at, updated_at) VALUES (?, ?, 'Harness Admin', ?, 'admin', ?, ?)`)
+        .run(id, 'admin', passwordHash, now, now);
       return id;
     },
     env: ({ scratch }) => {
@@ -270,7 +269,8 @@ test('console: real old-schema (v1) fixture with an existing admin migrates thro
       assert.equal(res.status, 200);
       const body = await res.json();
       assert.equal(body.totpRequired, false, 'admin with no TOTP secret logs straight in, unaffected by the totp_seal_state migration');
-      assert.equal(body.admin.username, 'admin', 'the pre-existing admin row survived the migration, renamed to the part of its email before @');
+      assert.equal(body.admin.username, 'admin', 'the pre-existing admin row survived the migration');
+      assert.equal(body.admin.services, null, 'the new service scope column is empty (every service) for an existing admin');
 
       const raw = new DatabaseSync(dbPath, { readOnly: true });
       try {
