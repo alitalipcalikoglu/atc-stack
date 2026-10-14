@@ -71,7 +71,7 @@ state update is necessarily newer.
 - 20 canonical `openapi.yaml` files, all OpenAPI 3.1.0. Console: 176 paths, 228 operations. Suite:
   568 operations (repositories added on `main` after the supported release enter the next release manifest).
 - Generated TypeScript clients: 20/20, 568/568 operations, no regeneration drift.
-- MCP: 568-operation candidate catalog, 10 explicitly exposed tools, STDIO transport only.
+- MCP: 568 operations classified, 153 tools (reads everywhere plus safe writes; nothing destructive; atc-auth read-only), STDIO transport only.
 
 Boundaries:
 

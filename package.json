@@ -41,7 +41,7 @@
     "mcp:typecheck": "mcp/node_modules/.bin/tsc -p mcp/jsconfig.json",
     "mcp:test": "node --disable-warning=ExperimentalWarning --experimental-strip-types --test \"mcp/test/*.test.mjs\"",
     "mcp:e2e": "node --disable-warning=ExperimentalWarning --experimental-strip-types --test \"mcp/test/e2e/*.test.mjs\"",
-    "mcp:catalog": "node mcp/tool-catalog.generate.mjs && node --disable-warning=ExperimentalWarning --experimental-strip-types mcp/tool-catalog.reconcile.mjs",
+    "mcp:catalog": "node mcp/tools.generate.mjs && node mcp/tool-catalog.generate.mjs && node --disable-warning=ExperimentalWarning --experimental-strip-types mcp/tool-catalog.reconcile.mjs",
     "contracts:check": "npm run openapi:validate && npm run openapi:info-parity && npm run clients:check && npm run clients:typecheck && npm run clients:test && npm run mcp:typecheck && npm run mcp:test"
   },
   "devDependencies": {

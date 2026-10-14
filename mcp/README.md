@@ -1,7 +1,7 @@
 # stack-mcp
 
 A single [Model Context Protocol](https://modelcontextprotocol.io) server foundation over the
-atc-web platform's 13 generated typed clients (`atc-stack/clients/typescript/`). Talks to real services
+atc-web platform's 20 generated typed clients (`atc-stack/clients/typescript/`). Talks to real services
 through their real, canonical HTTP APIs — never a database, never a service's own `src/`, never a
 hand-rolled HTTP call.
 
@@ -21,23 +21,22 @@ MCP tool handler -> ServiceRegistry -> a generated typed client -> the service's
 `test/boundary-scan.test.mjs` asserts all of the above by scanning this package's own source, so a
 future edit that reintroduces one of these is a failing test, not a design doc nobody re-reads.
 
-## One server, small tool set, default deny
+## One server, explicit tool list, default deny
 
-This is **not** an API mirror. Of the platform's 568 canonical operations, exactly **10 tools** are exposed — see "Available tools"
-below. `mcp/tool-catalog.json` classifies all 568 operations (service, method, path,
-`READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`)
-as a **candidate universe** for future phases — it is not the exposed list. The exposed list is
-`src/tools/index.mjs`'s explicit array, and only that array. An operation existing in a service's
-`openapi.yaml`, or being classified as safe in the catalog, never makes it a tool by itself.
+This is **not** an API mirror. Of the platform's 568 canonical operations, **153 tools** are exposed (see "Available tools"). The scope, decided for the `1.19.0` suite:
 
-MCP expansion was intentionally cancelled for the production `1.19.0` suite. The supported scope
-is this explicit 10-tool allowlist over local STDIO only: no destructive/admin tools, no remote
-transport, no MCP-specific authentication, and no package publication. This is a product decision,
-not unfinished release work; the catalog remains an audit/classification artifact, not a roadmap.
+- **Every service gets read tools plus safe writes**: create and update, enqueue, publish, start an export, render a stored document, create a monitor, create a payment intent, and similar calls that either can be undone by another safe call or only queue/start work.
+- **Nothing destructive or irreversible**: no delete, purge, clear, refund, cancel, restore, revoke, rotate, reset, key or role changes, dead-letter purge, and nothing that re-sends mail or deliveries. Every tool declares `destructiveHint: false`.
+- **atc-auth is read-only** (user lookup and list, sessions, its security event log) and never returns secrets: password hashes, tokens, TOTP data and recovery codes are filtered out of every result (`src/tools/overrides.mjs`), on top of the service never sending them. Its credential flows stay out because they take passwords or mint tokens, and `forgot`/`resend` must stay enumeration-resistant (see the atc-auth README's security notes). Use a `read` key for it.
+- **atc-console has no business tool**; only its probes are touched, via `atc-stack.status`.
+- Local STDIO only: no remote transport, no MCP-specific authentication, no package publication.
 
-No destructive, admin, or high-risk tool is exposed. `atc-auth` and `atc-console` have no
-business-operation tool at all (only their `/health`/`/ready`/`/v1/info` probes are touched, via
-`atc-stack.status` — see the flagged security-review items for why the rest of `atc-auth` stays out).
+How a tool comes to exist:
+
+- `tool-policy.mjs` names, per service, the operations that are tools and gives a one-line reason for every class of write operation that is not.
+- `tools.generate.mjs` turns those operations into explicit, committed definitions under `src/tools/services/<service>.mjs`: each tool is named after its `operationId`, and its input schema copies the operation's own path, query, header and body contract from its `openapi.yaml`. Nothing reads a spec at runtime.
+- `src/tools/hand-written.mjs` keeps `atc-stack.status` and the first ten tools as they were; `src/tools/overrides.mjs` holds the few deliberate tweaks (secret filtering, render always stored, extra descriptions).
+- `tool-catalog.json` classifies all 568 operations (`READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`), marks the ones a tool calls as `exposed`, and carries the policy. `tool-catalog.reconcile.mjs` fails when policy, tools and catalog disagree, or when a write operation is neither a tool nor excluded with a reason.
 
 ## Install / build / configure / run
 
@@ -59,6 +58,8 @@ STACK_MCP_NOTIFY_API_KEY=example-notify-api-key
 # ... one BASE_URL (+ API_KEY where the service needs one) per service a tool uses.
 STACK_MCP_TIMEOUT_MS=30000   # optional; default matches gateway's own UPSTREAM_TIMEOUT_MS default.
 ```
+
+Every service that has tools needs both variables (`STACK_MCP_<SERVICE>_BASE_URL`, `STACK_MCP_<SERVICE>_API_KEY`, e.g. `STACK_MCP_WEBHOOK_OUT_API_KEY`). Give the MCP server its own keys with the smallest role that covers its tools, and a `read` key wherever you want read tools only.
 
 `atc-stack.status` only ever needs a `BASE_URL` per service (its 3 probes are unauthenticated on every
 service) — a service with no `BASE_URL` configured is reported `configured: false` in its result,
@@ -94,21 +95,348 @@ root `package.json`, and no service repo's dependency graph changes at all.
 
 ## Available tools
 
-| Tool | Calls | Category | Notes |
-|---|---|---|---|
-| `atc-stack.status` | every configured service's `/health`+`/ready`+`/v1/info` | operational aggregate | Not one OpenAPI operation. One dead/unconfigured service never fails the whole call. |
-| `atc-flags.evaluate` | `atc-flags.evaluate.post` | authenticated read | |
-| `atc-geo.ip.lookup` | `atc-geo.ip.lookup` | authenticated read | |
-| `atc-media.files.get` | `atc-media.files.get` | authenticated read, real error path | Metadata only — never transports file bytes (see "Binary" below). |
-| `atc-notify.messages.list` | `atc-notify.messages.list` | authenticated read, pagination | Cursor-based (`items`/`nextCursor`). |
-| `atc-notify.messages.create` | `atc-notify.messages.create` | safe mutation, async submit | Returns immediately; delivery happens later. Pair with `atc-notify.messages.get`. |
-| `atc-notify.messages.get` | `atc-notify.messages.get` | authenticated read, async status | |
-| `atc-shortlink.links.create` | `atc-shortlink.links.create` | safe mutation | Creates a new resource; never overwrites/deletes. |
-| `atc-ratelimit.check` | `atc-ratelimit.check` | authenticated read | Always `peek:true` in the handler — never caller-controlled, so this tool can never consume real quota. |
-| `atc-search.query` | `atc-search.query.get` | authenticated read, pagination | Offset-based (`total`/`limit`/`offset`) — deliberately a different pagination style from `atc-notify.messages.list`'s cursor style; neither is normalized to match the other (see below). |
+`atc-stack.status` (every configured service's `/health`, `/ready` and `/v1/info`; one dead or unconfigured service never fails the call) plus the tools below. "safe write" tools create, update, queue or start work; "idempotent" means a repeat with the same arguments has no further effect; "external" means the call reaches outside the platform (mail, external URLs, Stripe).
 
-Every non-`atc-stack.status` tool name matches its operation's real `operationId` — no invented naming
-scheme, no API-path-shaped names like `notify_post_v1_messages`.
+### atc-console
+
+No tools.
+
+Not exposed:
+- `*`: The console is a human admin UI with its own session auth; agents use the services directly.
+
+### atc-audit
+
+| Tool | Kind |
+|---|---|
+| `atc-audit.events.list` | read |
+| `atc-audit.events.get` | read |
+| `atc-audit.stats.get` | read |
+| `atc-audit.chain.getHead` | read |
+| `atc-audit.chain.verify` | read |
+| `atc-audit.anchors.list` | read |
+
+Not exposed:
+- `events.create`, `events.createBatch`: The audit log is append-only security history; an agent must not author entries that can never be withdrawn.
+- `events.export`: Bulk NDJSON download; use events.list pages instead.
+
+### atc-auth
+
+| Tool | Kind |
+|---|---|
+| `atc-auth.users.list` | read |
+| `atc-auth.users.get` | read |
+| `atc-auth.sessions.list` | read |
+| `atc-auth.events.list` | read |
+
+Not exposed:
+- `users.create`, `users.patch`, `users.delete`: Account changes are identity administration; read-only by decision.
+- `sessions.revokeAll`, `sessions.revokeOne`, `logout`: Revoking sessions signs people out and cannot be undone.
+- `login`, `refresh`, `introspect`: End-user credential flows: they take passwords or tokens and mint secrets.
+- `password.change`, `password.forgot`, `password.reset`, `emailVerification.resend`, `emailVerification.verify`: Password and verification flows act for an end user and send mail; forgot/resend must stay enumeration-resistant.
+
+### atc-backup
+
+| Tool | Kind |
+|---|---|
+| `atc-backup.sources.list` | read |
+| `atc-backup.sources.get` | read |
+| `atc-backup.backups.list` | read |
+| `atc-backup.backups.get` | read |
+| `atc-backup.stats.get` | read |
+| `atc-backup.backups.verify` | safe write, idempotent |
+
+Not exposed:
+- `sources.backup`: A new backup runs retention, which can delete the oldest kept backup.
+- `backups.restore`, `backups.delete`: Restore overwrites files (or a live database); delete is irreversible.
+- `backups.download`: Streams a whole database (secrets included) as binary.
+
+### atc-content
+
+| Tool | Kind |
+|---|---|
+| `atc-content.namespaces.list` | read |
+| `atc-content.namespaces.get` | read |
+| `atc-content.keys.list` | read |
+| `atc-content.keys.get` | read |
+| `atc-content.releases.list` | read |
+| `atc-content.releases.get` | read |
+| `atc-content.stats.get` | read |
+| `atc-content.bundles.get` | read |
+| `atc-content.namespaces.create` | safe write |
+| `atc-content.namespaces.update` | safe write, idempotent |
+| `atc-content.locales.upsert` | safe write, idempotent |
+| `atc-content.keys.upsert` | safe write, idempotent |
+
+Not exposed:
+- `namespaces.delete`, `locales.delete`, `keys.delete`: Deletes are irreversible.
+- `releases.publish`, `releases.rollback`: Changes what every end user is served at once; a human decision in the console.
+- `translations.import`: Bulk overwrite of a whole locale; not undoable key by key.
+- `translations.export`: Bulk file download; read keys with keys.list.
+
+### atc-export
+
+| Tool | Kind |
+|---|---|
+| `atc-export.sources.list` | read |
+| `atc-export.exports.list` | read |
+| `atc-export.exports.get` | read |
+| `atc-export.stats.get` | read |
+| `atc-export.exports.download` | read |
+| `atc-export.exports.create` | safe write |
+| `atc-export.exports.retry` | safe write |
+
+Not exposed:
+- `exports.cancel`, `exports.delete`: Cancel and delete discard work and files irreversibly.
+
+### atc-flags
+
+| Tool | Kind |
+|---|---|
+| `atc-flags.evaluate` | read |
+| `atc-flags.environments.list` | read |
+| `atc-flags.flags.list` | read |
+| `atc-flags.flags.get` | read |
+| `atc-flags.flags.getHistory` | read |
+| `atc-flags.history.list` | read |
+| `atc-flags.envs.get` | read |
+| `atc-flags.stats.get` | read |
+| `atc-flags.flags.create` | safe write |
+| `atc-flags.flags.patch` | safe write, idempotent |
+
+Not exposed:
+- `flags.delete`: Irreversible.
+- `envs.copy`, `envs.patch`: Bulk changes to a whole environment at once.
+- `evaluate.get`, `snapshot.get`: Duplicates of evaluate.post / SDK bootstrap payloads; no extra value for an agent.
+
+### atc-geo
+
+| Tool | Kind |
+|---|---|
+| `atc-geo.ip.lookup` | read |
+| `atc-geo.ip.lookupBatch` | read |
+| `atc-geo.phone.normalize` | read |
+| `atc-geo.phone.normalizeBatch` | read |
+| `atc-geo.distance.compute` | read |
+| `atc-geo.countries.list` | read |
+| `atc-geo.countries.get` | read |
+| `atc-geo.currencies.list` | read |
+| `atc-geo.timezones.list` | read |
+| `atc-geo.collections.list` | read |
+| `atc-geo.collections.get` | read |
+| `atc-geo.places.list` | read |
+| `atc-geo.places.get` | read |
+| `atc-geo.places.nearby` | read |
+| `atc-geo.stats.get` | read |
+| `atc-geo.database.getInfo` | read |
+| `atc-geo.collections.create` | safe write |
+| `atc-geo.collections.patch` | safe write, idempotent |
+| `atc-geo.places.upsert` | safe write, idempotent |
+
+Not exposed:
+- `collections.delete`, `collections.clear`, `places.delete`: Delete and clear are irreversible.
+- `database.reload`: Operator action that swaps the live IP database.
+
+### atc-media
+
+| Tool | Kind |
+|---|---|
+| `atc-media.files.get` | read |
+| `atc-media.files.list` | read |
+| `atc-media.files.signUrls` | read |
+
+Not exposed:
+- `files.delete`, `files.restore`: Delete is irreversible; restore is its operator counterpart.
+- `files.patch`: Can switch a private file to public, which exposes it.
+- `files.upload`, `files.uploadTicketed`, `tickets.create`: Binary uploads do not fit MCP tool calls.
+
+### atc-notify
+
+| Tool | Kind |
+|---|---|
+| `atc-notify.messages.list` | read |
+| `atc-notify.messages.create` | safe write, external |
+| `atc-notify.messages.get` | read |
+| `atc-notify.templates.list` | read |
+
+Not exposed:
+- `messages.retry`: Sends an e-mail again to a real recipient.
+
+### atc-payments
+
+| Tool | Kind |
+|---|---|
+| `atc-payments.payments.list` | read |
+| `atc-payments.payments.get` | read |
+| `atc-payments.ledger.list` | read |
+| `atc-payments.events.list` | read |
+| `atc-payments.stats.get` | read |
+| `atc-payments.payments.create` | safe write, idempotent, external |
+| `atc-payments.payments.sync` | safe write, idempotent, external |
+
+Not exposed:
+- `refunds.create`, `payments.cancel`: Moves or stops real money; irreversible.
+- `webhooks.stripe`: Stripe-only endpoint authenticated by its signature.
+
+### atc-queue
+
+| Tool | Kind |
+|---|---|
+| `atc-queue.queues.list` | read |
+| `atc-queue.queues.get` | read |
+| `atc-queue.messages.list` | read |
+| `atc-queue.messages.get` | read |
+| `atc-queue.stats.get` | read |
+| `atc-queue.queues.upsert` | safe write, idempotent |
+| `atc-queue.messages.enqueue` | safe write |
+| `atc-queue.messages.enqueueBatch` | safe write |
+
+Not exposed:
+- `queues.delete`, `queues.purge`, `messages.delete`: Deletes messages irreversibly.
+- `messages.pull`, `messages.ack`, `messages.nack`, `messages.extend`: Worker data plane: leasing and acking another consumer's work.
+- `queues.redrive`: Dead-letter handling is an operator decision in the console.
+
+### atc-ratelimit
+
+| Tool | Kind |
+|---|---|
+| `atc-ratelimit.check` | read |
+| `atc-ratelimit.policies.list` | read |
+| `atc-ratelimit.policies.get` | read |
+| `atc-ratelimit.policies.getStats` | read |
+| `atc-ratelimit.policies.getTop` | read |
+| `atc-ratelimit.overrides.list` | read |
+| `atc-ratelimit.subjects.getUsage` | read |
+| `atc-ratelimit.stats.get` | read |
+| `atc-ratelimit.policies.create` | safe write |
+| `atc-ratelimit.policies.patch` | safe write, idempotent |
+
+Not exposed:
+- `policies.delete`, `overrides.delete`, `subjects.resetUsage`: Irreversible; reset wipes counters.
+- `overrides.set`: Undoing an override needs a delete.
+- `checkBatch`, `release`: Consume or return real quota (check is exposed as a peek only).
+
+### atc-render
+
+| Tool | Kind |
+|---|---|
+| `atc-render.templates.list` | read |
+| `atc-render.templates.get` | read |
+| `atc-render.versions.get` | read |
+| `atc-render.stats.get` | read |
+| `atc-render.templates.create` | safe write |
+| `atc-render.templates.update` | safe write, idempotent |
+| `atc-render.versions.create` | safe write |
+| `atc-render.render.create` | safe write |
+
+Not exposed:
+- `templates.delete`: Irreversible.
+- `render.preview`: Returns the PDF bytes; render.create stores the document and returns a reference instead.
+
+### atc-scheduler
+
+| Tool | Kind |
+|---|---|
+| `atc-scheduler.jobs.list` | read |
+| `atc-scheduler.jobs.get` | read |
+| `atc-scheduler.jobs.listRuns` | read |
+| `atc-scheduler.runs.list` | read |
+| `atc-scheduler.runs.get` | read |
+| `atc-scheduler.schedule.preview` | read |
+| `atc-scheduler.stats.get` | read |
+| `atc-scheduler.timezones.list` | read |
+| `atc-scheduler.targetKeys.list` | read |
+| `atc-scheduler.jobs.create` | safe write, external |
+| `atc-scheduler.jobs.patch` | safe write, idempotent, external |
+
+Not exposed:
+- `jobs.delete`, `runs.cancel`: Irreversible.
+- `jobs.run`: Fires the job's HTTP call at once, outside its schedule.
+
+### atc-search
+
+| Tool | Kind |
+|---|---|
+| `atc-search.query` | read |
+| `atc-search.indexes.list` | read |
+| `atc-search.indexes.get` | read |
+| `atc-search.query.post` | read |
+| `atc-search.suggest` | read |
+| `atc-search.documents.get` | read |
+| `atc-search.documents.browse` | read |
+| `atc-search.stats.get` | read |
+| `atc-search.indexes.create` | safe write |
+| `atc-search.indexes.patch` | safe write, idempotent |
+| `atc-search.documents.upsert` | safe write, idempotent |
+
+Not exposed:
+- `indexes.delete`, `indexes.clear`, `documents.delete`: Irreversible.
+
+### atc-shortlink
+
+| Tool | Kind |
+|---|---|
+| `atc-shortlink.links.create` | safe write |
+| `atc-shortlink.links.list` | read |
+| `atc-shortlink.links.get` | read |
+| `atc-shortlink.links.getStats` | read |
+| `atc-shortlink.stats.get` | read |
+| `atc-shortlink.links.patch` | safe write, idempotent |
+
+Not exposed:
+- `links.delete`: Irreversible.
+- `links.getQr`, `qr.getForText`, `qr.getPublic`: Binary images.
+- `redirect.follow`, `robots.get`: Public browser endpoints that count clicks.
+
+### atc-status
+
+| Tool | Kind |
+|---|---|
+| `atc-status.monitors.list` | read |
+| `atc-status.monitors.get` | read |
+| `atc-status.monitors.checks` | read |
+| `atc-status.incidents.list` | read |
+| `atc-status.incidents.get` | read |
+| `atc-status.stats.get` | read |
+| `atc-status.page.summary` | read |
+| `atc-status.monitors.upsert` | safe write, idempotent, external |
+
+Not exposed:
+- `monitors.delete`: Irreversible (checks and incidents go with it).
+- `monitors.check`: Can open an incident and send alert e-mails.
+- `page.get`: HTML; page.summary has the same data.
+
+### atc-webhook-out
+
+| Tool | Kind |
+|---|---|
+| `atc-webhook-out.subscriptions.list` | read |
+| `atc-webhook-out.subscriptions.get` | read |
+| `atc-webhook-out.subscriptions.listDeliveries` | read |
+| `atc-webhook-out.events.list` | read |
+| `atc-webhook-out.events.get` | read |
+| `atc-webhook-out.eventTypes.list` | read |
+| `atc-webhook-out.deliveries.list` | read |
+| `atc-webhook-out.deliveries.get` | read |
+| `atc-webhook-out.stats.get` | read |
+| `atc-webhook-out.subscriptions.create` | safe write, external |
+| `atc-webhook-out.subscriptions.patch` | safe write, idempotent, external |
+| `atc-webhook-out.events.publish` | safe write, external |
+
+Not exposed:
+- `subscriptions.delete`, `deliveries.cancel`: Irreversible.
+- `subscriptions.rotate`: Signing-secret change: breaks receivers until they update.
+- `subscriptions.test`, `subscriptions.replay`, `deliveries.redeliver`: Re-sends deliveries to external receivers.
+
+
+Notes on specific tools:
+
+- `atc-ratelimit.check` always evaluates with `peek: true`, so it can never consume quota.
+- `atc-payments.payments.create` requires `idempotencyKey` (sent as the `Idempotency-Key` header): the same key with the same body returns the same payment, and Stripe gets one PaymentIntent. Confirm the payment in the browser with the returned `clientSecret`.
+- `atc-render.render.create` always stores the PDF in atc-media and returns the reference; it never returns document bytes. `atc-export.exports.download` returns a short-lived signed URL, not the file.
+- `atc-webhook-out.subscriptions.*` results never include the signing secret; read or rotate it in the console.
+- List tools keep each service's own pagination (`items`/`nextCursor` cursors, or `total`/`limit`/`offset`); query parameters are strings exactly as the service's contract defines them (for example `limit: "20"`).
+
+The ten original tools keep their names (`atc-flags.evaluate` calls `atc-flags.evaluate.post`, `atc-search.query` calls `atc-search.query.get`); every other tool is named exactly after its operation's `operationId` — no invented naming scheme, no API-path-shaped names like `notify_post_v1_messages`.
 
 ### On the two different pagination shapes
 
@@ -184,33 +512,19 @@ contains a sentinel test secret.
 ```bash
 npm run mcp:typecheck   # strict, from stack root
 npm run mcp:test        # fast: catalog/allowlist/boundary-scan invariants, no process spawning
-STACK_INTEGRATION=1 npm run mcp:e2e   # real: 7 spawned services + a real stack-mcp child process, driven by the official MCP client SDK over real STDIO
+STACK_INTEGRATION=1 npm run mcp:e2e   # real: spawned services + a real stack-mcp child process, driven by the official MCP client SDK over real STDIO
 ```
 
 `mcp:e2e` proves, against real running services (not mocks, not direct handler calls): `initialize`
 → `listTools` → `callTool`, a read-only tool, an authenticated read, a safe mutation, an async
 submit-then-status-read pair, both real pagination shapes, an expected 4xx from a real service, a
 malformed-input rejection, an unconfigured-service error, a wrong-credential error, an
-unreachable-service transport error, and STDIO purity / secret non-leakage.
+unreachable-service transport error, and STDIO purity / secret non-leakage. `test/e2e/operations.test.mjs` adds the generated operation tools against real atc-queue, atc-payments (with a local fake Stripe, never real keys), atc-render with atc-media, and atc-auth with atc-notify: a PUT upsert, enqueue and cursor paging, a payment created twice with one idempotency key (one PaymentIntent), a stored render returned as a reference, and auth reads with no secret-looking field in any result.
 
-## Adding a future tool
+## Adding a tool
 
-1. The operation must already exist in that service's canonical `openapi.yaml`.
-2. Regenerate/confirm the typed client is current: `npm run clients:check` from `atc-stack/` must be
-   green (a stale client is not a base to build a tool on).
-3. Classify it: re-run `npm run mcp:catalog` from `atc-stack/` if the source spec changed, and look at
-   its entry in `mcp/tool-catalog.json`.
-4. Make an explicit allowlist decision. `DESTRUCTIVE`/`HIGH_RISK` operations default deny; adding
-   one requires a deliberate, reviewed policy change to this README and the allowlist tests, not
-   just a new entry in `src/tools/index.mjs`.
-5. Write the tool: a `zod` `inputSchema` copied from the operation's real request schema, a handler
-   that calls `registry.client(service)` and nothing else for I/O, real `annotations`
-   (`readOnlyHint`/`destructiveHint`/`idempotentHint`/`openWorldHint` matching real semantics, never
-   guessed).
-6. Update `mcp/tool-catalog.reconcile.mjs`'s `TOOL_TO_OPERATION_IDS` map and re-run
-   `npm run mcp:catalog`.
-7. Update `test/allowlist.test.mjs`'s `EXPECTED_TOOL_NAMES` deliberately (the test fails on an
-   accidental tool-count change on purpose).
-8. Add real, service-backed tests: at minimum a success case and its real expected-error case; a
-   protocol-level `test/e2e/` case if the new tool exercises a genuinely new pattern (a new
-   pagination shape, a new async flow, binary content, etc.) this suite doesn't already cover.
+1. The operation must already exist in that service's canonical `openapi.yaml`, and `npm run clients:check` (from `atc-stack/`) must be green.
+2. Decide in `tool-policy.mjs`: add the operationId to the service's `tools`, or keep it under `excluded` with a reason. `DESTRUCTIVE`/`HIGH_RISK` operations stay excluded; changing that is a reviewed policy change to this README and the tests.
+3. Regenerate: `node mcp/tools.generate.mjs`, then `npm run mcp:catalog` (catalog + reconcile). Put any behaviour tweak in `src/tools/overrides.mjs`, never in a generated file.
+4. Update `test/allowlist.test.mjs`'s `EXPECTED_COUNT` deliberately (the test fails on an accidental change on purpose).
+5. Add a service-backed `test/e2e/` case when the tool brings a new pattern (a new pagination shape, header idempotency, a stored output, binary content).

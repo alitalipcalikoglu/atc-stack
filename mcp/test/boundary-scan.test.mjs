@@ -32,7 +32,7 @@ test('no import of a sibling service\'s own src/ tree (only generated clients, o
   for (const { file, text } of sources) {
     for (const m of text.matchAll(importPattern)) {
       const spec = m[1];
-      if (/\/(?:gateway|notify|auth|media|console|audit|shortlink|flags|scheduler|webhook-out|search|ratelimit|geo)\/src\//.test(spec)) {
+      if (/\/(?:gateway|notify|auth|media|console|audit|shortlink|flags|scheduler|webhook-out|search|ratelimit|geo|content|export|render|queue|backup|status|payments)\/src\//.test(spec)) {
         offenders.push(`${path.relative(SRC_ROOT, file)}: imports "${spec}"`);
       }
     }
@@ -72,4 +72,9 @@ test('registry.mjs is the only file that constructs a typed client (via createCl
   const constructors = sources.filter(({ text }) => /\bcreateClient\s*\(/.test(text));
   const files_ = constructors.map(({ file }) => path.relative(SRC_ROOT, file));
   assert.deepEqual(files_, ['registry.mjs'], `createClient() must only be called from registry.mjs, found it in: ${files_.join(', ')}`);
+});
+
+test('no tool is registered from a spec or the catalog at runtime: nothing under src/ parses a spec or loads the catalog (config.mjs reads tool-policy.mjs only to know which services need keys)', () => {
+  const offenders = sources.filter(({ text }) => /from ['"]yaml['"]|tool-catalog\.json['"]|openapi\.yaml['"]|tool-policy\.mjs['"]/.test(text) && !text.includes('API_KEY_SERVICES')).map(({ file }) => path.relative(SRC_ROOT, file));
+  assert.deepEqual(offenders, []);
 });

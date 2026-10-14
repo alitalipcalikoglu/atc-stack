@@ -275,6 +275,19 @@ kept in `.release/v<version>.json` (untracked), so a failed step can simply be r
 | `LoadTest` | `src/load-test.js` | `load`: fetch loops per route, latency percentiles, errors |
 | `Cli` | `bin/stack.js` | Argument parsing |
 
+## MCP server
+
+[`mcp/`](mcp/README.md) is one local STDIO [Model Context Protocol](https://modelcontextprotocol.io) server over the generated typed clients: 153 tools, read tools for every service plus safe writes (create, update, enqueue, publish, start an export, render a stored document, create a monitor or a payment intent). Nothing destructive or irreversible is exposed (no delete, purge, refund, cancel, restore, revoke, rotate or key/role change); atc-auth is read-only with secrets filtered; atc-console only answers the status probe. `mcp/tool-policy.mjs` holds the per-service decision with a reason for every excluded write class.
+
+```bash
+cd mcp && npm install
+STACK_MCP_QUEUE_BASE_URL=http://127.0.0.1:3016 STACK_MCP_QUEUE_API_KEY=<key> \
+  node --experimental-strip-types --disable-warning=ExperimentalWarning bin/stack-mcp.js
+npm run mcp:test                         # from atc-stack/: policy, catalog, allowlist and boundary checks
+STACK_INTEGRATION=1 npm run mcp:e2e      # real services and a real MCP client over STDIO
+npm run mcp:catalog                      # regenerate the tools and catalog after a spec or policy change
+```
+
 ## Documentation
 
 - [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) — the request-id/`traceparent` propagation rules and structured-log field vocabulary every service is measured against.

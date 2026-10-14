@@ -2,7 +2,8 @@
 // (disposable, scratch SQLite/data dirs) plus the real stack-mcp server as its own child process,
 // and drives it with the OFFICIAL MCP client SDK over the real STDIO transport -- not a direct
 // function-handler call. Deliberately leaves gateway/auth/console/audit/scheduler/webhook-out
-// unconfigured, to prove atc-stack.status degrades gracefully rather than requiring all 13.
+// unconfigured, to prove atc-stack.status degrades gracefully rather than requiring every service.
+// test/e2e/operations.test.mjs covers the generated operation tools (queue, payments, render, auth).
 //
 // Only runs when explicitly requested, matching every other process-spawning test in this
 // workspace: `STACK_INTEGRATION=1 npm run mcp:e2e` (see atc-stack/package.json).
@@ -203,17 +204,16 @@ async function callTool(client, name, args) {
   return client.callTool({ name, arguments: args });
 }
 
-test('protocol: initialize -> listTools -> exactly the expected 10 tools -> shutdown', { skip }, async () => {
+test('protocol: initialize -> listTools -> exactly the allowlisted tools -> shutdown', { skip }, async () => {
   const { client } = await connectClient();
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.length, 10, `expected exactly 10 tools, got ${tools.length}: ${tools.map((t) => t.name).join(', ')}`);
+    const { TOOLS } = await import('../../src/tools/index.mjs');
+    assert.equal(tools.length, TOOLS.length, `expected ${TOOLS.length} tools, got ${tools.length}`);
     const names = tools.map((t) => t.name).sort();
-    assert.deepEqual(names, [
-      'atc-flags.evaluate', 'atc-geo.ip.lookup', 'atc-media.files.get', 'atc-notify.messages.create',
-      'atc-notify.messages.get', 'atc-notify.messages.list', 'atc-ratelimit.check', 'atc-search.query',
-      'atc-shortlink.links.create', 'atc-stack.status',
-    ]);
+    assert.deepEqual(names, TOOLS.map((t) => t.name).sort());
+    for (const n of ['atc-flags.evaluate', 'atc-geo.ip.lookup', 'atc-media.files.get', 'atc-notify.messages.create', 'atc-notify.messages.get', 'atc-notify.messages.list', 'atc-ratelimit.check', 'atc-search.query', 'atc-shortlink.links.create', 'atc-stack.status']) assert.ok(names.includes(n), n);
+    for (const t of tools) assert.equal(t.annotations?.destructiveHint, false, `${t.name} over the protocol`);
     // Real annotation semantics, over the real protocol (not read from source).
     const status = tools.find((t) => t.name === 'atc-stack.status');
     assert.ok(status);
