@@ -3541,6 +3541,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/services/{sid}/atc-export/exports/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the export file through the console.
+         * @description Asks the **export** service instance named by `sid` for a signed URL (`GET /v1/exports/{id}/download`) and fetches that URL server-side (no redirects, 60 s timeout), streaming the body back with backpressure, so the browser never needs to reach media. Always an attachment with a sanitised file name; content type is `text/csv; charset=utf-8`, `application/x-ndjson` or `application/octet-stream`; adds `content-security-policy: default-src 'none'; sandbox` and `cache-control: no-store`. A failed downstream call becomes a `ServiceError` rather than a partial file.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        get: operations["atc-console.atc-export.exports.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/services/{sid}/atc-export/exports/{id}/download": {
         parameters: {
             query?: never;
@@ -10687,6 +10711,40 @@ export interface operations {
             400: components["responses"]["ValidationFailed"];
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-export.exports.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The export file. */
+            200: {
+                headers: {
+                    /** @description `attachment; filename="<sanitised media file name>"`. */
+                    "Content-Disposition"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                    "application/x-ndjson": string;
+                    "application/octet-stream": string;
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
             404: components["responses"]["ProxyNotFound"];
             502: components["responses"]["Unreachable"];
             default: components["responses"]["DownstreamDefault"];

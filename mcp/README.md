@@ -23,8 +23,8 @@ future edit that reintroduces one of these is a failing test, not a design doc n
 
 ## One server, small tool set, default deny
 
-This is **not** an API mirror. Of the platform's 441 canonical operations, exactly **10 tools** are exposed — see "Available tools"
-below. `mcp/tool-catalog.json` classifies all 441 operations (service, method, path,
+This is **not** an API mirror. Of the platform's 442 canonical operations, exactly **10 tools** are exposed — see "Available tools"
+below. `mcp/tool-catalog.json` classifies all 442 operations (service, method, path,
 `READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`)
 as a **candidate universe** for future phases — it is not the exposed list. The exposed list is
 `src/tools/index.mjs`'s explicit array, and only that array. An operation existing in a service's

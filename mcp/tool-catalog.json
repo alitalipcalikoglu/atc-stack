@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 441,
+  "totalOperations": 442,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -981,6 +981,18 @@
       "operationId": "atc-console.atc-export.exports.download",
       "method": "GET",
       "path": "/api/services/{sid}/atc-export/exports/{id}/download",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.file",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-export/exports/{id}/file",
       "flags": [
         "READ_SAFE",
         "OPERATOR",

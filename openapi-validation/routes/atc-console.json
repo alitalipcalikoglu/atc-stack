@@ -182,6 +182,7 @@
     { "method": "DELETE", "path": "/api/services/{sid}/atc-export/exports/{id}" },
     { "method": "POST", "path": "/api/services/{sid}/atc-export/exports/{id}/cancel" },
     { "method": "POST", "path": "/api/services/{sid}/atc-export/exports/{id}/retry" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-export/exports/{id}/file" },
     { "method": "GET", "path": "/api/services/{sid}/atc-export/exports/{id}/download" },
     { "method": "PUT", "path": "/api/services/{sid}/atc-media/files" }
   ],

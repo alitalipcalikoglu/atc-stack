@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (183 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (184 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -85,6 +85,7 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-export.exports.create": (init: FetchOptions<operations["atc-console.atc-export.exports.create"]>) => client.POST("/api/services/{sid}/atc-export/exports", init),
     "atc-console.atc-export.exports.delete": (init: FetchOptions<operations["atc-console.atc-export.exports.delete"]>) => client.DELETE("/api/services/{sid}/atc-export/exports/{id}", init),
     "atc-console.atc-export.exports.download": (init: FetchOptions<operations["atc-console.atc-export.exports.download"]>) => client.GET("/api/services/{sid}/atc-export/exports/{id}/download", init),
+    "atc-console.atc-export.exports.file": (init: FetchOptions<operations["atc-console.atc-export.exports.file"]>) => client.GET("/api/services/{sid}/atc-export/exports/{id}/file", init),
     "atc-console.atc-export.exports.get": (init: FetchOptions<operations["atc-console.atc-export.exports.get"]>) => client.GET("/api/services/{sid}/atc-export/exports/{id}", init),
     "atc-console.atc-export.exports.list": (init: FetchOptions<operations["atc-console.atc-export.exports.list"]>) => client.GET("/api/services/{sid}/atc-export/exports", init),
     "atc-console.atc-export.exports.retry": (init: FetchOptions<operations["atc-console.atc-export.exports.retry"]>) => client.POST("/api/services/{sid}/atc-export/exports/{id}/retry", init),
