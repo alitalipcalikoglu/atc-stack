@@ -39,7 +39,7 @@ const eventsEnv = (c, id) => ({ WEBHOOK_OUT_URL: String(c.url('atc-webhook-out')
  * Media must accept export files and database backups: append those types to whatever the operator allows.
  * @param {string} list
  */
-const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3', 'application/gzip', 'application/octet-stream'])].join(',');
+const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3', 'application/gzip', 'application/vnd.atc-backup'])].join(',');
 
 /** Files and directories atc-backup archives besides the databases: the media blobs and the signing keys (relative to the workspace). */
 export const BACKUP_TREES = Object.freeze({
