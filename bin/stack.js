@@ -3,6 +3,8 @@ import './../src/quiet.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SERVICES } from '../src/manifest.js';
+import { Compose } from '../src/compose.js';
+import { LoadTest } from '../src/load-test.js';
 import { Release } from '../src/release.js';
 import { REPOSITORIES } from '../src/repository-catalog.js';
 import { Stack } from '../src/stack.js';
@@ -15,6 +17,8 @@ import { Stack } from '../src/stack.js';
  *   backup   --root <dir> --dir <snapshot dir>                     (default dir: <root>/backups/<timestamp>)
  *   restore  <snapshot dir> --root <dir> --service <id>             (default: every service the snapshot covers)
  *   maintenance <service>   --root <dir>                            (one-shot; today: media only)
+ *   compose  [--port-offset n] --root <dir>                         (writes compose/docker-compose.yml + env files)
+ *   load     [--url http://127.0.0.1:3000] [--duration 10] [--concurrency 10] [--routes "GET /health,..."] [--json]
  *   release:prepare|release:verify|release:publish <version>        (see README, "Releasing")
  * `--root` defaults to the parent folder of this checkout (the workspace with one folder per service).
  */
@@ -95,6 +99,30 @@ export class Cli {
         console.log(JSON.stringify(r));
         return r.errors ? 1 : 0;
       }
+      case 'compose': {
+        const offset = flags['port-offset'] === undefined ? 0 : Number(flags['port-offset']);
+        if (!Number.isInteger(offset) || offset < 0 || offset > 60_000) throw new Error('--port-offset must be an integer from 0 to 60000');
+        const r = new Compose({ root, stackDir, portOffset: offset }).generate();
+        console.log(`wrote ${r.file} (${r.services} services; published on 127.0.0.1: ${r.published.join(', ')})`);
+        console.log('next: docker compose -f compose/docker-compose.yml up -d --build');
+        return 0;
+      }
+      case 'load': {
+        const num = (/** @type {string} */ k, /** @type {number} */ d, /** @type {number} */ min, /** @type {number} */ max) => {
+          const v = flags[k] === undefined ? d : Number(flags[k]);
+          if (!Number.isFinite(v) || v < min || v > max) throw new Error(`--${k} must be a number from ${min} to ${max}`);
+          return v;
+        };
+        const lt = new LoadTest({
+          baseUrl: String(flags.url ?? 'http://127.0.0.1:3000'),
+          durationMs: num('duration', 10, 1, 3_600) * 1000,
+          concurrency: num('concurrency', 10, 1, 1_000),
+          routes: flags.routes === undefined ? undefined : LoadTest.parseRoutes(String(flags.routes)),
+        });
+        const report = await lt.run();
+        console.log(flags.json ? JSON.stringify(report, null, 2) : LoadTest.table(report));
+        return report.results.some((x) => x.errors > 0) ? 1 : 0;
+      }
       case 'release:prepare':
       case 'release:verify':
       case 'release:publish': {
@@ -105,7 +133,7 @@ export class Cli {
         return 0;
       }
       default:
-        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | release:prepare|release:verify|release:publish <version>');
+        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | compose [--port-offset n] | load [--url u] [--duration s] [--concurrency n] [--routes "GET /p,..."] [--json] | release:prepare|release:verify|release:publish <version>');
         return 2;
     }
   }

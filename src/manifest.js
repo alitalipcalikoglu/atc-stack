@@ -39,11 +39,11 @@ const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_
 const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3'])].join(',');
 
 /** Each service's SQLite file under its folder (its DB_PATH default); atc-backup reads them in place. */
-const DATA_FILES = {
+export const DATA_FILES = Object.freeze({
   'atc-notify': 'notify.db', 'atc-auth': 'auth.db', 'atc-media': 'media.db', 'atc-audit': 'audit.db', 'atc-shortlink': 'shortlink.db', 'atc-flags': 'flags.db',
   'atc-scheduler': 'scheduler.db', 'atc-webhook-out': 'webhook-out.db', 'atc-search': 'search.db', 'atc-ratelimit': 'ratelimit.db', 'atc-geo': 'geo.db',
   'atc-content': 'content.db', 'atc-export': 'export.db', 'atc-render': 'render.db', 'atc-queue': 'queue.db', 'atc-status': 'status.db', 'atc-payments': 'payments.db', 'atc-console': 'console.db',
-};
+});
 
 /** @type {Service[]} */
 export const SERVICES = [

@@ -147,6 +147,41 @@ By default the stack is **local**: `HOST=127.0.0.1`, plain HTTP everywhere, `COO
 
 Options: `--root <dir>` (default: the parent of this checkout), `--admin-username <name>` (default `admin`), `--admin-password <password>` (otherwise generated), `--install`.
 
+## Docker Compose
+
+`npm run compose` writes `compose/docker-compose.yml`, which builds every service from its own `Dockerfile` (`atc-web/<id>:local` images) and runs them on one network:
+
+```bash
+npm run setup                     # once: secrets, keys and the JWT key pair the containers reuse
+npm run compose                   # or: npm run compose -- --port-offset 10000 when the PM2 stack uses the ports
+docker compose -f compose/docker-compose.yml up -d --build
+docker compose -f compose/docker-compose.yml exec atc-console node --disable-warning=ExperimentalWarning scripts/admin.js create admin
+```
+
+- Generated next to it: one env file per service (`compose/env/<id>.env`, mode 0600, the same secrets as the local `.env` files; relative host paths are dropped so the images' own `/data`, `/config` and `/keys` apply), the gateway's `routes.json` and the console's `services.json` under `compose/config/`. Everything in `compose/` is untracked. The compose file itself holds no secrets.
+- Services call each other by container name (`http://atc-media:3003`); scheduler and webhook-out may reach those names. Only the gateway (3000), the console (3004) and media (3003, for signed file URLs; `PUBLIC_BASE_URL` points at the published port) are published, on 127.0.0.1. `--port-offset N` adds `N` to those host ports.
+- One named volume per service (`<id>-data` at `/data`); atc-auth's keys are mounted read-only from `atc-auth/keys`. atc-backup mounts every data volume at `/sources/<id>` and backs them all up.
+- Start order: the gateway waits for auth; backup and status wait until every other service is healthy, so their first backups and checks find everything up. `stop_grace_period` is 35 s, matching PM2's `kill_timeout`.
+- Stripe stays off until `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` are set in `atc-payments/.env` and `npm run compose` runs again.
+
+## Load test
+
+`npm run load` drives the gateway with plain `fetch` loops (no load-test dependency) and prints, per route, requests, rate, p50/p95/p99/max latency, errors (network failures and 5xx), 429s and other 4xx. It exits non-zero when any route had errors.
+
+```bash
+npm run load -- --url http://127.0.0.1:3000 --duration 30 --concurrency 20
+npm run load -- --routes "GET /health,GET /status/summary.json" --json
+```
+
+```
+http://127.0.0.1:3000  5s  5 loops per route
+route           requests     rps  p50 ms  p95 ms  p99 ms  max ms  errors    429  other 4xx
+gateway health     23428  4671.3     0.8     2.4     3.8    37.8       0      0          0
+status json        23235  4628.7     0.8     2.4     4.5    16.8       0  22933          0
+```
+
+Default routes are public and change nothing: `/health`, `/.well-known/jwks.json`, `/status/summary.json`, `/status`. Every loop runs from one address, so the gateway's per-route and per-IP limits answer 429 quickly (counted apart, not as errors): that column shows the limits working, the rest shows the cost of a request through the gateway. Measure upstream latency with routes that have no limit, or raise the route's `rateLimit` in `routes.json` for the run.
+
 ## Service list
 
 | Service | Port | Repository | What it does | Calls |
@@ -236,6 +271,8 @@ kept in `.release/v<version>.json` (untracked), so a failed step can simply be r
 | `Stack` | `src/stack.js` | `setup`, `up`, `down`, `dev`, `status`, `matrix`, `backup`, `restore`, `maintenance`, first admin |
 | `Snapshot` | `src/snapshot.js` | Whole-workspace backup creation and validated restore |
 | `Release` | `src/release.js` | `release:prepare`, `release:verify`, `release:publish` |
+| `Compose`, `ComposeContext` | `src/compose.js` | `compose`: docker-compose.yml, env files and config for containers |
+| `LoadTest` | `src/load-test.js` | `load`: fetch loops per route, latency percentiles, errors |
 | `Cli` | `bin/stack.js` | Argument parsing |
 
 ## Documentation
