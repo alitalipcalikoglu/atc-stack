@@ -113,13 +113,14 @@ export const SERVICES = [
   {
     id: 'atc-content', port: 3013, keysVar: 'CONTENT_API_KEYS',
     // Bundles reach applications through the gateway route below; direct anonymous reads stay off unless the operator turns them on.
-    env: (c) => ({ ...auditEnv(c, 'atc-content'), CONTENT_PUBLIC_BUNDLES: c.keep('atc-content', 'CONTENT_PUBLIC_BUNDLES', 'false') }),
+    env: (c) => ({ ...auditEnv(c, 'atc-content'), CONTENT_PUBLIC_BUNDLES: c.keep('atc-content', 'CONTENT_PUBLIC_BUNDLES', 'false'), ACTOR_KEYS: 'atc-console' }),
     console: { type: 'atc-content', label: 'Content', keyEnv: 'CONTENT_API_KEY' },
   },
   {
     id: 'atc-export', port: 3014, keysVar: 'EXPORT_API_KEYS',
     env: (c) => ({
       ...auditEnv(c, 'atc-export'),
+      ACTOR_KEYS: 'atc-console', // the console names the signed-in admin in X-Actor
       MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-export'),
       NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-export'),
       // Read keys on every source service; each export pages through that service's own list API.
@@ -135,7 +136,7 @@ export const SERVICES = [
   {
     id: 'atc-render', port: 3015, keysVar: 'RENDER_API_KEYS',
     // Media is its only network peer: image blocks by file id and stored renders.
-    env: (c) => ({ ...auditEnv(c, 'atc-render'), MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-render') }),
+    env: (c) => ({ ...auditEnv(c, 'atc-render'), ACTOR_KEYS: 'atc-console', MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-render') }),
     console: { type: 'atc-render', label: 'Render', keyEnv: 'RENDER_API_KEY' },
   },
   {

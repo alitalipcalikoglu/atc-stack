@@ -85,6 +85,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
     [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-export'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export'].secret, auditKeys['atc-export-reader'].secret, 'read', 'write', 'read', 'read', 'read', true], 'export reads every source with read keys and writes files to media');
   assert.equal(env('atc-console').EXPORT_API_KEY, keys('atc-export', 'EXPORT_API_KEYS')['atc-console'].secret);
   assert.deepEqual(env('atc-media').ALLOWED_TYPES.split(','), ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'application/pdf', 'text/csv', 'application/x-ndjson'], 'media accepts export files');
+  assert.deepEqual(['atc-content', 'atc-export', 'atc-render'].map((id) => env(id).ACTOR_KEYS), ['atc-console', 'atc-console', 'atc-console'], 'records name the signed-in admin');
   const contentKeys = keys('atc-content', 'CONTENT_API_KEYS');
   assert.deepEqual([env('atc-console').CONTENT_API_KEY, contentKeys['atc-console'].role, contentKeys['atc-gateway'].role, env('atc-gateway').CONTENT_API_KEY, env('atc-content').CONTENT_PUBLIC_BUNDLES, auditKeys['atc-content'].role], [contentKeys['atc-console'].secret, '', 'read', contentKeys['atc-gateway'].secret, 'false', 'write'], 'console edits content, gateway only reads bundles');
   assert.deepEqual(Object.keys(keys('atc-search', 'SEARCH_API_KEYS')), ['atc-console'], 'template placeholders dropped');

@@ -3267,6 +3267,8 @@ export interface paths {
          *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
          *
          *     Recorded in console's own activity log (`GET /api/audit`).
+         *
+         *     Accepts request bodies up to 2 MiB (other console routes: 64 KiB).
          */
         post: operations["atc-console.atc-content.translations.import"];
         delete?: never;
@@ -3736,7 +3738,7 @@ export interface paths {
         put?: never;
         /**
          * Render an unsaved layout and download the PDF through the console.
-         * @description Relays the body to the **render** service instance named by `sid` (`POST /v1/render/preview`) and streams the PDF back as an attachment (`preview.pdf`) with `content-security-policy: default-src 'none'; sandbox` and `cache-control: no-store`. Validation errors (with the failing block path) and 422 render errors are relayed as `ServiceError`s with the service's `details`. Console bodies are capped at 64 KiB.
+         * @description Relays the body to the **render** service instance named by `sid` (`POST /v1/render/preview`) and streams the PDF back as an attachment (`preview.pdf`) with `content-security-policy: default-src 'none'; sandbox` and `cache-control: no-store`. Validation errors (with the failing block path) and 422 render errors are relayed as `ServiceError`s with the service's `details`. This route accepts bodies up to 2 MiB (other console routes: 64 KiB).
          *
          *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
          *
