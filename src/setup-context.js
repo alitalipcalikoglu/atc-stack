@@ -158,7 +158,9 @@ export class SetupContext {
     return {
       jwt: { jwksUrl: `${this.url('atc-auth')}/.well-known/jwks.json`, issuer: this.url('atc-gateway'), audience: this.env('atc-auth').get('JWT_AUDIENCE') || 'app' },
       routes: [
-        { id: 'auth-public', pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('atc-auth')], methods: ['POST', 'OPTIONS'], injectApiKey: 'AUTH_API_KEY', cors: ['*'], rateLimit: 60, bodyLimit: 16384 },
+        { id: 'auth-public', pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('atc-auth')], methods: ['POST', 'OPTIONS'], injectApiKey: 'AUTH_API_KEY', cors: ['*'], rateLimit: 60, bodyLimit: 16384,
+          // Shared, restart-proof brute-force limit per client IP on top of the local one; the local limit still protects when ratelimit is down.
+          policy: { name: 'auth-public', subject: 'ip', cost: 1, failOpen: true } },
         { id: 'media-user', pathPrefix: '/api/media/', stripPrefix: '/api/media', upstreams: [this.url('atc-media')], auth: 'user', injectApiKey: 'MEDIA_API_KEY', cors: ['*'], bodyLimit: 26214400, timeoutMs: 120000 },
         { id: 'media-files', pathPrefix: '/files/', upstreams: [this.url('atc-media')], methods: ['GET', 'HEAD', 'OPTIONS'], cors: ['*'], rateLimit: 1200, timeoutMs: 120000 },
         { id: 'content-bundles', pathPrefix: '/api/content/v1/bundles/', stripPrefix: '/api/content', upstreams: [this.url('atc-content')], methods: ['GET', 'HEAD', 'OPTIONS'], injectApiKey: 'CONTENT_API_KEY', cors: ['*'], rateLimit: 600 },

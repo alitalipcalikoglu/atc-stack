@@ -67,6 +67,8 @@ export const SERVICES = [
     id: 'atc-media', port: 3003, keysVar: 'MEDIA_API_KEYS',
     env: (c) => ({
       ...auditEnv(c, 'atc-media'), PUBLIC_BASE_URL: c.publicUrl('atc-media'), SIGNING_SECRET: c.secret('atc-media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('atc-media', 'CORS_ORIGINS', c.url('atc-gateway')),
+      // Database backups (atc-backup) are far larger than the default upload limit.
+      KEY_MAX_UPLOAD_BYTES: 'atc-backup:1073741824',
       ALLOWED_TYPES: withDataTypes(c.keep('atc-media', 'ALLOWED_TYPES', 'image/jpeg,image/png,image/webp,image/gif,image/avif,application/pdf')),
     }),
     console: { type: 'atc-media', label: 'Media', keyEnv: 'MEDIA_API_KEY' },
@@ -110,7 +112,8 @@ export const SERVICES = [
   },
   {
     id: 'atc-ratelimit', port: 3011, keysVar: 'RATELIMIT_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-ratelimit'),}),
+    // Policies the generated gateway routes name; created when missing, never overwritten.
+    env: (c) => ({ ...auditEnv(c, 'atc-ratelimit'), POLICY_SEEDS: 'auth-public=20/60' }),
     console: { type: 'atc-ratelimit', label: 'Rate limits', keyEnv: 'RATELIMIT_API_KEY' },
   },
   {

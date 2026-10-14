@@ -87,6 +87,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual([env('atc-render').MEDIA_URL.endsWith(':3003'), env('atc-render').MEDIA_API_KEY, env('atc-console').RENDER_API_KEY, auditKeys['atc-render'].role], [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-render'].secret, keys('atc-render', 'RENDER_API_KEYS')['atc-console'].secret, 'write']);
   assert.deepEqual(Object.keys(keys('atc-render', 'RENDER_API_KEYS')), ['atc-console'], 'template placeholders dropped');
   assert.deepEqual([keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].role, env('atc-console').QUEUE_API_KEY, Object.keys(keys('atc-queue', 'QUEUE_API_KEYS'))], ['admin', keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].secret, ['atc-console']]);
+  assert.equal(env('atc-media').KEY_MAX_UPLOAD_BYTES, 'atc-backup:1073741824', 'database backups fit through media');
   const bk = env('atc-backup');
   assert.deepEqual([keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].role, env('atc-console').BACKUP_API_KEY, bk.MEDIA_API_KEY, bk.ALLOW_LIVE_RESTORE, auditKeys['atc-backup'].role], ['admin', keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].secret, keys('atc-media', 'MEDIA_API_KEYS')['atc-backup'].secret, 'false', 'write']);
   assert.deepEqual(bk.BACKUP_SOURCES.split(',').slice(0, 2), ['atc-notify=../atc-notify/data/notify.db', 'atc-auth=../atc-auth/data/auth.db']);
@@ -138,6 +139,8 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   // "looks like" it should accept (`/api/auth/login`) is a caller bug, not a generator bug — this
   // pins the real, documented, working shape (`atc-gateway/examples/public-route-with-injected-key.md`).
   const authPublic = routes.routes.find((/** @type {any} */ r) => r.id === 'auth-public');
+  assert.deepEqual(authPublic.policy, { name: 'auth-public', subject: 'ip', cost: 1, failOpen: true }, 'login routes use the shared rate-limit policy');
+  assert.equal(env('atc-ratelimit').POLICY_SEEDS, 'auth-public=20/60', 'and the policy exists');
   assert.deepEqual([authPublic.pathPrefix, authPublic.stripPrefix], ['/api/auth/', '/api/auth']);
   assert.equal('/api/auth/v1/auth/login'.slice(authPublic.stripPrefix.length), '/v1/auth/login');
   const mediaUser = routes.routes.find((/** @type {any} */ r) => r.id === 'media-user');
