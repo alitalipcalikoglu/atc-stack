@@ -98,7 +98,11 @@ export const SERVICES = [
     env: (c) => ({
       SIGNING_SECRET: c.secret('atc-scheduler', 'SIGNING_SECRET'),
       ...auditEnv(c, 'atc-scheduler'), ...eventsEnv(c, 'atc-scheduler'),
-      TARGET_KEYS: `atc-flags:${c.issue('atc-flags', 'atc-scheduler', 'write')},atc-notify:${c.issue('atc-notify', 'atc-scheduler')},atc-webhook-out:${c.issue('atc-webhook-out', 'atc-scheduler', 'publish')}`,
+      // Named bearer keys a job can use against internal services: the least role the typical scheduled call needs.
+      TARGET_KEYS: [
+        ['atc-flags', 'write'], ['atc-notify'], ['atc-webhook-out', 'publish'], ['atc-export', 'readwrite'], ['atc-queue', 'write'],
+        ['atc-backup', 'admin'], ['atc-status', 'admin'], ['atc-render', 'readwrite'], ['atc-payments', 'write'],
+      ].map(([id, role]) => `${id}:${c.issue(String(id), 'atc-scheduler', role)}`).join(','),
       ...c.outbound('atc-scheduler'),
     }),
     console: { type: 'atc-scheduler', label: 'Scheduler', keyEnv: 'SCHEDULER_API_KEY' },
