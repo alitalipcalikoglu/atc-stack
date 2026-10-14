@@ -16,7 +16,7 @@ export class ReleaseError extends Error {}
  * The local release flow for the whole suite, in three resumable commands:
  *   prepare  bump every repository, tag service-core, write the candidate manifest
  *   verify   integration, contracts, Console smokes, Docker images, candidate install from `main`
- *   publish  tag the 15 repositories, verify the default install, record the evidence
+ *   publish  tag the 16 repositories, verify the default install, record the evidence
  * Progress is kept in `.release/v<version>.json` inside stack (untracked), so a failed run can be
  * repeated without redoing finished steps. Pure text transformations are static and unit-tested.
  */

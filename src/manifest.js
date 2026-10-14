@@ -32,6 +32,12 @@
  */
 const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_KEY: String(c.issue('atc-audit', id, 'write')) });
 
+/**
+ * Media must accept export files: append the text data types to whatever the operator allows.
+ * @param {string} list
+ */
+const withExportTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson'])].join(',');
+
 /** @type {Service[]} */
 export const SERVICES = [
   {
@@ -52,7 +58,10 @@ export const SERVICES = [
   },
   {
     id: 'atc-media', port: 3003, keysVar: 'MEDIA_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-media'), PUBLIC_BASE_URL: c.publicUrl('atc-media'), SIGNING_SECRET: c.secret('atc-media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('atc-media', 'CORS_ORIGINS', c.url('atc-gateway')) }),
+    env: (c) => ({
+      ...auditEnv(c, 'atc-media'), PUBLIC_BASE_URL: c.publicUrl('atc-media'), SIGNING_SECRET: c.secret('atc-media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('atc-media', 'CORS_ORIGINS', c.url('atc-gateway')),
+      ALLOWED_TYPES: withExportTypes(c.keep('atc-media', 'ALLOWED_TYPES', 'image/jpeg,image/png,image/webp,image/gif,image/avif,application/pdf')),
+    }),
     console: { type: 'atc-media', label: 'Media', keyEnv: 'MEDIA_API_KEY' },
   },
   {
@@ -106,6 +115,22 @@ export const SERVICES = [
     // Bundles reach applications through the gateway route below; direct anonymous reads stay off unless the operator turns them on.
     env: (c) => ({ ...auditEnv(c, 'atc-content'), CONTENT_PUBLIC_BUNDLES: c.keep('atc-content', 'CONTENT_PUBLIC_BUNDLES', 'false') }),
     console: { type: 'atc-content', label: 'Content', keyEnv: 'CONTENT_API_KEY' },
+  },
+  {
+    id: 'atc-export', port: 3014, keysVar: 'EXPORT_API_KEYS',
+    env: (c) => ({
+      ...auditEnv(c, 'atc-export'),
+      MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-export'),
+      NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-export'),
+      // Read keys on every source service; each export pages through that service's own list API.
+      SOURCE_AUDIT_URL: c.url('atc-audit'), SOURCE_AUDIT_API_KEY: c.issue('atc-audit', 'atc-export-reader', 'read'),
+      SOURCE_AUTH_URL: c.url('atc-auth'), SOURCE_AUTH_API_KEY: c.issue('atc-auth', 'atc-export', 'read'),
+      SOURCE_SHORTLINK_URL: c.url('atc-shortlink'), SOURCE_SHORTLINK_API_KEY: c.issue('atc-shortlink', 'atc-export', 'read'),
+      SOURCE_FLAGS_URL: c.url('atc-flags'), SOURCE_FLAGS_API_KEY: c.issue('atc-flags', 'atc-export', 'read'),
+      SOURCE_MEDIA_URL: c.url('atc-media'), SOURCE_MEDIA_API_KEY: c.issue('atc-media', 'atc-export'),
+      SOURCE_CONTENT_URL: c.url('atc-content'), SOURCE_CONTENT_API_KEY: c.issue('atc-content', 'atc-export', 'read'),
+    }),
+    console: { type: 'atc-export', label: 'Exports', keyEnv: 'EXPORT_API_KEY' },
   },
   {
     id: 'atc-gateway', port: 3000,

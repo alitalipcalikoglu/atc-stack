@@ -27,6 +27,7 @@ const TEMPLATES = /** @type {Record<string, string>} */ ({
   'atc-ratelimit': 'PORT=3011\nHOST=0.0.0.0\nRATELIMIT_API_KEYS=console:REPLACE_WITH_64_HEX_CHARS,gateway:REPLACE_WITH_64_HEX_CHARS:check\n',
   'atc-geo': 'PORT=3012\nHOST=0.0.0.0\nMMDB_PATH=\nASN_MMDB_PATH=\nGEO_API_KEYS=console:REPLACE_WITH_64_HEX_CHARS,shop-backend:REPLACE_WITH_64_HEX_CHARS:read\n',
   'atc-content': 'PORT=3013\nHOST=0.0.0.0\nCONTENT_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS,web-frontend:REPLACE_WITH_64_HEX_CHARS:read\nCONTENT_PUBLIC_BUNDLES=false\n',
+  'atc-export': 'PORT=3014\nHOST=0.0.0.0\nEXPORT_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS\nMEDIA_URL=http://127.0.0.1:3003\nMEDIA_API_KEY=REPLACE_WITH_THE_EXPORT_KEY_FROM_MEDIA_API_KEYS\nNOTIFY_URL=\nNOTIFY_API_KEY=\nSOURCE_AUTH_URL=\nSOURCE_AUTH_API_KEY=\n',
   'atc-gateway': 'PORT=3000\nHOST=0.0.0.0\nMETRICS_TOKEN=\nAUTH_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_AUTH_API_KEYS\nMEDIA_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_MEDIA_API_KEYS\nNOTIFY_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_NOTIFY_API_KEYS\n',
   'atc-console': 'PORT=3004\nHOST=0.0.0.0\nCOOKIE_SECURE=true\nNOTIFY_API_KEY=REPLACE_WITH_THE_CONSOLE_KEY_FROM_NOTIFY_API_KEYS\nAUTH_API_KEY=REPLACE_WITH\nMEDIA_API_KEY=REPLACE_WITH\nGATEWAY_METRICS_TOKEN=REPLACE_WITH\nAUDIT_API_KEY=REPLACE_WITH\nSHORTLINK_API_KEY=REPLACE_WITH\nFLAGS_API_KEY=REPLACE_WITH\nSCHEDULER_API_KEY=REPLACE_WITH\nWEBHOOK_OUT_API_KEY=REPLACE_WITH\nSEARCH_API_KEY=REPLACE_WITH\n',
 });
@@ -76,6 +77,11 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual([auditKeys['atc-console'].role, auditKeys['atc-flags'].role, env('atc-flags').AUDIT_API_KEY, env('atc-flags').AUDIT_URL.endsWith(':3005')], ['readwrite', 'write', auditKeys['atc-flags'].secret, true], 'every service gets a write key for audit; the console reads and writes');
   assert.deepEqual([keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-gateway'].role, keys('atc-geo', 'GEO_API_KEYS')['atc-gateway'].role, env('atc-gateway').RATELIMIT_API_KEY, env('atc-gateway').GEO_URL.endsWith(':3012')], ['check', 'read', keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-gateway'].secret, true]);
   assert.equal(env('atc-geo').MMDB_PATH, '', 'operator-owned value kept empty');
+  const ex = env('atc-export');
+  assert.deepEqual([ex.EXPORT_API_KEYS.startsWith('atc-console:'), ex.MEDIA_API_KEY, ex.NOTIFY_API_KEY, ex.SOURCE_AUDIT_API_KEY, auditKeys['atc-export-reader'].role, auditKeys['atc-export'].role, keys('atc-auth', 'AUTH_API_KEYS')['atc-export'].role, keys('atc-flags', 'FLAGS_API_KEYS')['atc-export'].role, keys('atc-content', 'CONTENT_API_KEYS')['atc-export'].role, ex.SOURCE_SHORTLINK_URL.endsWith(':3006')],
+    [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-export'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export'].secret, auditKeys['atc-export-reader'].secret, 'read', 'write', 'read', 'read', 'read', true], 'export reads every source with read keys and writes files to media');
+  assert.equal(env('atc-console').EXPORT_API_KEY, keys('atc-export', 'EXPORT_API_KEYS')['atc-console'].secret);
+  assert.deepEqual(env('atc-media').ALLOWED_TYPES.split(','), ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'application/pdf', 'text/csv', 'application/x-ndjson'], 'media accepts export files');
   const contentKeys = keys('atc-content', 'CONTENT_API_KEYS');
   assert.deepEqual([env('atc-console').CONTENT_API_KEY, contentKeys['atc-console'].role, contentKeys['atc-gateway'].role, env('atc-gateway').CONTENT_API_KEY, env('atc-content').CONTENT_PUBLIC_BUNDLES, auditKeys['atc-content'].role], [contentKeys['atc-console'].secret, '', 'read', contentKeys['atc-gateway'].secret, 'false', 'write'], 'console edits content, gateway only reads bundles');
   assert.deepEqual(Object.keys(keys('atc-search', 'SEARCH_API_KEYS')), ['atc-console'], 'template placeholders dropped');
@@ -83,7 +89,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.equal(env('atc-console').COOKIE_SECURE, 'false');
   assert.match(env('atc-gateway').METRICS_TOKEN, /^[0-9a-f]{64}$/);
   // Template example keys are dropped; real holders kept.
-  assert.deepEqual(Object.keys(keys('atc-flags', 'FLAGS_API_KEYS')).sort(), ['atc-console', 'atc-scheduler']);
+  assert.deepEqual(Object.keys(keys('atc-flags', 'FLAGS_API_KEYS')).sort(), ['atc-console', 'atc-export', 'atc-scheduler']);
   assert.equal(keys('atc-flags', 'FLAGS_API_KEYS')['atc-scheduler'].role, 'write');
   assert.equal(keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-scheduler'].role, 'publish');
   // Cross-service holders.
@@ -169,7 +175,7 @@ test('server mode keeps secure defaults and operator URLs', async () => {
   assert.equal(ctx.env('atc-media').get('PUBLIC_BASE_URL'), 'https://media.mysite.com');
   assert.equal(ctx.env('atc-media').get('SIGNING_SECRET'), 'a'.repeat(64));
   assert.equal(ctx.env('atc-media').get('CORS_ORIGINS'), 'https://mysite.com');
-  assert.match(ctx.env('atc-media').get('MEDIA_API_KEYS') ?? '', new RegExp(`^shop:${'s'.repeat(64)},atc-gateway:[0-9a-f]{64},atc-console:[0-9a-f]{64}$`));
+  assert.match(ctx.env('atc-media').get('MEDIA_API_KEYS') ?? '', new RegExp(`^shop:${'s'.repeat(64)},atc-export:[0-9a-f]{64},atc-gateway:[0-9a-f]{64},atc-console:[0-9a-f]{64}$`));
   assert.equal(ctx.env('atc-scheduler').get('TARGET_ALLOW_PRIVATE'), 'false');
   assert.equal(ctx.env('atc-console').get('COOKIE_SECURE'), 'true');
   assert.equal(ctx.env('atc-auth').get('NOTIFY_URL'), 'http://10.0.0.5:3001');

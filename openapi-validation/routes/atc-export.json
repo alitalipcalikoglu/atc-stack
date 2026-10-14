@@ -1,0 +1,20 @@
+{
+  "service": "atc-export",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/sources" },
+    { "method": "GET", "path": "/v1/exports" },
+    { "method": "POST", "path": "/v1/exports" },
+    { "method": "GET", "path": "/v1/exports/{id}" },
+    { "method": "DELETE", "path": "/v1/exports/{id}" },
+    { "method": "POST", "path": "/v1/exports/{id}/cancel" },
+    { "method": "POST", "path": "/v1/exports/{id}/retry" },
+    { "method": "GET", "path": "/v1/exports/{id}/download" },
+    { "method": "GET", "path": "/v1/stats" }
+  ],
+  "exclusions": []
+}

@@ -18,5 +18,6 @@ export const REPOSITORIES = Object.freeze([
   'atc-ratelimit',
   'atc-geo',
   'atc-content',
+  'atc-export',
 ].map((id) => Object.freeze({ id, remote: `https://github.com/alitalipcalikoglu/${id}.git` })));
 

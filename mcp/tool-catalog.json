@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 418,
+  "totalOperations": 441,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -934,6 +934,115 @@
       "path": "/api/services/{sid}/atc-content/namespaces/{id}/import",
       "flags": [
         "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.cancel",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-export/exports/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-export/exports",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-export/exports/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.download",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-export/exports/{id}/download",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-export/exports/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-export/exports",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.exports.retry",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-export/exports/{id}/retry",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.sources.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-export/sources",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-export.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-export/stats",
+      "flags": [
+        "READ_SAFE",
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
@@ -2768,6 +2877,151 @@
       "path": "/v1/namespaces/{ns}/import",
       "flags": [
         "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.cancel",
+      "method": "POST",
+      "path": "/v1/exports/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.create",
+      "method": "POST",
+      "path": "/v1/exports",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.delete",
+      "method": "DELETE",
+      "path": "/v1/exports/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.download",
+      "method": "GET",
+      "path": "/v1/exports/{id}/download",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.get",
+      "method": "GET",
+      "path": "/v1/exports/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.list",
+      "method": "GET",
+      "path": "/v1/exports",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.exports.retry",
+      "method": "POST",
+      "path": "/v1/exports/{id}/retry",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.sources.list",
+      "method": "GET",
+      "path": "/v1/sources",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-export",
+      "operationId": "atc-export.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
+      "flags": [
+        "READ_SAFE"
       ],
       "exposedInPhase3": false
     },

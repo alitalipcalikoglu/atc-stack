@@ -52,7 +52,7 @@ export class Cli {
         console.log(`mode:         ${r.mode} (${r.ref})`);
         console.log(`workspace:    ${r.root}`);
         console.log(`repositories: ${r.cloned.length} clone, ${r.reused.length} reuse`);
-        console.log(`dependencies: ${r.dryRun ? 'planned for 15 repositories' : `${r.dependencies.length} installed`}`);
+        console.log(`dependencies: ${r.dryRun ? 'planned for 16 repositories' : `${r.dependencies.length} installed`}`);
         console.log(`configuration:${r.configured ? ' complete' : ' planned'}`);
         console.log(`startup:      ${r.dryRun ? 'planned' : r.started ? (r.splitWorkers ? 'PM2 split workers' : 'PM2 combined') : 'skipped (--no-start)'}`);
         console.log(`ready:        ${r.started ? `${r.ready}/13` : 'not checked'}`);

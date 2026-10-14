@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (174 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (183 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -81,6 +81,15 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-content.stats.get": (init: FetchOptions<operations["atc-console.atc-content.stats.get"]>) => client.GET("/api/services/{sid}/atc-content/stats", init),
     "atc-console.atc-content.translations.export": (init: FetchOptions<operations["atc-console.atc-content.translations.export"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/export/{sub}", init),
     "atc-console.atc-content.translations.import": (init: FetchOptions<operations["atc-console.atc-content.translations.import"]>) => client.POST("/api/services/{sid}/atc-content/namespaces/{id}/import", init),
+    "atc-console.atc-export.exports.cancel": (init: FetchOptions<operations["atc-console.atc-export.exports.cancel"]>) => client.POST("/api/services/{sid}/atc-export/exports/{id}/cancel", init),
+    "atc-console.atc-export.exports.create": (init: FetchOptions<operations["atc-console.atc-export.exports.create"]>) => client.POST("/api/services/{sid}/atc-export/exports", init),
+    "atc-console.atc-export.exports.delete": (init: FetchOptions<operations["atc-console.atc-export.exports.delete"]>) => client.DELETE("/api/services/{sid}/atc-export/exports/{id}", init),
+    "atc-console.atc-export.exports.download": (init: FetchOptions<operations["atc-console.atc-export.exports.download"]>) => client.GET("/api/services/{sid}/atc-export/exports/{id}/download", init),
+    "atc-console.atc-export.exports.get": (init: FetchOptions<operations["atc-console.atc-export.exports.get"]>) => client.GET("/api/services/{sid}/atc-export/exports/{id}", init),
+    "atc-console.atc-export.exports.list": (init: FetchOptions<operations["atc-console.atc-export.exports.list"]>) => client.GET("/api/services/{sid}/atc-export/exports", init),
+    "atc-console.atc-export.exports.retry": (init: FetchOptions<operations["atc-console.atc-export.exports.retry"]>) => client.POST("/api/services/{sid}/atc-export/exports/{id}/retry", init),
+    "atc-console.atc-export.sources.list": (init: FetchOptions<operations["atc-console.atc-export.sources.list"]>) => client.GET("/api/services/{sid}/atc-export/sources", init),
+    "atc-console.atc-export.stats.get": (init: FetchOptions<operations["atc-console.atc-export.stats.get"]>) => client.GET("/api/services/{sid}/atc-export/stats", init),
     "atc-console.atc-flags.environments.list": (init: FetchOptions<operations["atc-console.atc-flags.environments.list"]>) => client.GET("/api/services/{sid}/atc-flags/environments", init),
     "atc-console.atc-flags.envs.copy": (init: FetchOptions<operations["atc-console.atc-flags.envs.copy"]>) => client.POST("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}/copy", init),
     "atc-console.atc-flags.envs.update": (init: FetchOptions<operations["atc-console.atc-flags.envs.update"]>) => client.PATCH("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}", init),
