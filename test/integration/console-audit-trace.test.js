@@ -44,7 +44,7 @@ function fixtureDir(scratch, serviceId) {
   mkdirSync(dir, { recursive: true });
   symlinkSync(join(real, 'src'), join(dir, 'src'), 'dir');
   symlinkSync(join(real, 'node_modules'), join(dir, 'node_modules'), 'dir');
-  if (serviceId === 'console') {
+  if (serviceId === 'atc-console') {
     symlinkSync(join(real, 'build'), join(dir, 'build'), 'dir');
     cpSync(join(real, 'server.mjs'), join(dir, 'server.mjs'));
     cpSync(join(real, 'openapi.yaml'), join(dir, 'openapi.yaml'));
@@ -62,12 +62,12 @@ test('console -> audit: the trace console generates for a real admin request con
   // --- real audit process ---
   const auditPort = await freePort();
   const consoleToAuditSecret = randomSecret();
-  const auditDir = fixtureDir(scratch, 'audit');
+  const auditDir = fixtureDir(scratch, 'atc-audit');
   const audit = new ServiceProcess({
-    name: 'audit', cwd: auditDir, entry: 'src/index.js', port: auditPort,
+    name: 'atc-audit', cwd: auditDir, entry: 'src/index.js', port: auditPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(auditPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-      AUDIT_API_KEYS: `console:${consoleToAuditSecret}:read`,
+      AUDIT_API_KEYS: `atc-console:${consoleToAuditSecret}:read`,
       // Post-production Phase 5: console is audit's real trusted caller here — the same
       // TRUST_PROXY declaration audit already makes for X-Forwarded-For, reused for traceparent.
       TRUST_PROXY: 'true',
@@ -79,8 +79,8 @@ test('console -> audit: the trace console generates for a real admin request con
   // --- real console process, seeded with one real admin before it starts ---
   const consolePort = await freePort();
   const servicesFile = join(scratch, 'services.json');
-  writeFileSync(servicesFile, JSON.stringify({ services: [{ id: 'audit', type: 'audit', url: audit.baseUrl, apiKeyEnv: 'AUDIT_API_KEY' }] }));
-  const consoleDir = fixtureDir(scratch, 'console');
+  writeFileSync(servicesFile, JSON.stringify({ services: [{ id: 'atc-audit', type: 'atc-audit', url: audit.baseUrl, apiKeyEnv: 'AUDIT_API_KEY' }] }));
+  const consoleDir = fixtureDir(scratch, 'atc-console');
   const dbPath = join(consoleDir, 'data', 'console.db');
 
   const { Database } = await import(pathToFileURL(join(consoleDir, 'src', 'db.js')).href);
@@ -94,7 +94,7 @@ test('console -> audit: the trace console generates for a real admin request con
   seedDb.close();
 
   const consoleProc = new ServiceProcess({
-    name: 'console', cwd: consoleDir, entry: 'server.mjs', port: consolePort,
+    name: 'atc-console', cwd: consoleDir, entry: 'server.mjs', port: consolePort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(consolePort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: './data/console.db',
       SERVICES_FILE: servicesFile, AUDIT_API_KEY: consoleToAuditSecret,
@@ -112,7 +112,7 @@ test('console -> audit: the trace console generates for a real admin request con
   const cookie = String(setCookie).split(';')[0];
 
   // The proxied admin call to the real audit service.
-  const eventsRes = await fetch(`${consoleProc.baseUrl}/api/services/audit/audit/events?limit=5`, { headers: { cookie, 'x-console-request': '1' } });
+  const eventsRes = await fetch(`${consoleProc.baseUrl}/api/services/atc-audit/atc-audit/events?limit=5`, { headers: { cookie, 'x-console-request': '1' } });
   assert.equal(eventsRes.status, 200, await eventsRes.text());
   const eventsTraceparent = eventsRes.headers.get('traceparent');
   const eventsTrace = TRACEPARENT.exec(/** @type {string} */ (eventsTraceparent));

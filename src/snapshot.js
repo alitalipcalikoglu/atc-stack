@@ -42,13 +42,13 @@ function pathInside(root, target) {
  * @type {Record<string, (serviceDir: string, log?: (line: string) => void) => string[]>}
  */
 const EXTRA_PATHS = {
-  media: (dir) => {
+  'atc-media': (dir) => {
     const dataDir = envVar(dir, 'DATA_DIR') || './data/files';
     return ['objects', 'variants'].map((sub) => relTo(dir, join(dataDir, sub)));
   },
-  auth: () => ['keys'],
-  gateway: (dir) => [relTo(dir, envVar(dir, 'ROUTES_FILE') || 'routes.json')],
-  console: (dir) => [relTo(dir, envVar(dir, 'SERVICES_FILE') || 'services.json')],
+  'atc-auth': () => ['keys'],
+  'atc-gateway': (dir) => [relTo(dir, envVar(dir, 'ROUTES_FILE') || 'routes.json')],
+  'atc-console': (dir) => [relTo(dir, envVar(dir, 'SERVICES_FILE') || 'services.json')],
   /**
    * The Ed25519 anchor signing key pair — cryptographic continuity material for
    * `chain/verify`/anchoring, not reconstructible from the database alone (the private key is
@@ -68,7 +68,7 @@ const EXTRA_PATHS = {
    * `stack/docs/BACKUP.md`).
    * @param {string} dir @param {(line: string) => void} [log]
    */
-  audit: (dir, log = () => {}) => {
+  'atc-audit': (dir, log = () => {}) => {
     /** @param {string} envName @param {string} configuredPath */
     const resolveKeyPath = (envName, configuredPath) => {
       const resolved = resolve(dir, configuredPath);
@@ -97,7 +97,7 @@ const EXTRA_PATHS = {
 };
 
 /** Services backed up by their SQLite database (every stateful service; gateway has none). */
-const DB_SERVICES = SERVICES.map((s) => s.id).filter((id) => id !== 'gateway');
+const DB_SERVICES = SERVICES.map((s) => s.id).filter((id) => id !== 'atc-gateway');
 
 /** Services touched by a backup at all (DB services plus gateway, for its `routes.json`). */
 const ALL_SERVICES = [...new Set([...DB_SERVICES, ...Object.keys(EXTRA_PATHS)])];

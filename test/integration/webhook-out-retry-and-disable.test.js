@@ -100,7 +100,7 @@ async function startWebhookOut({ name, retryScheduleSec, disableAfterFailures = 
   const port = await freePort();
   const apiKey = randomSecret();
   const proc = new ServiceProcess({
-    name, cwd: join(workspaceRoot, 'webhook-out'), entry: 'src/index.js', port,
+    name, cwd: join(workspaceRoot, 'atc-webhook-out'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
       WEBHOOK_API_KEYS: `harness:${apiKey}:readwrite`,

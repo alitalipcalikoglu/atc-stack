@@ -11,7 +11,7 @@ import { freePort, randomSecret, ServiceProcess, stopAll, waitUntil } from './ha
  * Real cross-process failure-recovery test: a real `scheduler` `node` child process (not a mock,
  * not an in-process fake) is pointed at a local HTTP target that accepts the connection and then
  * never writes a response. That genuinely drives scheduler's outbound call through Node's own
- * socket-idle `timeout` (see `net/http-caller.js` / `@atc-web/service-core`'s `HttpCaller.send`,
+ * socket-idle `timeout` (see `net/http-caller.js` / `@atc-web/atc-service-core`'s `HttpCaller.send`,
  * which uses `http.request`'s `timeout` option, not `AbortSignal.timeout`) rather than a fast,
  * uninteresting connection-refused error. Stage 11 proves the whole retry/backoff/exhaustion cycle
  * survives that, that no run is left stuck `running`, and that the worker keeps processing other
@@ -47,7 +47,7 @@ before(async () => {
   const schedulerPort = await freePort();
   apiKeySecret = randomSecret();
   scheduler = new ServiceProcess({
-    name: 'scheduler', cwd: join(workspaceRoot, 'scheduler'), entry: 'src/index.js', port: schedulerPort,
+    name: 'atc-scheduler', cwd: join(workspaceRoot, 'atc-scheduler'), entry: 'src/index.js', port: schedulerPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(schedulerPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
       SIGNING_SECRET: randomSecret(), SCHEDULER_API_KEYS: `harness:${apiKeySecret}:readwrite`,

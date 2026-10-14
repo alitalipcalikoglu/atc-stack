@@ -166,7 +166,7 @@ export class Stack {
     const ready = await this.waitReady(20_000);
     this.log('');
     for (const r of ready) this.log(`${r.id.padEnd(11)} ${r.ok ? 'ready' : 'NOT READY'}  ${r.url}`);
-    this.log(`\nconsole: ${SetupContext.service('console') && this.#url('console')}`);
+    this.log(`\nconsole: ${SetupContext.service('atc-console') && this.#url('atc-console')}`);
     await Promise.all(children.map((c) => new Promise((resolve) => c.on('exit', resolve))));
   }
 
@@ -335,7 +335,7 @@ export class Stack {
    * never starts an HTTP listener, never touches anything the live process's own startup path
    * would treat as exclusively its own (no destructive `tmp/` wipe, no port bind).
    * @param {string} serviceId
-   * @returns {Promise<import('../../media/src/maintenance.js').MaintenanceResult>}
+   * @returns {Promise<import('../../atc-media/src/maintenance.js').MaintenanceResult>}
    */
   async maintenance(serviceId) {
     return runMaintenance(this.root, serviceId);
@@ -381,7 +381,7 @@ export class Stack {
    * @param {string|undefined} password
    */
   async #firstAdmin(email, password) {
-    const dir = join(this.root, 'console');
+    const dir = join(this.root, 'atc-console');
     const env = EnvFile.load(join(dir, '.env'));
     const dbPath = join(dir, env.get('DB_PATH') || './data/console.db');
     mkdirSync(dirname(dbPath), { recursive: true });
@@ -395,7 +395,7 @@ export class Stack {
       if (admins.byEmail(email) || admins.count?.() > 0 || admins.list?.().length) return { email, password: null, created: false };
       const generated = password ?? Stack.password();
       const service = new AdminService({ admins, sessions: new SessionStore(db), audit: new AuditStore(db), hasher: new PasswordHasher({ logN: Number(env.get('SCRYPT_LOG_N') || 15) }) });
-      await service.create({ email, name: 'Administrator', password: generated, role: 'admin' }, null, { ip: null, userAgent: 'stack' });
+      await service.create({ email, name: 'Administrator', password: generated, role: 'admin' }, null, { ip: null, userAgent: 'atc-stack' });
       return { email, password: generated, created: true };
     } finally {
       db.close();

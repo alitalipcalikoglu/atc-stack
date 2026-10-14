@@ -35,7 +35,7 @@ before(async () => {
   const port = await freePort();
   apiKeySecret = randomSecret();
   flags = new ServiceProcess({
-    name: 'flags', cwd: join(workspaceRoot, 'flags'), entry: 'src/index.js', port,
+    name: 'atc-flags', cwd: join(workspaceRoot, 'atc-flags'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
       // One unscoped readwrite key: touches every configured environment (defaults to dev,staging,prod).

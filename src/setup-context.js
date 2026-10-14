@@ -136,7 +136,7 @@ export class SetupContext {
   consoleServicesJson() {
     return {
       services: this.consoleServices().map((s) => {
-        const c = /** @type {NonNullable<import('./manifest.js').Service['console']>} */ (s.console);
+        const c = /** @type {NonNullable<import('./manifest.js').Service['atc-console']>} */ (s.console);
         return { id: s.id, type: c.type, label: c.label, url: this.url(s.id), ...(c.keyEnv ? { apiKeyEnv: c.keyEnv } : {}), ...(c.metricsTokenEnv ? { metricsTokenEnv: c.metricsTokenEnv } : {}), ...(c.polling ? { polling: c.polling } : {}) };
       }),
     };
@@ -153,15 +153,15 @@ export class SetupContext {
    * `gateway/examples/user-authenticated-route.md`). It is not a shorthand for the upstream path.
    */
   gatewayRoutes() {
-    const existing = join(this.dir('gateway'), 'routes.json');
+    const existing = join(this.dir('atc-gateway'), 'routes.json');
     if (existsSync(existing) && !this.local) return JSON.parse(readFileSync(existing, 'utf8'));
     return {
-      jwt: { jwksUrl: `${this.url('auth')}/.well-known/jwks.json`, issuer: this.url('gateway'), audience: this.env('auth').get('JWT_AUDIENCE') || 'app' },
+      jwt: { jwksUrl: `${this.url('atc-auth')}/.well-known/jwks.json`, issuer: this.url('atc-gateway'), audience: this.env('atc-auth').get('JWT_AUDIENCE') || 'app' },
       routes: [
-        { id: 'auth-public', pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('auth')], methods: ['POST', 'OPTIONS'], injectApiKey: 'AUTH_API_KEY', cors: ['*'], rateLimit: 60, bodyLimit: 16384 },
-        { id: 'media-user', pathPrefix: '/api/media/', stripPrefix: '/api/media', upstreams: [this.url('media')], auth: 'user', injectApiKey: 'MEDIA_API_KEY', cors: ['*'], bodyLimit: 26214400, timeoutMs: 120000 },
-        { id: 'media-files', pathPrefix: '/files/', upstreams: [this.url('media')], methods: ['GET', 'HEAD', 'OPTIONS'], cors: ['*'], rateLimit: 1200, timeoutMs: 120000 },
-        { id: 'jwks', pathPrefix: '/.well-known/jwks.json', upstreams: [this.url('auth')], methods: ['GET', 'HEAD'] },
+        { id: 'auth-public', pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('atc-auth')], methods: ['POST', 'OPTIONS'], injectApiKey: 'AUTH_API_KEY', cors: ['*'], rateLimit: 60, bodyLimit: 16384 },
+        { id: 'media-user', pathPrefix: '/api/media/', stripPrefix: '/api/media', upstreams: [this.url('atc-media')], auth: 'user', injectApiKey: 'MEDIA_API_KEY', cors: ['*'], bodyLimit: 26214400, timeoutMs: 120000 },
+        { id: 'media-files', pathPrefix: '/files/', upstreams: [this.url('atc-media')], methods: ['GET', 'HEAD', 'OPTIONS'], cors: ['*'], rateLimit: 1200, timeoutMs: 120000 },
+        { id: 'jwks', pathPrefix: '/.well-known/jwks.json', upstreams: [this.url('atc-auth')], methods: ['GET', 'HEAD'] },
       ],
     };
   }

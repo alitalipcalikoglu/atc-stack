@@ -66,7 +66,7 @@ module.exports = {
 // Distinct kill_timeout per split service (150000/630000/222222) so a test that passed by
 // coincidence on one shared constant would fail on the others.
 /** @type {Record<string, number>} */
-const FIXTURE_KILL_TIMEOUT = { notify: 150_000, scheduler: 630_000, 'webhook-out': 222_222 };
+const FIXTURE_KILL_TIMEOUT = { 'atc-notify': 150_000, 'atc-scheduler': 630_000, 'atc-webhook-out': 222_222 };
 for (const id of SPLIT_IDS) {
   const dir = join(root, id);
   mkdirSync(join(dir, 'src'), { recursive: true });
@@ -77,7 +77,7 @@ for (const id of SPLIT_IDS) {
 }
 
 test('manifest: exactly notify, scheduler, webhook-out are marked splitWorkers — the three real services with a split template', () => {
-  assert.deepEqual(new Set(SPLIT_IDS), new Set(['notify', 'scheduler', 'webhook-out']));
+  assert.deepEqual(new Set(SPLIT_IDS), new Set(['atc-notify', 'atc-scheduler', 'atc-webhook-out']));
 });
 
 test('generateSplitEcosystem: two apps, correct names, correct entry scripts, kill_timeout reused verbatim from the real combined app (not hardcoded)', () => {
@@ -141,28 +141,28 @@ test('generateSplitEcosystem: app names are unique both within one service and a
 
 test('generateSplitEcosystem: deterministic — regenerating from the same, unchanged ecosystem.config.cjs produces byte-identical output', () => {
   const stack = new Stack({ root, exec: async () => ({ code: 0, out: '' }) });
-  const service = serviceOf('webhook-out');
-  const path = join(root, 'webhook-out', stack.generateSplitEcosystem(service));
+  const service = serviceOf('atc-webhook-out');
+  const path = join(root, 'atc-webhook-out', stack.generateSplitEcosystem(service));
   const first = readFileSync(path, 'utf8');
-  const second = readFileSync(join(root, 'webhook-out', stack.generateSplitEcosystem(service)), 'utf8');
+  const second = readFileSync(join(root, 'atc-webhook-out', stack.generateSplitEcosystem(service)), 'utf8');
   assert.equal(first, second);
 });
 
 test('generateSplitEcosystem: reflects an edited kill_timeout on the next generation — never a stale require() cache entry', () => {
   const stack = new Stack({ root, exec: async () => ({ code: 0, out: '' }) });
-  const service = serviceOf('scheduler');
-  const dir = join(root, 'scheduler');
+  const service = serviceOf('atc-scheduler');
+  const dir = join(root, 'atc-scheduler');
   const before = require(join(dir, stack.generateSplitEcosystem(service)));
   assert.equal(before.apps[1].kill_timeout, 630_000);
 
-  writeFileSync(join(dir, 'ecosystem.config.cjs'), ecosystemFixture('scheduler', 999_000));
+  writeFileSync(join(dir, 'ecosystem.config.cjs'), ecosystemFixture('atc-scheduler', 999_000));
   delete require.cache[require.resolve(join(dir, 'ecosystem.config.cjs'))];
   const relFile = stack.generateSplitEcosystem(service);
   delete require.cache[require.resolve(join(dir, relFile))];
   const after = require(join(dir, relFile));
   assert.equal(after.apps[1].kill_timeout, 999_000, 're-derives from whatever is on disk right now, not a cached 630000');
 
-  writeFileSync(join(dir, 'ecosystem.config.cjs'), ecosystemFixture('scheduler', 630_000)); // restore for later tests in this file
+  writeFileSync(join(dir, 'ecosystem.config.cjs'), ecosystemFixture('atc-scheduler', 630_000)); // restore for later tests in this file
 });
 
 test('up({}) (no --split-workers): every service, including the three split-capable ones, still starts its plain ecosystem.config.cjs — pre-Stage-12 behaviour unchanged', async () => {
@@ -197,7 +197,7 @@ test('up({ splitWorkers: true }): split-capable services start the generated spl
   }
   // The generated files this produced are the real, valid ones (not just a filename string) —
   // spot-check one.
-  const generated = require(join(root, 'notify', Stack.SPLIT_ECOSYSTEM_FILE));
+  const generated = require(join(root, 'atc-notify', Stack.SPLIT_ECOSYSTEM_FILE));
   assert.equal(generated.apps.length, 2);
 });
 

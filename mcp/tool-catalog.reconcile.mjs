@@ -12,36 +12,36 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 // The real, hand-verified mapping from each exposed MCP tool to the operationId(s) its handler
-// calls. stack.status is the one MCP-native aggregate: it calls the 3 operational probes on every
+// calls. atc-stack.status is the one MCP-native aggregate: it calls the 3 operational probes on every
 // one of the 13 services, whatever that service happens to have named them (see
 // src/tools/index.mjs's findOp() comment on the real cross-service naming inconsistency).
 const OPERATIONAL_PROBE_OPIDS = [
-  'gateway.health.check', 'gateway.ready.check', 'gateway.info.get',
-  'notify.health.get', 'notify.ready.get', 'notify.info.get',
-  'auth.health.get', 'auth.ready.get', 'auth.info.get',
-  'media.ops.health', 'media.ops.ready', 'media.ops.info',
-  'console.health.get', 'console.ready.get', 'console.info.get',
-  'audit.health.get', 'audit.ready.get', 'audit.info.get',
-  'shortlink.health.get', 'shortlink.ready.get', 'shortlink.info.get',
-  'flags.health.get', 'flags.ready.get', 'flags.info.get',
-  'scheduler.health.get', 'scheduler.ready.get', 'scheduler.info.get',
-  'webhookOut.health.get', 'webhookOut.ready.get', 'webhookOut.info.get',
-  'search.system.health', 'search.system.ready', 'search.system.info',
-  'ratelimit.health.check', 'ratelimit.ready.check', 'ratelimit.info.get',
-  'geo.health.check', 'geo.ready.check', 'geo.info.get',
+  'atc-gateway.health.check', 'atc-gateway.ready.check', 'atc-gateway.info.get',
+  'atc-notify.health.get', 'atc-notify.ready.get', 'atc-notify.info.get',
+  'atc-auth.health.get', 'atc-auth.ready.get', 'atc-auth.info.get',
+  'atc-media.ops.health', 'atc-media.ops.ready', 'atc-media.ops.info',
+  'atc-console.health.get', 'atc-console.ready.get', 'atc-console.info.get',
+  'atc-audit.health.get', 'atc-audit.ready.get', 'atc-audit.info.get',
+  'atc-shortlink.health.get', 'atc-shortlink.ready.get', 'atc-shortlink.info.get',
+  'atc-flags.health.get', 'atc-flags.ready.get', 'atc-flags.info.get',
+  'atc-scheduler.health.get', 'atc-scheduler.ready.get', 'atc-scheduler.info.get',
+  'atc-webhook-out.health.get', 'atc-webhook-out.ready.get', 'atc-webhook-out.info.get',
+  'atc-search.system.health', 'atc-search.system.ready', 'atc-search.system.info',
+  'atc-ratelimit.health.check', 'atc-ratelimit.ready.check', 'atc-ratelimit.info.get',
+  'atc-geo.health.check', 'atc-geo.ready.check', 'atc-geo.info.get',
 ];
 
 export const TOOL_TO_OPERATION_IDS = {
-  'stack.status': OPERATIONAL_PROBE_OPIDS,
-  'flags.evaluate': ['flags.evaluate.post'],
-  'geo.ip.lookup': ['geo.ip.lookup'],
-  'media.files.get': ['media.files.get'],
-  'notify.messages.list': ['notify.messages.list'],
-  'notify.messages.create': ['notify.messages.create'],
-  'notify.messages.get': ['notify.messages.get'],
-  'shortlink.links.create': ['shortlink.links.create'],
-  'ratelimit.check': ['ratelimit.check'],
-  'search.query': ['search.query.get'],
+  'atc-stack.status': OPERATIONAL_PROBE_OPIDS,
+  'atc-flags.evaluate': ['atc-flags.evaluate.post'],
+  'atc-geo.ip.lookup': ['atc-geo.ip.lookup'],
+  'atc-media.files.get': ['atc-media.files.get'],
+  'atc-notify.messages.list': ['atc-notify.messages.list'],
+  'atc-notify.messages.create': ['atc-notify.messages.create'],
+  'atc-notify.messages.get': ['atc-notify.messages.get'],
+  'atc-shortlink.links.create': ['atc-shortlink.links.create'],
+  'atc-ratelimit.check': ['atc-ratelimit.check'],
+  'atc-search.query': ['atc-search.query.get'],
 };
 
 async function main() {

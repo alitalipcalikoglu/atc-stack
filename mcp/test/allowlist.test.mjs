@@ -6,16 +6,16 @@ import { TOOLS } from '../src/tools/index.mjs';
 import { z } from 'zod';
 
 const EXPECTED_TOOL_NAMES = [
-  'stack.status',
-  'flags.evaluate',
-  'geo.ip.lookup',
-  'media.files.get',
-  'notify.messages.list',
-  'notify.messages.create',
-  'notify.messages.get',
-  'shortlink.links.create',
-  'ratelimit.check',
-  'search.query',
+  'atc-stack.status',
+  'atc-flags.evaluate',
+  'atc-geo.ip.lookup',
+  'atc-media.files.get',
+  'atc-notify.messages.list',
+  'atc-notify.messages.create',
+  'atc-notify.messages.get',
+  'atc-shortlink.links.create',
+  'atc-ratelimit.check',
+  'atc-search.query',
 ].sort();
 
 test('exposed tool count is deterministic: exactly the expected 10, no more, no fewer', () => {
@@ -41,7 +41,7 @@ test('no tool declares destructiveHint:true (Phase 3 exposes no destructive tool
 });
 
 test('readOnlyHint matches the handler\'s real semantics: mutation tools are explicitly marked non-read-only', () => {
-  const mutationTools = new Set(['notify.messages.create', 'shortlink.links.create']);
+  const mutationTools = new Set(['atc-notify.messages.create', 'atc-shortlink.links.create']);
   for (const t of TOOLS) {
     if (mutationTools.has(t.name)) assert.equal(t.annotations.readOnlyHint, false, `${t.name} performs a real mutation and must have readOnlyHint:false`);
     else assert.equal(t.annotations.readOnlyHint, true, `${t.name} is read-only and must have readOnlyHint:true`);
@@ -49,9 +49,9 @@ test('readOnlyHint matches the handler\'s real semantics: mutation tools are exp
 });
 
 test('an operation that is NOT in the allowlist cannot become a tool merely by existing in a spec (spot check)', () => {
-  // auth.login is a real, valid operationId in auth/openapi.yaml -- it must never appear here.
+  // atc-auth.login is a real, valid operationId in auth/openapi.yaml -- it must never appear here.
   const names = TOOLS.map((t) => t.name);
-  assert.ok(!names.includes('auth.login'));
+  assert.ok(!names.includes('atc-auth.login'));
   assert.ok(!names.some((n) => n.startsWith('auth.')));
   assert.ok(!names.some((n) => n.startsWith('console.')));
 });
@@ -60,7 +60,7 @@ test('every tool\'s inputSchema is a valid zod raw shape that rejects an obvious
   for (const t of TOOLS) {
     const schema = z.object(t.inputSchema);
     // An empty object is invalid for every tool that has at least one required field; tools with
-    // zero required fields (stack.status) must accept it.
+    // zero required fields (atc-stack.status) must accept it.
     const result = schema.safeParse({});
     const hasRequiredField = Object.values(t.inputSchema).some((s) => !s.isOptional());
     if (hasRequiredField) assert.equal(result.success, false, `${t.name}: empty input should be rejected (it has required fields)`);

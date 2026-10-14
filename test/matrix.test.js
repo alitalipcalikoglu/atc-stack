@@ -23,8 +23,8 @@ for (const s of SERVICES) {
  * @type {Record<string, 'ok'|'minor'|'mismatch'|'noCore'|'unreachable'|'malformed'|'notFound'|'partial'>}
  */
 const SCENARIO = {
-  notify: 'ok', auth: 'ok', scheduler: 'ok', 'webhook-out': 'ok', search: 'ok', console: 'ok',
-  geo: 'minor', media: 'mismatch', gateway: 'noCore', shortlink: 'unreachable', audit: 'malformed', flags: 'notFound', ratelimit: 'partial',
+  'atc-notify': 'ok', 'atc-auth': 'ok', 'atc-scheduler': 'ok', 'atc-webhook-out': 'ok', 'atc-search': 'ok', 'atc-console': 'ok',
+  'atc-geo': 'minor', 'atc-media': 'mismatch', 'atc-gateway': 'noCore', 'atc-shortlink': 'unreachable', 'atc-audit': 'malformed', 'atc-flags': 'notFound', 'atc-ratelimit': 'partial',
 };
 
 /** @type {typeof fetch} */
@@ -53,34 +53,34 @@ test('matrix(): reachability and /v1/info are independent per row; one bad servi
 
   const byId = /** @type {Record<string, any>} */ (Object.fromEntries(rows.map((r) => [r.id, r])));
 
-  assert.equal(byId.notify.ok, true);
-  assert.equal(byId.notify.infoOk, true);
-  assert.deepEqual(byId.notify.capabilities, ['x', 'y']);
-  assert.equal(byId.notify.serviceCore, '1.10.0');
+  assert.equal(byId['atc-notify'].ok, true);
+  assert.equal(byId['atc-notify'].infoOk, true);
+  assert.deepEqual(byId['atc-notify'].capabilities, ['x', 'y']);
+  assert.equal(byId['atc-notify'].serviceCore, '1.10.0');
 
-  assert.equal(byId.gateway.infoOk, true, 'a service with no service-core dependency still has a valid /v1/info');
-  assert.equal(byId.gateway.serviceCore, null);
+  assert.equal(byId['atc-gateway'].infoOk, true, 'a service with no service-core dependency still has a valid /v1/info');
+  assert.equal(byId['atc-gateway'].serviceCore, null);
 
-  assert.equal(byId.geo.infoOk, true);
-  assert.equal(byId.geo.serviceCore, '1.9.0', 'a different MINOR is visible in the row, not hidden');
+  assert.equal(byId['atc-geo'].infoOk, true);
+  assert.equal(byId['atc-geo'].serviceCore, '1.9.0', 'a different MINOR is visible in the row, not hidden');
 
-  assert.equal(byId.shortlink.ok, false, 'unreachable: health/ready also fail');
-  assert.equal(byId.shortlink.infoOk, false);
-  assert.match(byId.shortlink.infoError, /unreachable/);
+  assert.equal(byId['atc-shortlink'].ok, false, 'unreachable: health/ready also fail');
+  assert.equal(byId['atc-shortlink'].infoOk, false);
+  assert.match(byId['atc-shortlink'].infoError, /unreachable/);
 
-  assert.equal(byId.audit.ok, true, 'audit itself is healthy; only its /v1/info body is broken');
-  assert.equal(byId.audit.infoOk, false);
-  assert.match(byId.audit.infoError, /malformed/);
+  assert.equal(byId['atc-audit'].ok, true, 'audit itself is healthy; only its /v1/info body is broken');
+  assert.equal(byId['atc-audit'].infoOk, false);
+  assert.match(byId['atc-audit'].infoError, /malformed/);
 
-  assert.equal(byId.flags.ok, true);
-  assert.equal(byId.flags.infoOk, false, 'a too-old service (no /v1/info route yet) degrades, does not crash the command');
-  assert.match(byId.flags.infoError, /older version/);
+  assert.equal(byId['atc-flags'].ok, true);
+  assert.equal(byId['atc-flags'].infoOk, false, 'a too-old service (no /v1/info route yet) degrades, does not crash the command');
+  assert.match(byId['atc-flags'].infoError, /older version/);
 
-  assert.equal(byId.ratelimit.infoOk, true, 'an older, partial /v1/info response still parses');
-  assert.equal(byId.ratelimit.version, '0.9.0');
-  assert.equal(byId.ratelimit.apiVersion, null, 'missing optional field reads as null, not a crash');
-  assert.equal(byId.ratelimit.schemaVersion, null);
-  assert.deepEqual(byId.ratelimit.capabilities, []);
+  assert.equal(byId['atc-ratelimit'].infoOk, true, 'an older, partial /v1/info response still parses');
+  assert.equal(byId['atc-ratelimit'].version, '0.9.0');
+  assert.equal(byId['atc-ratelimit'].apiVersion, null, 'missing optional field reads as null, not a crash');
+  assert.equal(byId['atc-ratelimit'].schemaVersion, null);
+  assert.deepEqual(byId['atc-ratelimit'].capabilities, []);
 
   // Every row present regardless of any single service's failure mode — the whole command
   // completed instead of throwing partway through.
@@ -102,6 +102,6 @@ test('matrix(): a mismatched serviceCore major never affects the ok/exit-code se
   const rows = await stack.matrix();
   // media has a different serviceCore major but is otherwise healthy — `ok` reflects only
   // reachability (health/ready), exactly like plain `status()`, never the version comparison.
-  const media = rows.find((r) => r.id === 'media');
+  const media = rows.find((r) => r.id === 'atc-media');
   assert.equal(media?.ok, true);
 });

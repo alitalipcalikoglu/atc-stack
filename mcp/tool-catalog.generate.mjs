@@ -12,8 +12,8 @@ import { parse as parseYaml } from 'yaml';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(HERE, '..', '..');
 const SERVICES = [
-  'gateway', 'notify', 'auth', 'media', 'console', 'audit', 'shortlink',
-  'flags', 'scheduler', 'webhook-out', 'search', 'ratelimit', 'geo',
+  'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
+  'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo',
 ];
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'];
 
@@ -31,8 +31,8 @@ function classify(service, method, opId, p) {
   // are objectively safe (unauthenticated, read-only, zero side effects, confirmed identically
   // across all 13 services in the Phase 0/1 audits) regardless of which service hosts them, so a
   // whole-service conservative override (e.g. auth's HIGH_RISK below) must never sweep them in.
-  // operationId naming for these is NOT consistent across specs (gateway.health.check,
-  // notify.health.get, media.ops.health, search.system.health, webhookOut.health.get, ...) -- so
+  // operationId naming for these is NOT consistent across specs (atc-gateway.health.check,
+  // atc-notify.health.get, atc-media.ops.health, atc-search.system.health, atc-webhook-out.health.get, ...) -- so
   // detection is "does the operationId contain this word as a whole dot-segment", the same
   // technique src/tools/index.mjs's findOp() uses, not a fixed suffix pattern.
   const segments = opId.toLowerCase().split('.');
@@ -45,8 +45,8 @@ function classify(service, method, opId, p) {
   else flags.add('MUTATION'); // post/put/patch
 
   // Whole-service conservative overrides (never reached for a probe operation -- see above).
-  if (service === 'auth') flags.add('HIGH_RISK'); // Phase 0/1: ungated user-list, account lifecycle, session/token control -- treat the whole surface conservatively.
-  if (service === 'console') { flags.add('OPERATOR'); flags.add('POOR_MCP_FIT'); } // cookie+CSRF session model, 105 low-confidence pass-through responses (Phase 1 §G/§O).
+  if (service === 'atc-auth') flags.add('HIGH_RISK'); // Phase 0/1: ungated user-list, account lifecycle, session/token control -- treat the whole surface conservatively.
+  if (service === 'atc-console') { flags.add('OPERATOR'); flags.add('POOR_MCP_FIT'); } // cookie+CSRF session model, 105 low-confidence pass-through responses (Phase 1 §G/§O).
 
   // Keyword-driven upgrades, regardless of service (checked against the operationId's own words).
   const idLower = opId.toLowerCase();
@@ -58,22 +58,22 @@ function classify(service, method, opId, p) {
   // Binary / non-JSON payloads (path-based heuristic -- these are the operations Phase 1 modeled with
   // format:binary bodies or non-application/json response content).
   if (
-    (service === 'media' && /files\.(upload|deliver)/.test(idLower)) ||
-    (service === 'audit' && idLower.includes('export')) ||
-    (service === 'shortlink' && idLower.includes('qr'))
+    (service === 'atc-media' && /files\.(upload|deliver)/.test(idLower)) ||
+    (service === 'atc-audit' && idLower.includes('export')) ||
+    (service === 'atc-shortlink' && idLower.includes('qr'))
   ) flags.add('BINARY');
 
   // Async / state-machine operations (Phase 1 §K's four services).
   if (
-    (service === 'notify' && /messages\.(create|get|list|retry)/.test(idLower)) ||
-    (service === 'scheduler' && /(jobs\.run|runs\.)/.test(idLower)) ||
-    (service === 'webhook-out' && /(events\.publish|deliveries\.|subscriptions\.(test|replay))/.test(idLower)) ||
-    (service === 'media' && idLower.includes('files.deliver')) // lazy variant generation
+    (service === 'atc-notify' && /messages\.(create|get|list|retry)/.test(idLower)) ||
+    (service === 'atc-scheduler' && /(jobs\.run|runs\.)/.test(idLower)) ||
+    (service === 'atc-webhook-out' && /(events\.publish|deliveries\.|subscriptions\.(test|replay))/.test(idLower)) ||
+    (service === 'atc-media' && idLower.includes('files.deliver')) // lazy variant generation
   ) flags.add('ASYNC');
 
   // Gateway's own operational surface only (4 operations) -- never proxy-surface (there is none in
   // its spec; Phase 1 confirmed gateway.openapi.yaml only documents its own 4 endpoints).
-  if (service === 'gateway') flags.add('OPERATOR');
+  if (service === 'atc-gateway') flags.add('OPERATOR');
 
   return [...flags];
 }

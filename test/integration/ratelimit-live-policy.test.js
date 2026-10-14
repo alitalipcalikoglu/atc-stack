@@ -37,7 +37,7 @@ before(async () => {
   harnessApiKeySecret = randomSecret();
   const port = await freePort();
   ratelimit = new ServiceProcess({
-    name: 'ratelimit', cwd: join(workspaceRoot, 'ratelimit'), entry: 'src/index.js', port,
+    name: 'atc-ratelimit', cwd: join(workspaceRoot, 'atc-ratelimit'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info',
       DB_PATH: join(scratch, 'ratelimit.db'), RATELIMIT_API_KEYS: `harness:${harnessApiKeySecret}:readwrite`,

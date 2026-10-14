@@ -201,7 +201,7 @@ test('notify: real old-schema (v2) fixture with an existing queued message migra
   /** @type {string} */ let sentinelId;
   const apiKey = randomSecret();
   await positiveMigrationE2E({
-    serviceId: 'notify',
+    serviceId: 'atc-notify',
     entry: 'src/api-main.js', // API-only: no worker loop, so the seeded 'queued' message is never claimed/delivered as a side effect of this test.
     checkBackup: true,
     seed: (db) => {
@@ -243,13 +243,13 @@ test('notify: real old-schema (v2) fixture with an existing queued message migra
 });
 
 test('console: real old-schema (v1) fixture with an existing admin migrates through a real process to v2, login still works, totp_seal_state sealed', { skip }, async () => {
-  const { PasswordHasher } = await import(pathToFileURL(join(workspaceRoot, 'console', 'src', 'crypto', 'password.js')).href);
+  const { PasswordHasher } = await import(pathToFileURL(join(workspaceRoot, 'atc-console', 'src', 'crypto', 'password.js')).href);
   const email = 'admin@example.test';
   const password = 'correct horse battery staple 9';
   const passwordHash = await new PasswordHasher({ logN: 14 }).hash(password);
 
   await positiveMigrationE2E({
-    serviceId: 'console',
+    serviceId: 'atc-console',
     entry: 'server.mjs',
     seed: (db) => {
       const id = '22222222-2222-4222-8222-222222222222';
@@ -260,7 +260,7 @@ test('console: real old-schema (v1) fixture with an existing admin migrates thro
     },
     env: ({ scratch }) => {
       const servicesFile = join(scratch, 'services.json');
-      writeFileSync(servicesFile, JSON.stringify({ services: [{ id: 'audit', type: 'audit', url: 'http://127.0.0.1:1', apiKeyEnv: 'AUDIT_API_KEY' }] }));
+      writeFileSync(servicesFile, JSON.stringify({ services: [{ id: 'atc-audit', type: 'atc-audit', url: 'http://127.0.0.1:1', apiKeyEnv: 'AUDIT_API_KEY' }] }));
       return { SERVICES_FILE: servicesFile, AUDIT_API_KEY: randomSecret() };
     },
     verify: async ({ proc, dbPath }) => {
@@ -286,7 +286,7 @@ test('console: real old-schema (v1) fixture with an existing admin migrates thro
 test('webhook-out: real old-schema (v2) fixture with an existing subscription migrates through a real process to v3, /ready, ordered defaults false', { skip }, async () => {
   const apiKey = randomSecret();
   await positiveMigrationE2E({
-    serviceId: 'webhook-out',
+    serviceId: 'atc-webhook-out',
     entry: 'src/api-main.js',
     seed: (db) => {
       const id = `sub_${randomSecret(8)}`;
@@ -312,7 +312,7 @@ test('webhook-out: real old-schema (v2) fixture with an existing subscription mi
 });
 
 test('auth: real old-schema (v1) fixture with an existing user migrates through a real process to v2, login still works, outbox is live', { skip }, async () => {
-  const { PasswordHasher } = await import(pathToFileURL(join(workspaceRoot, 'auth', 'src', 'crypto', 'password.js')).href);
+  const { PasswordHasher } = await import(pathToFileURL(join(workspaceRoot, 'atc-auth', 'src', 'crypto', 'password.js')).href);
   const email = 'user@example.test';
   const password = 'correct horse battery staple 9';
   const passwordHash = await new PasswordHasher({ logN: 14 }).hash(password);
@@ -320,7 +320,7 @@ test('auth: real old-schema (v1) fixture with an existing user migrates through 
   const apiKey = randomSecret();
   try {
     await positiveMigrationE2E({
-      serviceId: 'auth',
+      serviceId: 'atc-auth',
       entry: 'src/index.js',
       seed: (db) => {
         const id = '44444444-4444-4444-8444-444444444444';
@@ -359,12 +359,12 @@ test('auth: real old-schema (v1) fixture with an existing user migrates through 
 });
 
 test('audit: real old-schema (v1) fixture with an existing chained event migrates through a real process to v2, chain still verifies', { skip }, async () => {
-  const { HashChain } = await import(pathToFileURL(join(workspaceRoot, 'audit', 'src', 'chain.js')).href);
+  const { HashChain } = await import(pathToFileURL(join(workspaceRoot, 'atc-audit', 'src', 'chain.js')).href);
   const apiKey = randomSecret();
   /** @type {string} */ let expectedHash;
 
   await positiveMigrationE2E({
-    serviceId: 'audit',
+    serviceId: 'atc-audit',
     entry: 'src/index.js',
     seed: (db) => {
       const id = '55555555-5555-4555-8555-555555555555';
@@ -404,7 +404,7 @@ test('audit: real old-schema (v1) fixture with an existing chained event migrate
 test('notify: a real process refuses to start against a database one schema version ahead, and leaves it untouched', { skip }, async () => {
   /** @type {string} */ let sentinelId;
   await futureSchemaRefusalE2E({
-    serviceId: 'notify',
+    serviceId: 'atc-notify',
     entry: 'src/index.js',
     seed: (db) => {
       sentinelId = '66666666-6666-4666-8666-666666666666';
@@ -425,7 +425,7 @@ test('notify: a real process refuses to start against a database one schema vers
 test('auth: a real process refuses to start against a database one schema version ahead, and leaves it untouched', { skip }, async () => {
   /** @type {string} */ let sentinelId;
   await futureSchemaRefusalE2E({
-    serviceId: 'auth',
+    serviceId: 'atc-auth',
     entry: 'src/index.js',
     seed: (db) => {
       sentinelId = '77777777-7777-4777-8777-777777777777';

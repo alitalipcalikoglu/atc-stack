@@ -38,7 +38,7 @@ not unfinished release work; the catalog remains an audit/classification artifac
 
 No destructive, admin, or high-risk tool is exposed. `auth` and `console` have no
 business-operation tool at all (only their `/health`/`/ready`/`/v1/info` probes are touched, via
-`stack.status` — see the flagged security-review items for why the rest of `auth` stays out).
+`atc-stack.status` — see the flagged security-review items for why the rest of `auth` stays out).
 
 ## Install / build / configure / run
 
@@ -61,7 +61,7 @@ STACK_MCP_NOTIFY_API_KEY=example-notify-api-key
 STACK_MCP_TIMEOUT_MS=30000   # optional; default matches gateway's own UPSTREAM_TIMEOUT_MS default.
 ```
 
-`stack.status` only ever needs a `BASE_URL` per service (its 3 probes are unauthenticated on every
+`atc-stack.status` only ever needs a `BASE_URL` per service (its 3 probes are unauthenticated on every
 service) — a service with no `BASE_URL` configured is reported `configured: false` in its result,
 not an error. Every other tool needs both `BASE_URL` and `API_KEY` for its own service; a missing
 one produces a clear, specific `SERVICE_UNAVAILABLE` tool error naming exactly which env var is
@@ -97,23 +97,23 @@ root `package.json`, and no service repo's dependency graph changes at all.
 
 | Tool | Calls | Category | Notes |
 |---|---|---|---|
-| `stack.status` | every configured service's `/health`+`/ready`+`/v1/info` | operational aggregate | Not one OpenAPI operation. One dead/unconfigured service never fails the whole call. |
-| `flags.evaluate` | `flags.evaluate.post` | authenticated read | |
-| `geo.ip.lookup` | `geo.ip.lookup` | authenticated read | |
-| `media.files.get` | `media.files.get` | authenticated read, real error path | Metadata only — never transports file bytes (see "Binary" below). |
-| `notify.messages.list` | `notify.messages.list` | authenticated read, pagination | Cursor-based (`items`/`nextCursor`). |
-| `notify.messages.create` | `notify.messages.create` | safe mutation, async submit | Returns immediately; delivery happens later. Pair with `notify.messages.get`. |
-| `notify.messages.get` | `notify.messages.get` | authenticated read, async status | |
-| `shortlink.links.create` | `shortlink.links.create` | safe mutation | Creates a new resource; never overwrites/deletes. |
-| `ratelimit.check` | `ratelimit.check` | authenticated read | Always `peek:true` in the handler — never caller-controlled, so this tool can never consume real quota. |
-| `search.query` | `search.query.get` | authenticated read, pagination | Offset-based (`total`/`limit`/`offset`) — deliberately a different pagination style from `notify.messages.list`'s cursor style; neither is normalized to match the other (see below). |
+| `atc-stack.status` | every configured service's `/health`+`/ready`+`/v1/info` | operational aggregate | Not one OpenAPI operation. One dead/unconfigured service never fails the whole call. |
+| `atc-flags.evaluate` | `atc-flags.evaluate.post` | authenticated read | |
+| `atc-geo.ip.lookup` | `atc-geo.ip.lookup` | authenticated read | |
+| `atc-media.files.get` | `atc-media.files.get` | authenticated read, real error path | Metadata only — never transports file bytes (see "Binary" below). |
+| `atc-notify.messages.list` | `atc-notify.messages.list` | authenticated read, pagination | Cursor-based (`items`/`nextCursor`). |
+| `atc-notify.messages.create` | `atc-notify.messages.create` | safe mutation, async submit | Returns immediately; delivery happens later. Pair with `atc-notify.messages.get`. |
+| `atc-notify.messages.get` | `atc-notify.messages.get` | authenticated read, async status | |
+| `atc-shortlink.links.create` | `atc-shortlink.links.create` | safe mutation | Creates a new resource; never overwrites/deletes. |
+| `atc-ratelimit.check` | `atc-ratelimit.check` | authenticated read | Always `peek:true` in the handler — never caller-controlled, so this tool can never consume real quota. |
+| `atc-search.query` | `atc-search.query.get` | authenticated read, pagination | Offset-based (`total`/`limit`/`offset`) — deliberately a different pagination style from `atc-notify.messages.list`'s cursor style; neither is normalized to match the other (see below). |
 
-Every non-`stack.status` tool name matches its operation's real `operationId` — no invented naming
+Every non-`atc-stack.status` tool name matches its operation's real `operationId` — no invented naming
 scheme, no API-path-shaped names like `notify_post_v1_messages`.
 
 ### On the two different pagination shapes
 
-`notify.messages.list` returns `{items, nextCursor}`; `search.query` returns
+`atc-notify.messages.list` returns `{items, nextCursor}`; `atc-search.query` returns
 `{hits, total, limit, offset}`. This is a **real, existing** platform inconsistency
 (`stack/docs/API_CONTRACT_AUDIT.md` §H flags it as a deferred policy question), not something this
 package invented or should silently paper over. Each tool's output uses that operation's own real
@@ -121,7 +121,7 @@ field names.
 
 ### Binary
 
-No tool in this phase transports file bytes through MCP. `media.files.get` returns metadata
+No tool in this phase transports file bytes through MCP. `atc-media.files.get` returns metadata
 (including signed/public URLs) that a caller can fetch directly — never base64-encoded content in a
 tool result. A future phase adding a true binary tool should use an MCP resource/content primitive
 deliberately, not a giant base64 string stuffed into `structuredContent`.

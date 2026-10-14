@@ -35,27 +35,27 @@ after(() => { for (const d of scratchDirs) rmSync(d, { recursive: true, force: t
 
 /** @param {string} base @returns {Promise<{ privatePath: string, publicPath: string }>} */
 async function generateAnchorKeys(base) {
-  const { AnchorKeyGenerator } = await import(pathToFileURL(join(workspaceRoot, 'audit', 'scripts', 'anchor-keygen.js')).href);
+  const { AnchorKeyGenerator } = await import(pathToFileURL(join(workspaceRoot, 'atc-audit', 'scripts', 'anchor-keygen.js')).href);
   return new AnchorKeyGenerator(base).run();
 }
 
 /** @param {string} publicKeyPath @returns {Promise<string>} the real, independently-computed keyId (not a guess/copy of the service's own value) */
 async function keyIdFromPublicFile(publicKeyPath) {
-  const { AnchorSigner } = await import(pathToFileURL(join(workspaceRoot, 'audit', 'src', 'crypto', 'anchor-signer.js')).href);
+  const { AnchorSigner } = await import(pathToFileURL(join(workspaceRoot, 'atc-audit', 'src', 'crypto', 'anchor-signer.js')).href);
   const { createPublicKey } = await import('node:crypto');
   return AnchorSigner.keyId(createPublicKey(readFileSync(publicKeyPath, 'utf8')));
 }
 
 /**
  * A real audit checkout, not a synthetic stand-in: symlinks the real `src/`/`node_modules` (so
- * `ServiceProcess` spawns the exact real `src/index.js` entry point and `@atc-web/service-core`
+ * `ServiceProcess` spawns the exact real `src/index.js` entry point and `@atc-web/atc-service-core`
  * resolves normally) with its own `.env`/`data`/`keys` under a throwaway scratch dir — same
  * convention `stack/test/snapshot.test.js`'s `realServiceFixture` uses.
  * @param {string} scratch
  */
 function auditFixture(scratch) {
-  const real = join(workspaceRoot, 'audit');
-  const dir = join(scratch, 'audit');
+  const real = join(workspaceRoot, 'atc-audit');
+  const dir = join(scratch, 'atc-audit');
   mkdirSync(dir, { recursive: true });
   symlinkSync(join(real, 'src'), join(dir, 'src'), 'dir');
   symlinkSync(join(real, 'node_modules'), join(dir, 'node_modules'), 'dir');
@@ -85,7 +85,7 @@ test('audit anchor cryptographic continuity survives a real stack backup/restore
   const procs = [];
   /** Spawns real audit, waits for ready, returns it. Every launch is tracked so `finally` below can always stop every one of them, even mid-assertion-failure — a spawned real child process left running otherwise keeps `node --test` itself from ever exiting. */
   const launch = async () => {
-    const p = new ServiceProcess({ name: 'audit', cwd: serviceDir, entry: 'src/index.js', port, env });
+    const p = new ServiceProcess({ name: 'atc-audit', cwd: serviceDir, entry: 'src/index.js', port, env });
     procs.push(p);
     await p.start();
     return p;
@@ -110,7 +110,7 @@ test('audit anchor cryptographic continuity survives a real stack backup/restore
     const snap = new Snapshot({ root: scratch, exec: async () => ({ code: 0, out: '' }) });
     const { dir: snapshotDir } = await snap.create();
     const manifest = JSON.parse(readFileSync(join(snapshotDir, 'manifest.json'), 'utf8'));
-    assert.ok(manifest.entries.some((/** @type {any} */ e) => e.service === 'audit' && e.path === 'keys/anchor-private.pem'), 'the backup actually captured the anchor key, not just the database');
+    assert.ok(manifest.entries.some((/** @type {any} */ e) => e.service === 'atc-audit' && e.path === 'keys/anchor-private.pem'), 'the backup actually captured the anchor key, not just the database');
 
     // 7: mutate live state — a new post-backup event, and the key rotated to K2, which signs its own new anchor.
     proc = await launch();
@@ -127,7 +127,7 @@ test('audit anchor cryptographic continuity survives a real stack backup/restore
     await proc.stop();
 
     // 8: real stack restore — database and anchor key together, one consistency unit.
-    const result = await snap.restore(snapshotDir, { services: ['audit'] });
+    const result = await snap.restore(snapshotDir, { services: ['atc-audit'] });
     assert.equal(result.outcome, 'restored');
     assert.deepEqual(readFileSync(keyPath), readFileSync(k1.privatePath), 'the restored key file is byte-for-byte K1 again');
 

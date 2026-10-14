@@ -25,15 +25,15 @@ running instance without guessing from a version number.
 | `apiVersion` | The `/v1` HTTP contract this instance serves. Independent of `version`: a service ships many package releases (`1.4.0`, `1.9.0`, …) while `apiVersion` stays `"v1"` throughout, and only changes when the `/v1` contract itself is replaced wholesale (there is no `/v2` as of this stage). |
 | `capabilities` | Real, public, currently-supported behaviors only — deterministic (the same running configuration always reports the same list), lowercase, stable identifiers, each documented in that service's own README. Never a planned or future feature, and never a behavior that is actually disabled in this instance's configuration (e.g. notify omits `"webhook"` when `NOTIFY_WEBHOOK_CHANNEL=false`). |
 | `schemaVersion` | For a stateful service: its real, currently-open database schema version, read live from `Database#schemaVersion` (`PRAGMA user_version`) — never hand-maintained, never hardcoded. For a service with no database (today, only `gateway`): always `null`. This is the one, consistent stateless contract — every stateless service reports `null`, not an omitted field, so a consumer never has to branch on whether the key exists. |
-| `serviceCore` | The version of `@atc-web/service-core` actually installed and running in this process, read from that package's own `package.json` at import time (`readServiceVersion`/`SERVICE_CORE_VERSION` in `@atc-web/service-core/fastify`) — it can never say something different from what is truly running. `null` for the one service with no dependency on service-core at all (`gateway`, a deliberate, pre-existing design choice, not new to this stage). |
+| `serviceCore` | The version of `@atc-web/atc-service-core` actually installed and running in this process, read from that package's own `package.json` at import time (`readServiceVersion`/`SERVICE_CORE_VERSION` in `@atc-web/atc-service-core/fastify`) — it can never say something different from what is truly running. `null` for the one service with no dependency on service-core at all (`gateway`, a deliberate, pre-existing design choice, not new to this stage). |
 
 ## Adding `/v1/info` to a service
 
-Every service that depends on `@atc-web/service-core` calls the shared helper once, right next to
+Every service that depends on `@atc-web/atc-service-core` calls the shared helper once, right next to
 its existing `registerProbes(...)` call:
 
 ```js
-import { registerInfo, readServiceVersion } from '@atc-web/service-core/fastify';
+import { registerInfo, readServiceVersion } from '@atc-web/atc-service-core/fastify';
 
 // in Application's constructor:
 this.version = readServiceVersion(import.meta.url); // reads this service's own package.json

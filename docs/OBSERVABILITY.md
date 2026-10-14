@@ -64,7 +64,7 @@ traceparent: 00-<32 hex trace-id>-<16 hex span-id>-<2 hex flags>
 closed in post-production Phase 5).** Two independent, behaviourally-identical implementations of
 the same convention:
 
-- **gateway** (no `@atc-web/service-core` dependency — a deliberate, standing choice, unrelated to
+- **gateway** (no `@atc-web/atc-service-core` dependency — a deliberate, standing choice, unrelated to
   this convention): `gateway/src/trace-context.js` (`TraceContext`) parses an inbound header,
   validates it (rejects a malformed value and the spec's reserved all-zero trace-id/parent-id), and
   — under the *same* `TRUST_PROXY` gate as the request id — either continues the caller's trace-id
@@ -72,11 +72,11 @@ the same convention:
   caller's. Forwarded to the matched upstream in `proxy.js`, echoed on the response, its `traceId`
   added to the gateway's access log line.
 - **console and every backend service** (audit, notify, auth, media, shortlink, flags, scheduler,
-  webhook-out, search, ratelimit, geo): `@atc-web/service-core/trace`'s `TraceContext` (source of
+  webhook-out, search, ratelimit, geo): `@atc-web/atc-service-core/trace`'s `TraceContext` (source of
   truth: gateway's own, reproduced field for field, not derived from it at build time) plus
-  `@atc-web/service-core/request-context`'s `RequestContext` (an `AsyncLocalStorage`-based
+  `@atc-web/atc-service-core/request-context`'s `RequestContext` (an `AsyncLocalStorage`-based
   per-request correlation store), wired into each service's own `Fastify(...)` app by one call to
-  `@atc-web/service-core/fastify`'s `registerRequestContext(app, { trustProxy: config.trustProxy })`
+  `@atc-web/atc-service-core/fastify`'s `registerRequestContext(app, { trustProxy: config.trustProxy })`
   — the identical trust gate every one of these services already declares for `X-Forwarded-*`,
   reused, not a new boundary. **console previously kept its own independent copy of this
   (`console/src/trace-context.js`, an `AsyncLocalStorage` in `services/client.js`) — that copy is
@@ -107,7 +107,7 @@ bearing on, and is never consulted by, any service's real authentication (API-ke
 authorization logic, which remains completely separate and unaffected.
 
 **External/operator-configured HTTP targets do not receive platform trace context automatically.**
-`@atc-web/service-core/http`'s `HttpCaller` — the transport every genuinely external, operator-
+`@atc-web/atc-service-core/http`'s `HttpCaller` — the transport every genuinely external, operator-
 configured call goes through (scheduler's job targets, webhook-out's subscriber endpoints, audit's
 anchor webhook; notify's webhook channel has its own pre-existing, unrelated transport) — was not
 touched by this: it has no notion of trust and injects nothing implicitly, and none of those three
@@ -120,7 +120,7 @@ opt-in and explicit at exactly the internal, trusted-platform-dependency call si
 (`auth/src/domain/mailer.js`) and gateway → ratelimit (`gateway/src/rate-limit-client.js`, gateway's
 own request/trace, no service-core dependency needed for this one call site). Two internal call
 sites were deliberately left unwired despite being "trusted internal" by classification — every
-service → audit (`@atc-web/service-core/audit`'s `AuditClient`) and gateway → geo
+service → audit (`@atc-web/atc-service-core/audit`'s `AuditClient`) and gateway → geo
 (`gateway/src/geo-client.js`) — both because they don't have a single originating request to
 propagate from: `AuditClient` batches events from possibly-many different requests into one flush
 call, and `GeoClient` caches lookups by IP across many requests, so neither outbound HTTP call maps

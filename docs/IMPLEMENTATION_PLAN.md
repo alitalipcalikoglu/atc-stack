@@ -43,7 +43,7 @@ Tests: harness self-test; gateway request-id tests. No persistence changes.
 
 ## Stage 2 — `service-core` extraction
 
-New repository: `service-core` (`@alitalipcalikoglu/service-core`, MIT, semver, `exports` map, no runtime dependencies besides `fastify` as a peer for the hook types).
+New repository: `service-core` (`@alitalipcalikoglu/atc-service-core`, MIT, semver, `exports` map, no runtime dependencies besides `fastify` as a peer for the hook types).
 
 Contents (each a class, each with its own tests, taken from the best existing copy):
 
@@ -58,7 +58,7 @@ Contents (each a class, each with its own tests, taken from the best existing co
 | `lifecycle` (`Lifecycle.install(app, { forceExitMs, steps })`, PM2 ready) | auth/ratelimit | shutdown step order becomes explicit: stop intake → drain workers → flush audit → close db |
 | `fastify` (`errorHandler(DomainError)`, `probes(app, readiness)`, `metricsText(lines)`, `jsonParser`) | search/ratelimit | pure helpers, no app factory |
 
-Adoption order (one commit each, tests must stay green with zero behaviour change): ratelimit, geo, search, flags, shortlink (decorator rename kept via alias), audit, media, notify, scheduler, webhook-out, auth, console. Every adoption deletes the local copy, pins `"@alitalipcalikoglu/service-core": "1.0.0"`, and adds `serviceCore` to `/v1/info` (Stage 7 fills the rest of `/v1/info`; the endpoint is introduced here with `service`, `version`, `apiVersion`).
+Adoption order (one commit each, tests must stay green with zero behaviour change): ratelimit, geo, search, flags, shortlink (decorator rename kept via alias), audit, media, notify, scheduler, webhook-out, auth, console. Every adoption deletes the local copy, pins `"@alitalipcalikoglu/atc-service-core": "1.0.0"`, and adds `serviceCore` to `/v1/info` (Stage 7 fills the rest of `/v1/info`; the endpoint is introduced here with `service`, `version`, `apiVersion`).
 
 Invariants: byte-identical HTTP responses before/after for every existing test; no new env variables required.
 

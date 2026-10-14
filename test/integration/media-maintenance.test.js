@@ -33,7 +33,7 @@ function putBody(url, { headers = {}, body }) {
 
 /**
  * Post-production Phase 4: proves the chosen operator-trigger mechanism (`stack maintenance media`
- * / `Stack#maintenance('media')`) end-to-end against a real, live, separately-running media
+ * / `Stack#maintenance('atc-media')`) end-to-end against a real, live, separately-running media
  * process — not an in-process shortcut. A real file is uploaded and soft-deleted through the real
  * HTTP API, the manual maintenance trigger runs (as a genuinely separate invocation, the same way
  * an operator's CLI call would, while the live server keeps running), and the result is checked
@@ -63,8 +63,8 @@ after(async () => {
  * @param {string} scratch @param {Record<string,string>} env
  */
 function mediaFixture(scratch, env) {
-  const real = join(workspaceRoot, 'media');
-  const dir = join(scratch, 'media');
+  const real = join(workspaceRoot, 'atc-media');
+  const dir = join(scratch, 'atc-media');
   mkdirSync(dir, { recursive: true });
   symlinkSync(join(real, 'src'), join(dir, 'src'), 'dir');
   symlinkSync(join(real, 'node_modules'), join(dir, 'node_modules'), 'dir');
@@ -86,7 +86,7 @@ test('manual maintenance trigger, run against a real live media process: soft-de
   };
   const serviceDir = mediaFixture(scratch, env);
 
-  const proc = new ServiceProcess({ name: 'media', cwd: serviceDir, entry: 'src/index.js', port, env: { PATH: process.env.PATH ?? '', ...env } });
+  const proc = new ServiceProcess({ name: 'atc-media', cwd: serviceDir, entry: 'src/index.js', port, env: { PATH: process.env.PATH ?? '', ...env } });
   procs.push(proc);
   await proc.start();
 
@@ -113,7 +113,7 @@ test('manual maintenance trigger, run against a real live media process: soft-de
   // The manual trigger itself: a completely separate invocation (Stack#maintenance), not the live
   // process's own timer — while that live process keeps running, unaffected.
   const stack = new Stack({ root: scratch });
-  const result = await stack.maintenance('media');
+  const result = await stack.maintenance('atc-media');
   assert.equal(result.errors, 0);
   assert.equal(result.files, 1, 'the one soft-deleted-past-grace file row');
   assert.equal(result.blobs, 1, 'its now-orphaned blob');

@@ -60,7 +60,7 @@ const pdfBytes = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF');
 /** @param {number} port */
 async function startMedia(port) {
   const proc = new ServiceProcess({
-    name: 'media', cwd: join(workspaceRoot, 'media'), entry: 'src/index.js', port,
+    name: 'atc-media', cwd: join(workspaceRoot, 'atc-media'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info',
       DB_PATH: dbPath, DATA_DIR: dataDir, DELETE_GRACE_DAYS: '0',

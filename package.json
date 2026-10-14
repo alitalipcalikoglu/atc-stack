@@ -1,12 +1,12 @@
 {
-  "name": "@atc-web/stack",
+  "name": "@atc-web/atc-stack",
   "version": "1.13.0",
   "private": true,
   "description": "Set up, wire and run every atc-web service with the console in one command: dependencies, secrets, API keys, env files, gateway routes, console services.json, first admin",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alitalipcalikoglu/stack.git"
+    "url": "git+https://github.com/alitalipcalikoglu/atc-stack.git"
   },
   "type": "module",
   "bin": {

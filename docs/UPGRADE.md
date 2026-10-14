@@ -10,7 +10,7 @@ outcome/rollback mechanics; this document only covers the upgrade sequence itsel
 
 - Read the target version's changelog/diff for every service you're upgrading, specifically for a
   new `MIGRATIONS` entry in its `src/db.js` (each service extends
-  `@atc-web/service-core`'s `Database` with its own `static MIGRATIONS` array — see "DB migration
+  `@atc-web/atc-service-core`'s `Database` with its own `static MIGRATIONS` array — see "DB migration
   implications" below) and for any new required env var (`Config.fromEnv` in that service throws
   `ConfigError` at startup if one is missing — see "Config validation" below).
 - `atc-stack status --matrix` (from `stack/`) to record the current `version`/`schemaVersion`/
@@ -31,7 +31,7 @@ database, per BACKUP.md).
 
 ## Service-core compatibility check
 
-Every service pins its own `@atc-web/service-core` version and reports it at `GET /v1/info` as
+Every service pins its own `@atc-web/atc-service-core` version and reports it at `GET /v1/info` as
 `serviceCore` (Stage 7, `stack/src/manifest.js` / each service's `/v1/info` route). `atc-stack status
 --matrix` reads this from every service and prints a warning line when more than one `serviceCore`
 major is present across the fleet (`Stack#matrix` → `#printMatrix`, `stack/src/stack.js:232-255`;
@@ -74,7 +74,7 @@ of that step beyond the preflight changelog read above (to know what a new requi
 
 ## DB migration implications
 
-Every stateful service's `Database` (`@atc-web/service-core/src/db.js`, subclassed per service with
+Every stateful service's `Database` (`@atc-web/atc-service-core/src/db.js`, subclassed per service with
 that service's own `static MIGRATIONS` array) applies any pending migration the moment its
 constructor runs, inside the service's own normal startup path — there is no separate migration
 step or command, and a fresh install and an upgrade of an existing database go through the exact
@@ -117,7 +117,7 @@ construct their own `Application`, and every `Application` constructor — regar
 its own `Database(config.dbPath, ...)` against the same file.
 
 **Concurrent startup against the same local SQLite database is migration-safe** (post-production
-Phase 1, `@atc-web/service-core` v1.10.1 — pinned by all three of these services): migration
+Phase 1, `@atc-web/atc-service-core` v1.10.1 — pinned by all three of these services): migration
 ownership is serialized by SQLite's own `BEGIN IMMEDIATE` write lock, and `PRAGMA user_version` is
 re-read fresh after that lock is acquired, not from a value cached before any lock existed. A process
 that loses the race for a given migration version's lock blocks until the winner's transaction
@@ -155,7 +155,7 @@ succeeded 100/100 times with zero corruption and zero duplicate migration effect
 Every other service in the manifest has no `splitWorkers` flag and only ever runs one process per
 service, so this scenario does not apply to it — one process, one `Database` instance, nothing to
 race. Every consumer (all 11 other backend services plus `console`) is now pinned to
-`@atc-web/service-core` v1.11.1, well past the v1.10.1 that first shipped this guarantee — updated
+`@atc-web/atc-service-core` v1.11.1, well past the v1.10.1 that first shipped this guarantee — updated
 post-production Phase 5, which needed the newer tag anyway for its own centralized trace-context
 work (see `service-core/VERSIONING.md` on why a pin bump is each service's own deliberate act, and
 `stack/docs/OBSERVABILITY.md` for what Phase 5 actually changed). None of these 12 services run in

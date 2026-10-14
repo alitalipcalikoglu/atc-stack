@@ -64,7 +64,7 @@ after(() => {
 // auth pilot: real login, real mutation, real expected error -- through the generated auth client.
 // ---------------------------------------------------------------------------------------------
 test('auth pilot: register -> login -> authenticated mutation -> expected error, via the generated client', { skip }, async (t) => {
-  const { createClient } = await import('../../auth/index.ts');
+  const { createClient } = await import('../../atc-auth/index.ts');
 
   // Stub notify (auth's /ready pings NOTIFY_URL/health; login/register/introspect never call it).
   const notifyStub = createServer((_req, res) => { res.writeHead(200, { 'content-type': 'application/json' }); res.end('{"status":"ok"}'); });
@@ -81,7 +81,7 @@ test('auth pilot: register -> login -> authenticated mutation -> expected error,
   const apiKeySecret = randomSecret();
   const port = await freePort();
   const auth = new ServiceProcess({
-    name: 'auth', cwd: join(WORKSPACE_ROOT, 'auth'), entry: 'src/index.js', port,
+    name: 'atc-auth', cwd: join(WORKSPACE_ROOT, 'atc-auth'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
       DB_PATH: join(scratch, 'auth.db'),
@@ -101,24 +101,24 @@ test('auth pilot: register -> login -> authenticated mutation -> expected error,
   const password = 'correct-horse-battery-staple-9';
 
   // 1. write: register a user.
-  const created = await client['auth.users.create']({ body: { email, password } });
+  const created = await client['atc-auth.users.create']({ body: { email, password } });
   assert.equal(created.response.status, 201, `expected 201, got ${created.response.status}: ${JSON.stringify(created.error ?? created.data)}`);
   assert.ok(created.data?.user?.id, 'created user has an id');
 
   // 2. login (a distinct real request/response cycle, exercising the request-schema-validated body).
-  const login = await client['auth.login']({ body: { email, password } });
+  const login = await client['atc-auth.login']({ body: { email, password } });
   assert.equal(login.response.status, 200, `expected 200, got ${login.response.status}: ${JSON.stringify(login.error)}`);
   assert.equal(login.data?.user?.email, email);
   assert.ok(login.data?.tokens?.accessToken, 'login returns a real access token');
   assert.ok(login.data?.tokens?.refreshToken, 'login returns a real refresh token');
 
   // 3. authenticated mutation: patch the user (disable, then confirm via a read).
-  const patched = await client['auth.users.patch']({ params: { path: { id: created.data!.user.id } }, body: { name: 'Renamed by smoke test' } });
+  const patched = await client['atc-auth.users.patch']({ params: { path: { id: created.data!.user.id } }, body: { name: 'Renamed by smoke test' } });
   assert.equal(patched.response.status, 200, `expected 200, got ${patched.response.status}: ${JSON.stringify(patched.error)}`);
   assert.equal(patched.data?.user?.name, 'Renamed by smoke test');
 
   // 4. expected error: wrong password -> 401 INVALID_CREDENTIALS, typed error envelope preserved.
-  const badLogin = await client['auth.login']({ body: { email, password: 'not-the-real-password' } });
+  const badLogin = await client['atc-auth.login']({ body: { email, password: 'not-the-real-password' } });
   assert.equal(badLogin.response.status, 401);
   assert.equal(badLogin.error?.error?.code, 'INVALID_CREDENTIALS');
 });
@@ -127,14 +127,14 @@ test('auth pilot: register -> login -> authenticated mutation -> expected error,
 // media pilot: real binary upload, real binary download roundtrip, expected error.
 // ---------------------------------------------------------------------------------------------
 test('media pilot: binary upload -> binary download roundtrip -> expected error, via the generated client', { skip }, async (t) => {
-  const { createClient } = await import('../../media/index.ts');
+  const { createClient } = await import('../../atc-media/index.ts');
 
   const dataDir = join(scratch, 'media-data');
   mkdirSync(dataDir, { recursive: true });
   const apiKeySecret = randomSecret();
   const port = await freePort();
   const media = new ServiceProcess({
-    name: 'media', cwd: join(WORKSPACE_ROOT, 'media'), entry: 'src/index.js', port,
+    name: 'atc-media', cwd: join(WORKSPACE_ROOT, 'atc-media'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
       DB_PATH: join(scratch, 'media.db'), DATA_DIR: dataDir,
@@ -156,7 +156,7 @@ test('media pilot: binary upload -> binary download roundtrip -> expected error,
   //    -> `string` typing (see clients/typescript/README.md's "Binary bodies" section): a targeted
   //    `as unknown as string` cast plus a bodySerializer override that hands the real bytes straight
   //    to fetch. Not `any`, not a generator patch -- the documented, supported openapi-fetch escape.
-  const uploaded = await client['media.files.upload']({
+  const uploaded = await client['atc-media.files.upload']({
     params: { query: { visibility: 'public' } },
     body: png as unknown as string,
     bodySerializer: (b: unknown) => b as unknown as BodyInit,
@@ -173,7 +173,7 @@ test('media pilot: binary upload -> binary download roundtrip -> expected error,
   //    clients/typescript/README.md's "Binary responses" section. Once `parseAs` is set, `.data`
   //    holds the already-parsed body in that shape; `.response` is still the full raw Response for
   //    headers/status, but its body stream has already been consumed by that parse.
-  const downloaded = await client['media.files.deliver']({ params: { path: { id: fileId, variant: 'original' } }, parseAs: 'arrayBuffer' });
+  const downloaded = await client['atc-media.files.deliver']({ params: { path: { id: fileId, variant: 'original' } }, parseAs: 'arrayBuffer' });
   assert.equal(downloaded.response.status, 200);
   const bytesBack = Buffer.from(downloaded.data as ArrayBuffer);
   // media re-encodes every raster upload (STRIP_IMAGE_METADATA, on by default) so the downloaded
@@ -185,7 +185,7 @@ test('media pilot: binary upload -> binary download roundtrip -> expected error,
   assert.equal(downloaded.response.headers.get('content-type'), 'image/png');
 
   // 3. expected error: unknown file id -> 404, typed error envelope preserved.
-  const missing = await client['media.files.get']({ params: { path: { id: '00000000-0000-0000-0000-000000000000' } } });
+  const missing = await client['atc-media.files.get']({ params: { path: { id: '00000000-0000-0000-0000-000000000000' } } });
   assert.equal(missing.response.status, 404);
   assert.equal(missing.error?.error?.code, 'NOT_FOUND');
 });
@@ -198,7 +198,7 @@ function media_publicBaseUrl(port: number) {
 // console pilot: real cookie-session login, real session-scoped read, expected error.
 // ---------------------------------------------------------------------------------------------
 test('console pilot: cookie login -> session read -> expected error, via the generated client', { skip }, async (t) => {
-  const { createClient } = await import('../../console/index.ts');
+  const { createClient } = await import('../../atc-console/index.ts');
 
   const dbPath = join(scratch, 'console.db');
   const email = 'smoke-admin@example.test';
@@ -211,7 +211,7 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
 
   const port = await freePort();
   const console_ = new ServiceProcess({
-    name: 'console', cwd: join(WORKSPACE_ROOT, 'console'), entry: 'server.mjs', port,
+    name: 'atc-console', cwd: join(WORKSPACE_ROOT, 'atc-console'), entry: 'server.mjs', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
       DB_PATH: dbPath, SERVICES_FILE: join(scratch, 'console-services.json'),
@@ -221,7 +221,7 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   // console requires at least one configured service; a placeholder, unreachable notify entry is
   // enough -- this smoke proves console's own session/login contract, not its downstream proxying.
   writeFileSync(join(scratch, 'console-services.json'), JSON.stringify({
-    services: [{ id: 'notify', type: 'notify', label: 'Notify', url: 'http://127.0.0.1:1', apiKeyEnv: 'NOTIFY_API_KEY' }],
+    services: [{ id: 'atc-notify', type: 'atc-notify', label: 'Notify', url: 'http://127.0.0.1:1', apiKeyEnv: 'NOTIFY_API_KEY' }],
   }));
   await console_.start();
   t.after(() => stopAll([console_]));
@@ -231,7 +231,7 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   // openapi-fetch doesn't persist cookies across calls on its own in Node (no cookie jar) -- so we
   // capture the real Set-Cookie from login and pass it back explicitly on the next call, exactly as
   // a browser would automatically and exactly as this client's own ClientConfig.headers supports.
-  const login = await client['console.session.login']({ body: { email, password } });
+  const login = await client['atc-console.session.login']({ body: { email, password } });
   assert.equal(login.response.status, 200, `expected 200, got ${login.response.status}: ${JSON.stringify(login.error)}`);
   assert.equal(login.data?.totpRequired, false);
   const setCookie = login.response.headers.get('set-cookie');
@@ -239,19 +239,19 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   const cookiePair = setCookie!.split(';')[0];
 
   const authedClient = createClient({ baseUrl: console_.baseUrl, headers: { cookie: cookiePair } });
-  const session = await authedClient['console.session.get']({});
+  const session = await authedClient['atc-console.session.get']({});
   assert.equal(session.response.status, 200);
   assert.equal(session.data?.admin?.email, email);
 
   // expected error: wrong password -> 401 INVALID_CREDENTIALS.
-  const bad = await client['console.session.login']({ body: { email, password: 'not-the-real-password' } });
+  const bad = await client['atc-console.session.login']({ body: { email, password: 'not-the-real-password' } });
   assert.equal(bad.response.status, 401);
   assert.equal(bad.error?.error?.code, 'INVALID_CREDENTIALS');
 });
 
 async function seedFirstAdmin(dbPath: string, email: string, password: string) {
   mkdirSync(dirname(dbPath), { recursive: true });
-  const consoleDir = join(WORKSPACE_ROOT, 'console');
+  const consoleDir = join(WORKSPACE_ROOT, 'atc-console');
   const mod = (rel: string) => import(pathToFileURL(join(consoleDir, rel)).href);
   const [{ Database }, { AdminStore }, { SessionStore }, { AuditStore }, { PasswordHasher }, { AdminService }] = await Promise.all([
     mod('src/db.js'), mod('src/store/admin-store.js'), mod('src/store/session-store.js'),

@@ -2,7 +2,7 @@
 // (disposable, scratch SQLite/data dirs) plus the real stack-mcp server as its own child process,
 // and drives it with the OFFICIAL MCP client SDK over the real STDIO transport -- not a direct
 // function-handler call. Deliberately leaves gateway/auth/console/audit/scheduler/webhook-out
-// unconfigured, to prove stack.status degrades gracefully rather than requiring all 13.
+// unconfigured, to prove atc-stack.status degrades gracefully rather than requiring all 13.
 //
 // Only runs when explicitly requested, matching every other process-spawning test in this
 // workspace: `STACK_INTEGRATION=1 npm run mcp:e2e` (see stack/package.json).
@@ -20,7 +20,7 @@ const shouldRun = Boolean(process.env.STACK_INTEGRATION);
 const skip = shouldRun ? false : 'set STACK_INTEGRATION=1 to run (spawns real service processes + a real stack-mcp child process)';
 
 const WORKSPACE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
-const MCP_BIN = join(WORKSPACE_ROOT, 'stack', 'mcp', 'bin', 'stack-mcp.js');
+const MCP_BIN = join(WORKSPACE_ROOT, 'atc-stack', 'mcp', 'bin', 'stack-mcp.js');
 
 /** A sentinel value we assert never appears anywhere in MCP output/stderr -- proves no secret leakage. */
 const SENTINEL_NOTIFY_KEY = `sentinel-secret-${randomSecret(8)}-do-not-leak`;
@@ -41,7 +41,7 @@ before(async () => {
   {
     const port = await freePort();
     const proc = new ServiceProcess({
-      name: 'notify', cwd: join(WORKSPACE_ROOT, 'notify'), entry: 'src/index.js', port,
+      name: 'atc-notify', cwd: join(WORKSPACE_ROOT, 'atc-notify'), entry: 'src/index.js', port,
       env: {
         PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
         DB_PATH: join(scratch, 'notify.db'),
@@ -60,7 +60,7 @@ before(async () => {
     const port = await freePort();
     const secret = randomSecret();
     const proc = new ServiceProcess({
-      name: 'flags', cwd: join(WORKSPACE_ROOT, 'flags'), entry: 'src/index.js', port,
+      name: 'atc-flags', cwd: join(WORKSPACE_ROOT, 'atc-flags'), entry: 'src/index.js', port,
       env: { PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn', DB_PATH: join(scratch, 'flags.db'), FLAGS_API_KEYS: `mcp:${secret}:readwrite` },
     });
     await proc.start();
@@ -74,7 +74,7 @@ before(async () => {
     const port = await freePort();
     const secret = randomSecret();
     const proc = new ServiceProcess({
-      name: 'geo', cwd: join(WORKSPACE_ROOT, 'geo'), entry: 'src/index.js', port,
+      name: 'atc-geo', cwd: join(WORKSPACE_ROOT, 'atc-geo'), entry: 'src/index.js', port,
       env: { PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn', DB_PATH: join(scratch, 'geo.db'), GEO_API_KEYS: `mcp:${secret}:readwrite` },
     });
     await proc.start();
@@ -90,7 +90,7 @@ before(async () => {
     const dataDir = join(scratch, 'media-data');
     mkdirSync(dataDir, { recursive: true });
     const proc = new ServiceProcess({
-      name: 'media', cwd: join(WORKSPACE_ROOT, 'media'), entry: 'src/index.js', port,
+      name: 'atc-media', cwd: join(WORKSPACE_ROOT, 'atc-media'), entry: 'src/index.js', port,
       env: {
         PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
         DB_PATH: join(scratch, 'media.db'), DATA_DIR: dataDir, MEDIA_API_KEYS: `mcp:${secret}`, // roleless (Phase 1/2 finding)
@@ -108,7 +108,7 @@ before(async () => {
     const port = await freePort();
     const secret = randomSecret();
     const proc = new ServiceProcess({
-      name: 'shortlink', cwd: join(WORKSPACE_ROOT, 'shortlink'), entry: 'src/index.js', port,
+      name: 'atc-shortlink', cwd: join(WORKSPACE_ROOT, 'atc-shortlink'), entry: 'src/index.js', port,
       env: {
         PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
         DB_PATH: join(scratch, 'shortlink.db'), SHORTLINK_API_KEYS: `mcp:${secret}:readwrite`,
@@ -126,7 +126,7 @@ before(async () => {
     const port = await freePort();
     const secret = randomSecret();
     const proc = new ServiceProcess({
-      name: 'ratelimit', cwd: join(WORKSPACE_ROOT, 'ratelimit'), entry: 'src/index.js', port,
+      name: 'atc-ratelimit', cwd: join(WORKSPACE_ROOT, 'atc-ratelimit'), entry: 'src/index.js', port,
       env: { PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn', DB_PATH: join(scratch, 'ratelimit.db'), RATELIMIT_API_KEYS: `mcp:${secret}:readwrite` },
     });
     await proc.start();
@@ -149,7 +149,7 @@ before(async () => {
     const port = await freePort();
     const secret = randomSecret();
     const proc = new ServiceProcess({
-      name: 'search', cwd: join(WORKSPACE_ROOT, 'search'), entry: 'src/index.js', port,
+      name: 'atc-search', cwd: join(WORKSPACE_ROOT, 'atc-search'), entry: 'src/index.js', port,
       env: { PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn', DB_PATH: join(scratch, 'search.db'), SEARCH_API_KEYS: `mcp:${secret}:readwrite` },
     });
     await proc.start();
@@ -210,15 +210,15 @@ test('protocol: initialize -> listTools -> exactly the expected 10 tools -> shut
     assert.equal(tools.length, 10, `expected exactly 10 tools, got ${tools.length}: ${tools.map((t) => t.name).join(', ')}`);
     const names = tools.map((t) => t.name).sort();
     assert.deepEqual(names, [
-      'flags.evaluate', 'geo.ip.lookup', 'media.files.get', 'notify.messages.create',
-      'notify.messages.get', 'notify.messages.list', 'ratelimit.check', 'search.query',
-      'shortlink.links.create', 'stack.status',
+      'atc-flags.evaluate', 'atc-geo.ip.lookup', 'atc-media.files.get', 'atc-notify.messages.create',
+      'atc-notify.messages.get', 'atc-notify.messages.list', 'atc-ratelimit.check', 'atc-search.query',
+      'atc-shortlink.links.create', 'atc-stack.status',
     ]);
     // Real annotation semantics, over the real protocol (not read from source).
-    const status = tools.find((t) => t.name === 'stack.status');
+    const status = tools.find((t) => t.name === 'atc-stack.status');
     assert.ok(status);
     assert.equal(status.annotations?.readOnlyHint, true);
-    const create = tools.find((t) => t.name === 'notify.messages.create');
+    const create = tools.find((t) => t.name === 'atc-notify.messages.create');
     assert.ok(create);
     assert.equal(create.annotations?.readOnlyHint, false);
     assert.notEqual(create.annotations?.destructiveHint, true);
@@ -227,18 +227,18 @@ test('protocol: initialize -> listTools -> exactly the expected 10 tools -> shut
   }
 });
 
-test('read-only tool + aggregate status: stack.status reports real per-service health, gracefully omitting unconfigured services', { skip }, async () => {
+test('read-only tool + aggregate status: atc-stack.status reports real per-service health, gracefully omitting unconfigured services', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'stack.status', {});
+    const result = await callTool(client, 'atc-stack.status', {});
     assert.equal(result.isError, undefined, `expected success, got: ${JSON.stringify(result)}`);
     const rows = result.structuredContent.data.services;
     const byService = Object.fromEntries(rows.map((/** @type {any} */ r) => [r.service, r]));
-    for (const s of ['notify', 'flags', 'geo', 'media', 'shortlink', 'ratelimit', 'search']) {
+    for (const s of ['atc-notify', 'atc-flags', 'atc-geo', 'atc-media', 'atc-shortlink', 'atc-ratelimit', 'atc-search']) {
       assert.equal(byService[s].configured, true, `${s} should be configured`);
       assert.equal(byService[s].healthy, true, `${s} should be healthy: ${JSON.stringify(byService[s])}`);
     }
-    for (const s of ['gateway', 'auth', 'console', 'audit', 'scheduler', 'webhook-out']) {
+    for (const s of ['atc-gateway', 'atc-auth', 'atc-console', 'atc-audit', 'atc-scheduler', 'atc-webhook-out']) {
       assert.equal(byService[s].configured, false, `${s} should be reported unconfigured, not an error`);
     }
   } finally {
@@ -246,10 +246,10 @@ test('read-only tool + aggregate status: stack.status reports real per-service h
   }
 });
 
-test('authenticated read: flags.evaluate', { skip }, async () => {
+test('authenticated read: atc-flags.evaluate', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'flags.evaluate', { env: 'prod', userId: 'u1' });
+    const result = await callTool(client, 'atc-flags.evaluate', { env: 'prod', userId: 'u1' });
     assert.equal(result.isError, undefined, JSON.stringify(result));
     assert.equal(result.structuredContent.status, 200);
   } finally {
@@ -257,16 +257,16 @@ test('authenticated read: flags.evaluate', { skip }, async () => {
   }
 });
 
-test('async submit -> status read: notify.messages.create then notify.messages.get', { skip }, async () => {
+test('async submit -> status read: atc-notify.messages.create then atc-notify.messages.get', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const created = await callTool(client, 'notify.messages.create', { channel: 'webhook', url: 'https://example.test/hook', event: 'mcp.e2e.test', data: { hello: 'world' } });
+    const created = await callTool(client, 'atc-notify.messages.create', { channel: 'webhook', url: 'https://example.test/hook', event: 'mcp.e2e.test', data: { hello: 'world' } });
     assert.equal(created.isError, undefined, JSON.stringify(created));
     assert.equal(created.structuredContent.status, 202);
     const id = created.structuredContent.data.id;
     assert.ok(id, 'created message has an id');
 
-    const read = await callTool(client, 'notify.messages.get', { id });
+    const read = await callTool(client, 'atc-notify.messages.get', { id });
     assert.equal(read.isError, undefined, JSON.stringify(read));
     assert.equal(read.structuredContent.status, 200);
     assert.equal(read.structuredContent.data.id, id);
@@ -276,10 +276,10 @@ test('async submit -> status read: notify.messages.create then notify.messages.g
   }
 });
 
-test('pagination: notify.messages.list returns real items/nextCursor shape', { skip }, async () => {
+test('pagination: atc-notify.messages.list returns real items/nextCursor shape', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'notify.messages.list', { limit: 1 });
+    const result = await callTool(client, 'atc-notify.messages.list', { limit: 1 });
     assert.equal(result.isError, undefined, JSON.stringify(result));
     assert.ok(Array.isArray(result.structuredContent.data.items));
     assert.ok('nextCursor' in result.structuredContent.data);
@@ -288,10 +288,10 @@ test('pagination: notify.messages.list returns real items/nextCursor shape', { s
   }
 });
 
-test('safe mutation: shortlink.links.create', { skip }, async () => {
+test('safe mutation: atc-shortlink.links.create', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'shortlink.links.create', { url: 'https://example.test/mcp-e2e-page' });
+    const result = await callTool(client, 'atc-shortlink.links.create', { url: 'https://example.test/mcp-e2e-page' });
     assert.equal(result.isError, undefined, JSON.stringify(result));
     assert.equal(result.structuredContent.status, 201);
     assert.ok(result.structuredContent.data.link.code);
@@ -300,10 +300,10 @@ test('safe mutation: shortlink.links.create', { skip }, async () => {
   }
 });
 
-test('search.query offset-based pagination against a real (empty) index', { skip }, async () => {
+test('atc-search.query offset-based pagination against a real (empty) index', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'search.query', { name: 'mcp-e2e-index', q: 'nothing' });
+    const result = await callTool(client, 'atc-search.query', { name: 'mcp-e2e-index', q: 'nothing' });
     assert.equal(result.isError, undefined, JSON.stringify(result));
     assert.equal(result.structuredContent.data.total, 0);
     assert.equal(result.structuredContent.data.offset, 0);
@@ -312,10 +312,10 @@ test('search.query offset-based pagination against a real (empty) index', { skip
   }
 });
 
-test('ratelimit.check is always peek (never consumes quota), and preserves the real allowed:true-on-HTTP-200 semantics', { skip }, async () => {
+test('atc-ratelimit.check is always peek (never consumes quota), and preserves the real allowed:true-on-HTTP-200 semantics', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'ratelimit.check', { policy: 'mcp-e2e-policy', subject: 'mcp-e2e-subject' });
+    const result = await callTool(client, 'atc-ratelimit.check', { policy: 'mcp-e2e-policy', subject: 'mcp-e2e-subject' });
     assert.equal(result.isError, undefined, JSON.stringify(result));
     assert.equal(result.structuredContent.status, 200);
     assert.equal(typeof result.structuredContent.data.allowed, 'boolean');
@@ -325,10 +325,10 @@ test('ratelimit.check is always peek (never consumes quota), and preserves the r
   }
 });
 
-test('expected error path: media.files.get on a real-shaped but nonexistent id returns a translated, safe upstream error', { skip }, async () => {
+test('expected error path: atc-media.files.get on a real-shaped but nonexistent id returns a translated, safe upstream error', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'media.files.get', { id: '00000000-0000-0000-0000-000000000000' });
+    const result = await callTool(client, 'atc-media.files.get', { id: '00000000-0000-0000-0000-000000000000' });
     assert.equal(result.isError, true);
     assert.equal(result.structuredContent.code, 'UPSTREAM_ERROR');
     assert.equal(result.structuredContent.status, 404);
@@ -346,7 +346,7 @@ test('malformed tool input is rejected before any upstream call (protocol-level 
     // a failure as a normal CallToolResult with isError:true (MCP's own design: tool-level errors,
     // including input validation, are part of the result the model sees, not a rejected JSON-RPC
     // request) -- confirmed directly against the real server, not assumed from SDK docs.
-    const result = await callTool(client, 'flags.evaluate', { /* missing required env */ });
+    const result = await callTool(client, 'atc-flags.evaluate', { /* missing required env */ });
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /env|required|invalid/i);
     // No structuredContent from our own output.mjs/errors.mjs -- this never reached our handler at
@@ -360,11 +360,11 @@ test('malformed tool input is rejected before any upstream call (protocol-level 
 test('service unavailable: an unconfigured service returns a safe SERVICE_UNAVAILABLE, not a crash', { skip }, async () => {
   const { client } = await connectClient({ STACK_MCP_GEO_BASE_URL: '', STACK_MCP_GEO_API_KEY: '' });
   try {
-    const result = await callTool(client, 'geo.ip.lookup', { ip: '1.1.1.1' });
+    const result = await callTool(client, 'atc-geo.ip.lookup', { ip: '1.1.1.1' });
     assert.equal(result.isError, true);
     assert.equal(result.structuredContent.code, 'SERVICE_UNAVAILABLE');
     // still connected, still usable for a different, configured tool -- one bad service doesn't kill the process.
-    const flagsResult = await callTool(client, 'flags.evaluate', { env: 'prod' });
+    const flagsResult = await callTool(client, 'atc-flags.evaluate', { env: 'prod' });
     assert.equal(flagsResult.isError, undefined);
   } finally {
     await client.close();
@@ -375,7 +375,7 @@ test('wrong credential: real 401 from the service is translated safely, and neve
   const wrongKey = 'wrong-key-0000000000000000000000000000000000';
   const { client } = await connectClient({ STACK_MCP_FLAGS_API_KEY: wrongKey });
   try {
-    const result = await callTool(client, 'flags.evaluate', { env: 'prod' });
+    const result = await callTool(client, 'atc-flags.evaluate', { env: 'prod' });
     assert.equal(result.isError, true);
     assert.equal(result.structuredContent.status, 401);
     const dump = JSON.stringify(result);
@@ -390,7 +390,7 @@ test('service unreachable (transport failure): a real connection-refused target 
   const deadPort = await freePort(); // freed immediately -- guaranteed nothing is listening.
   const { client } = await connectClient({ STACK_MCP_GEO_BASE_URL: `http://127.0.0.1:${deadPort}` });
   try {
-    const result = await callTool(client, 'geo.ip.lookup', { ip: '1.1.1.1' });
+    const result = await callTool(client, 'atc-geo.ip.lookup', { ip: '1.1.1.1' });
     assert.equal(result.isError, true);
     assert.equal(result.structuredContent.code, 'TRANSPORT_ERROR');
     const dump = JSON.stringify(result);
@@ -406,8 +406,8 @@ test('STDIO purity + secret leakage: stdout carries only protocol frames, stderr
   try {
     // Exercise the credentialed path several times, including the error paths above, so there's a
     // real, generous window of output to scan.
-    await callTool(client, 'notify.messages.list', {});
-    await callTool(client, 'stack.status', {});
+    await callTool(client, 'atc-notify.messages.list', {});
+    await callTool(client, 'atc-stack.status', {});
     await new Promise((r) => setTimeout(r, 200)); // let any buffered stderr flush.
     const stderrText = Buffer.concat(stderrChunks).toString('utf8');
     assert.ok(!stderrText.includes(SENTINEL_NOTIFY_KEY), `sentinel secret leaked into stderr:\n${stderrText}`);

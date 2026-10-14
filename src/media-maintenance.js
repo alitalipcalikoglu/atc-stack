@@ -31,10 +31,10 @@ import { EnvFile } from './env-file.js';
  * (`LocalStorage#detachForDelete`) are what make two independent purges of the same content safe,
  * regardless of which processes they run in — see `media/test/maintenance-concurrency.test.js`.
  * @param {string} root @param {string} serviceId
- * @returns {Promise<import('../../media/src/maintenance.js').MaintenanceResult>}
+ * @returns {Promise<import('../../atc-media/src/maintenance.js').MaintenanceResult>}
  */
 export async function runMaintenance(root, serviceId) {
-  if (serviceId !== 'media') throw new Error(`no maintenance mechanism is wired for "${serviceId}" — only "media" has one today`);
+  if (serviceId !== 'atc-media') throw new Error(`no maintenance mechanism is wired for "${serviceId}" — only "atc-media" has one today`);
   const serviceDir = join(root, serviceId);
   const envPath = join(serviceDir, '.env');
   const env = existsSync(envPath) ? EnvFile.load(envPath).toObject() : {};

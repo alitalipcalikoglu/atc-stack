@@ -1,4 +1,4 @@
-# stack
+# atc-stack
 
 One command to set up and run every atc-web service together with the console: installs dependencies, generates every secret and API key, wires the services to each other and to the console (`.env` files, gateway `routes.json`, console `services.json`), builds the console, creates the first administrator, and starts or supervises the whole set.
 
@@ -23,7 +23,7 @@ PM2 (`npm i -g pm2`). Clone only this repository, install its CLI dependencies, 
 acquire the 14 sibling repositories:
 
 ```bash
-git clone https://github.com/alitalipcalikoglu/stack.git
+git clone https://github.com/alitalipcalikoglu/atc-stack.git
 cd stack
 npm ci
 npm link            # exposes both `stack` and the existing `atc-stack` command names
@@ -92,7 +92,7 @@ not installed.
 ### Configure an already-present workspace
 
 ```bash
-git clone https://github.com/alitalipcalikoglu/stack.git && cd stack && npm ci
+git clone https://github.com/alitalipcalikoglu/atc-stack.git && cd stack && npm ci
 npm run setup      # dependencies, secrets, keys, .env files, routes, console build, first admin
 npm run dev        # every service in this terminal, prefixed logs, Ctrl-C stops all
 ```
@@ -156,20 +156,20 @@ Options: `--root <dir>` (default: the parent of this checkout), `--admin-email <
 
 | Service | Port | Repository | What it does | Calls |
 |---|---|---|---|---|
-| gateway | 3000 | [gateway](https://github.com/alitalipcalikoglu/gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream |
-| notify | 3001 | [notify](https://github.com/alitalipcalikoglu/notify) | Queued e-mail with templates and retries, plus a legacy signed webhook for one-off calls (`webhook-out` is the durable delivery service — see below). API/worker split-capable. | audit |
-| auth | 3002 | [auth](https://github.com/alitalipcalikoglu/auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, audit |
-| media | 3003 | [media](https://github.com/alitalipcalikoglu/media) | Uploads, deduplication, image variants, signed URLs, upload tickets | audit |
-| console | 3004 | [console](https://github.com/alitalipcalikoglu/console) | Admin web app for every service: own admins, 2FA, console log | every service, audit |
-| audit | 3005 | [audit](https://github.com/alitalipcalikoglu/audit) | Append-only event log with a hash chain, filters, export, retention | – |
-| shortlink | 3006 | [shortlink](https://github.com/alitalipcalikoglu/shortlink) | Short links, click statistics, QR codes | audit |
-| flags | 3007 | [flags](https://github.com/alitalipcalikoglu/flags) | Feature flags and typed settings per environment, rollouts, targeting rules | audit |
-| scheduler | 3008 | [scheduler](https://github.com/alitalipcalikoglu/scheduler) | Cron and one-shot jobs calling HTTP targets with signatures and retries. API/worker split-capable. | flags, notify, webhook-out (targets), audit |
-| webhook-out | 3009 | [webhook-out](https://github.com/alitalipcalikoglu/webhook-out) | The durable, general-purpose outbound-webhook service: subscriptions, signed deliveries, retries, replay. API/worker split-capable. | audit |
-| search | 3010 | [search](https://github.com/alitalipcalikoglu/search) | Full-text search over your documents with facets and highlights (SQLite FTS5) | audit |
-| ratelimit | 3011 | [ratelimit](https://github.com/alitalipcalikoglu/ratelimit) | Central rate limits and quotas: policies, sliding windows, overrides, blocks | audit |
-| geo | 3012 | [geo](https://github.com/alitalipcalikoglu/geo) | IP geolocation (MMDB), countries, currencies, time zones, phone normalization, places | audit |
-| stack | – | [stack](https://github.com/alitalipcalikoglu/stack) | This installer and runner | – |
+| atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream |
+| atc-notify | 3001 | [atc-notify](https://github.com/alitalipcalikoglu/atc-notify) | Queued e-mail with templates and retries, plus a legacy signed webhook for one-off calls (`webhook-out` is the durable delivery service — see below). API/worker split-capable. | audit |
+| atc-auth | 3002 | [atc-auth](https://github.com/alitalipcalikoglu/atc-auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, audit |
+| atc-media | 3003 | [atc-media](https://github.com/alitalipcalikoglu/atc-media) | Uploads, deduplication, image variants, signed URLs, upload tickets | audit |
+| atc-console | 3004 | [atc-console](https://github.com/alitalipcalikoglu/atc-console) | Admin web app for every service: own admins, 2FA, console log | every service, audit |
+| atc-audit | 3005 | [atc-audit](https://github.com/alitalipcalikoglu/atc-audit) | Append-only event log with a hash chain, filters, export, retention | – |
+| atc-shortlink | 3006 | [atc-shortlink](https://github.com/alitalipcalikoglu/atc-shortlink) | Short links, click statistics, QR codes | audit |
+| atc-flags | 3007 | [atc-flags](https://github.com/alitalipcalikoglu/atc-flags) | Feature flags and typed settings per environment, rollouts, targeting rules | audit |
+| atc-scheduler | 3008 | [atc-scheduler](https://github.com/alitalipcalikoglu/atc-scheduler) | Cron and one-shot jobs calling HTTP targets with signatures and retries. API/worker split-capable. | flags, notify, webhook-out (targets), audit |
+| atc-webhook-out | 3009 | [atc-webhook-out](https://github.com/alitalipcalikoglu/atc-webhook-out) | The durable, general-purpose outbound-webhook service: subscriptions, signed deliveries, retries, replay. API/worker split-capable. | audit |
+| atc-search | 3010 | [atc-search](https://github.com/alitalipcalikoglu/atc-search) | Full-text search over your documents with facets and highlights (SQLite FTS5) | audit |
+| atc-ratelimit | 3011 | [atc-ratelimit](https://github.com/alitalipcalikoglu/atc-ratelimit) | Central rate limits and quotas: policies, sliding windows, overrides, blocks | audit |
+| atc-geo | 3012 | [atc-geo](https://github.com/alitalipcalikoglu/atc-geo) | IP geolocation (MMDB), countries, currencies, time zones, phone normalization, places | audit |
+| atc-stack | – | [atc-stack](https://github.com/alitalipcalikoglu/atc-stack) | This installer and runner | – |
 
 Every service is its own repository and deployable alone; "Calls" lists the services it talks to over HTTP when configured (all optional except auth → notify for verification and reset mails). Browsers only ever reach the gateway and the console.
 
@@ -177,14 +177,14 @@ Every service is its own repository and deployable alone; "Calls" lists the serv
 
 | Service | Port | | Service | Port |
 |---|---|---|---|---|
-| gateway | 3000 | | audit | 3005 |
-| notify | 3001 | | shortlink | 3006 |
-| auth | 3002 | | flags | 3007 |
-| media | 3003 | | scheduler | 3008 |
-| console | 3004 | | webhook-out | 3009 |
-| | | | search | 3010 |
-| | | | ratelimit | 3011 |
-| | | | geo | 3012 |
+| atc-gateway | 3000 | | atc-audit | 3005 |
+| atc-notify | 3001 | | atc-shortlink | 3006 |
+| atc-auth | 3002 | | atc-flags | 3007 |
+| atc-media | 3003 | | atc-scheduler | 3008 |
+| atc-console | 3004 | | atc-webhook-out | 3009 |
+| | | | atc-search | 3010 |
+| | | | atc-ratelimit | 3011 |
+| | | | atc-geo | 3012 |
 
 ## Adding a service
 

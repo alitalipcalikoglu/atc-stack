@@ -68,7 +68,7 @@ function jwtKeyPath(tag) {
 function notifyEnv({ port, apiKey }) {
   return {
     PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-    NOTIFY_API_KEYS: `auth:${apiKey}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
+    NOTIFY_API_KEYS: `atc-auth:${apiKey}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
   };
 }
 
@@ -94,18 +94,18 @@ test('signup with notify unreachable: still 201 with no rollback, and the audit 
   t.after(() => stopAll(/** @type {ServiceProcess[]} */ ([audit, notify, auth].filter((s) => s !== undefined))));
 
   audit = new ServiceProcess({
-    name: 'audit', cwd: join(workspaceRoot, 'audit'), entry: 'src/index.js', port: auditPort,
-    env: auditEnv({ port: auditPort, apiKeys: `auth:${authToAuditSecret}:write,harness:${harnessAuditSecret}:read` }),
+    name: 'atc-audit', cwd: join(workspaceRoot, 'atc-audit'), entry: 'src/index.js', port: auditPort,
+    env: auditEnv({ port: auditPort, apiKeys: `atc-auth:${authToAuditSecret}:write,harness:${harnessAuditSecret}:read` }),
   });
   await audit.start();
 
   // Boot notify only long enough to satisfy auth's own /ready gate (see file doc comment), then
   // take it down for real — the actual "notify unavailable" this part is testing.
-  notify = new ServiceProcess({ name: 'notify', cwd: join(workspaceRoot, 'notify'), entry: 'src/index.js', port: notifyPort, env: notifyEnv({ port: notifyPort, apiKey: authToNotifySecret }) });
+  notify = new ServiceProcess({ name: 'atc-notify', cwd: join(workspaceRoot, 'atc-notify'), entry: 'src/index.js', port: notifyPort, env: notifyEnv({ port: notifyPort, apiKey: authToNotifySecret }) });
   await notify.start();
 
   auth = new ServiceProcess({
-    name: 'auth', cwd: join(workspaceRoot, 'auth'), entry: 'src/index.js', port: authPort,
+    name: 'atc-auth', cwd: join(workspaceRoot, 'atc-auth'), entry: 'src/index.js', port: authPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(authPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
       AUTH_API_KEYS: `harness-write:${authWriteSecret}:write,harness-read:${authReadSecret}:read`,
@@ -142,7 +142,7 @@ test('signup with notify unreachable: still 201 with no rollback, and the audit 
   // (and its failure) ever ran. waitUntil here only covers auth's async outbox flush timer, not
   // any dependency on notify.
   const items = await waitUntil(async () => {
-    const eres = await fetch(`${audit.baseUrl}/v1/events?source=auth&action=auth.user.registered&targetId=${userId}`, { headers: { authorization: `Bearer ${harnessAuditSecret}` } });
+    const eres = await fetch(`${audit.baseUrl}/v1/events?source=atc-auth&action=atc-auth.user.registered&targetId=${userId}`, { headers: { authorization: `Bearer ${harnessAuditSecret}` } });
     const ebody = await eres.json();
     return ebody.items?.length ? ebody.items : undefined;
   }, { timeoutMs: 5_000, message: `an auth.user.registered audit event for user ${userId} on the real audit service` });
@@ -177,9 +177,9 @@ test('signup with audit unreachable: the durable SQLite outbox survives an auth 
   // 1) boot auth with notify briefly up (its own /ready gate), then take notify down too — this
   //    part doesn't care about notify's outcome, but keeping it unreachable here as well keeps
   //    the scenario honest (verificationEmailSent will read false, same as Part A).
-  notify = new ServiceProcess({ name: 'notify', cwd: join(workspaceRoot, 'notify'), entry: 'src/index.js', port: notifyPort, env: notifyEnv({ port: notifyPort, apiKey: authToNotifySecret }) });
+  notify = new ServiceProcess({ name: 'atc-notify', cwd: join(workspaceRoot, 'atc-notify'), entry: 'src/index.js', port: notifyPort, env: notifyEnv({ port: notifyPort, apiKey: authToNotifySecret }) });
   await notify.start();
-  auth = new ServiceProcess({ name: 'auth', cwd: join(workspaceRoot, 'auth'), entry: 'src/index.js', port: authPort, env: authEnv() });
+  auth = new ServiceProcess({ name: 'atc-auth', cwd: join(workspaceRoot, 'atc-auth'), entry: 'src/index.js', port: authPort, env: authEnv() });
   await auth.start();
   await notify.stop();
 
@@ -198,22 +198,22 @@ test('signup with audit unreachable: the durable SQLite outbox survives an auth 
   //    boundary, not just an in-memory buffer. Notify has to come back up briefly again purely
   //    for this restart's own readiness gate.
   await auth.stop();
-  notify = new ServiceProcess({ name: 'notify', cwd: join(workspaceRoot, 'notify'), entry: 'src/index.js', port: notifyPort, env: notifyEnv({ port: notifyPort, apiKey: authToNotifySecret }) });
+  notify = new ServiceProcess({ name: 'atc-notify', cwd: join(workspaceRoot, 'atc-notify'), entry: 'src/index.js', port: notifyPort, env: notifyEnv({ port: notifyPort, apiKey: authToNotifySecret }) });
   await notify.start();
-  auth = new ServiceProcess({ name: 'auth', cwd: join(workspaceRoot, 'auth'), entry: 'src/index.js', port: authPort, env: authEnv() });
+  auth = new ServiceProcess({ name: 'atc-auth', cwd: join(workspaceRoot, 'atc-auth'), entry: 'src/index.js', port: authPort, env: authEnv() });
   await auth.start();
   await notify.stop();
 
   // 4) only now start the real audit service the outbox was configured to talk to all along.
   audit = new ServiceProcess({
-    name: 'audit', cwd: join(workspaceRoot, 'audit'), entry: 'src/index.js', port: auditPort,
-    env: auditEnv({ port: auditPort, apiKeys: `auth:${authToAuditSecret}:write,harness:${harnessAuditSecret}:read` }),
+    name: 'atc-audit', cwd: join(workspaceRoot, 'atc-audit'), entry: 'src/index.js', port: auditPort,
+    env: auditEnv({ port: auditPort, apiKeys: `atc-auth:${authToAuditSecret}:write,harness:${harnessAuditSecret}:read` }),
   });
   await audit.start();
 
   // 5) the row that survived the restart is picked up by the outbox's background flush timer
   //    (default 2s) once its target is finally reachable.
-  const query = `${audit.baseUrl}/v1/events?source=auth&action=auth.user.registered&targetId=${userId}`;
+  const query = `${audit.baseUrl}/v1/events?source=atc-auth&action=atc-auth.user.registered&targetId=${userId}`;
   const items = await waitUntil(async () => {
     const eres = await fetch(query, { headers: { authorization: `Bearer ${harnessAuditSecret}` } });
     const ebody = await eres.json();

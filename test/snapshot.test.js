@@ -10,7 +10,7 @@ import { Snapshot } from '../src/snapshot.js';
  * These tests exercise `Snapshot` against real service checkouts (`ratelimit`, `media`) from this
  * workspace, through their own, real `Database` subclass — not a synthetic stand-in — per the plan's
  * requirement that backup/restore is proven "using each service's Database through the core". Each
- * fixture service directory symlinks the real `src/` and `node_modules` (so `@atc-web/service-core`
+ * fixture service directory symlinks the real `src/` and `node_modules` (so `@atc-web/atc-service-core`
  * resolves and any future schema change is exercised automatically) but gets its own `.env` and
  * `data/` pointed at a throwaway temp path — the real workspace checkouts and their real data are
  * never opened or touched.
@@ -27,7 +27,7 @@ function realServiceFixture(root, id, envExtra = '') {
   symlinkSync(join(real, 'src'), join(dir, 'src'), 'dir');
   symlinkSync(join(real, 'node_modules'), join(dir, 'node_modules'), 'dir');
   cpSync(join(real, 'package.json'), join(dir, 'package.json'));
-  writeFileSync(join(dir, '.env'), `DB_PATH=./data/${id}.db\n${envExtra}`);
+  writeFileSync(join(dir, '.env'), `DB_PATH=./data/${id.replace(/^atc-/, '')}.db\n${envExtra}`);
   return dir;
 }
 
@@ -37,21 +37,21 @@ function realServiceFixture(root, id, envExtra = '') {
  * @param {string} dir
  */
 async function generateAnchorKeys(dir) {
-  const { AnchorKeyGenerator } = await import(pathToFileURL(join(workspaceRoot, 'audit', 'scripts', 'anchor-keygen.js')).href);
+  const { AnchorKeyGenerator } = await import(pathToFileURL(join(workspaceRoot, 'atc-audit', 'scripts', 'anchor-keygen.js')).href);
   return new AnchorKeyGenerator(join(dir, 'keys', 'anchor')).run();
 }
 
 /** @param {string} serviceDir */
 async function openDb(serviceDir) {
   const { Database } = await import(pathToFileURL(join(serviceDir, 'src/db.js')).href);
-  return new Database(join(serviceDir, 'data', `${serviceDir.split('/').pop()}.db`));
+  return new Database(join(serviceDir, 'data', `${serviceDir.split('/').pop()?.replace(/^atc-/, '')}.db`));
 }
 
 const fakeExec = async () => ({ code: 0, out: '' });
 
 test('backup then restore round-trips a real service database (ratelimit) unchanged', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'rt-'));
-  const dir = realServiceFixture(root, 'ratelimit');
+  const dir = realServiceFixture(root, 'atc-ratelimit');
   const db = await openDb(dir);
   db.prepare("INSERT INTO policies (name, limits, created_by, created_at, updated_at) VALUES ('p1', '[]', 'test', 0, 0)").run();
   db.close();
@@ -69,7 +69,7 @@ test('backup then restore round-trips a real service database (ratelimit) unchan
 
   const result = await snap.restore(snapshotDir);
   assert.equal(result.outcome, 'restored');
-  assert.deepEqual(result, { outcome: 'restored', restored: ['ratelimit/data/ratelimit.db'], failed: null, rolledBack: [], rollbackFailed: [], skipped: [], runId: result.runId });
+  assert.deepEqual(result, { outcome: 'restored', restored: ['atc-ratelimit/data/ratelimit.db'], failed: null, rolledBack: [], rollbackFailed: [], skipped: [], runId: result.runId });
   assert.equal(typeof result.runId, 'string');
 
   const restored = await openDb(dir);
@@ -97,7 +97,7 @@ test('backup then restore round-trips a real service database (ratelimit) unchan
  */
 test('successful restore discards a stale, un-checkpointed WAL — a service that was not cleanly closed leaves exactly this behind', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'wal-restore-'));
-  const dir = realServiceFixture(root, 'ratelimit');
+  const dir = realServiceFixture(root, 'atc-ratelimit');
   const db = await openDb(dir);
   db.prepare("INSERT INTO policies (name, limits, created_by, created_at, updated_at) VALUES ('pre-backup', '[]', 'test', 0, 0)").run();
   db.close(); // clean close: VACUUM INTO's own backup already sees a flattened, WAL-free file regardless
@@ -129,8 +129,8 @@ test('successful restore discards a stale, un-checkpointed WAL — a service tha
 
 test('failed-restore rollback restores the WAL/SHM sidecars together with the main file, not just the main file', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'wal-rollback-'));
-  const mediaDir = realServiceFixture(root, 'media', 'DATA_DIR=./data/files\n');
-  const rtDir = realServiceFixture(root, 'ratelimit');
+  const mediaDir = realServiceFixture(root, 'atc-media', 'DATA_DIR=./data/files\n');
+  const rtDir = realServiceFixture(root, 'atc-ratelimit');
   mkdirSync(join(mediaDir, 'data', 'files', 'objects'), { recursive: true });
   writeFileSync(join(mediaDir, 'data', 'files', 'objects', 'x.bin'), 'blob v1');
   (await openDb(mediaDir)).close();
@@ -152,7 +152,7 @@ test('failed-restore rollback restores the WAL/SHM sidecars together with the ma
   // entry's apply, after ratelimit's db (and its WAL) has already been moved aside in phase 1.
   const snapWithFault = new Snapshot({
     root, exec: fakeExec,
-    _fault: (op, target) => op === 'apply' && target.endsWith(join('ratelimit', 'data', 'ratelimit.db')),
+    _fault: (op, target) => op === 'apply' && target.endsWith(join('atc-ratelimit', 'data', 'ratelimit.db')),
   });
   const result = await snapWithFault.restore(snapshotDir);
 
@@ -169,7 +169,7 @@ test('failed-restore rollback restores the WAL/SHM sidecars together with the ma
 
 test('backup then restore round-trips a real service database plus its extra directories (media: objects/variants)', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'media-'));
-  const dir = realServiceFixture(root, 'media', 'DATA_DIR=./data/files\n');
+  const dir = realServiceFixture(root, 'atc-media', 'DATA_DIR=./data/files\n');
   mkdirSync(join(dir, 'data', 'files', 'objects', 'ab'), { recursive: true });
   writeFileSync(join(dir, 'data', 'files', 'objects', 'ab', 'original.bin'), 'original blob content');
   mkdirSync(join(dir, 'data', 'files', 'variants', 'ab'), { recursive: true });
@@ -205,11 +205,11 @@ test('backup then restore round-trips a real service database plus its extra dir
 
 test('restore refuses a backup with a missing file (incomplete backup) and touches nothing', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'incomplete-'));
-  const dir = realServiceFixture(root, 'ratelimit');
+  const dir = realServiceFixture(root, 'atc-ratelimit');
   (await openDb(dir)).close();
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir } = await snap.create();
-  rmSync(join(snapshotDir, 'ratelimit', 'data', 'ratelimit.db'));
+  rmSync(join(snapshotDir, 'atc-ratelimit', 'data', 'ratelimit.db'));
 
   await assert.rejects(() => snap.restore(snapshotDir), /missing from snapshot/);
   assert.equal(existsSync(join(dir, 'data', 'ratelimit.db')), true, 'the live file was never touched');
@@ -217,13 +217,13 @@ test('restore refuses a backup with a missing file (incomplete backup) and touch
 
 test('restore refuses a backup whose recorded checksum no longer matches (corrupt backup) and touches nothing', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'corrupt-'));
-  const dir = realServiceFixture(root, 'ratelimit');
+  const dir = realServiceFixture(root, 'atc-ratelimit');
   const db = await openDb(dir);
   db.prepare("INSERT INTO policies (name, limits, created_by, created_at, updated_at) VALUES ('live', '[]', 'test', 0, 0)").run();
   db.close();
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir } = await snap.create();
-  writeFileSync(join(snapshotDir, 'ratelimit', 'data', 'ratelimit.db'), 'not actually a valid backup file');
+  writeFileSync(join(snapshotDir, 'atc-ratelimit', 'data', 'ratelimit.db'), 'not actually a valid backup file');
 
   await assert.rejects(() => snap.restore(snapshotDir), /checksum mismatch/);
   const untouched = await openDb(dir);
@@ -233,7 +233,7 @@ test('restore refuses a backup whose recorded checksum no longer matches (corrup
 
 test('restore refuses a manifest entry that resolves outside the snapshot or the service folder (path traversal guard)', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'traversal-'));
-  const dir = realServiceFixture(root, 'ratelimit');
+  const dir = realServiceFixture(root, 'atc-ratelimit');
   (await openDb(dir)).close();
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir } = await snap.create();
@@ -247,8 +247,8 @@ test('restore refuses a manifest entry that resolves outside the snapshot or the
 
 test('a real permission failure preparing one target rolls back everything and touches no live content', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'prep-fail-'));
-  const mediaDir = realServiceFixture(root, 'media', 'DATA_DIR=./data/files\n');
-  const rtDir = realServiceFixture(root, 'ratelimit');
+  const mediaDir = realServiceFixture(root, 'atc-media', 'DATA_DIR=./data/files\n');
+  const rtDir = realServiceFixture(root, 'atc-ratelimit');
   mkdirSync(join(mediaDir, 'data', 'files', 'objects'), { recursive: true });
   writeFileSync(join(mediaDir, 'data', 'files', 'objects', 'x.bin'), 'blob');
   (await openDb(mediaDir)).close();
@@ -266,13 +266,13 @@ test('a real permission failure preparing one target rolls back everything and t
     const result = await snap.restore(snapshotDir);
     assert.equal(result.outcome, 'rolled_back');
     assert.equal(result.failed?.phase, 'prepare');
-    assert.ok(result.failed?.service === 'ratelimit', result.failed?.service);
+    assert.ok(result.failed?.service === 'atc-ratelimit', result.failed?.service);
     assert.equal(result.rollbackFailed.length, 0);
     assert.equal(result.rolledBack.length, 2, 'media db and media objects — the two items phase 1 actually moved aside before hitting ratelimit — confirmed reverted');
     assert.equal(existsSync(join(mediaDir, 'data', 'media.db')), true, 'media db back in place');
     assert.equal(existsSync(join(mediaDir, 'data', 'files', 'objects', 'x.bin')), true, 'media object back in place');
     assert.equal(readdirSync(join(mediaDir, 'data')).some((f) => f.includes('.before-restore-')), false, 'no leftover aside for media — phase 1 abort moved it straight back');
-    assert.equal(existsSync(join(rtDir, 'data', 'ratelimit.db')), true, "ratelimit's own db was never even moved — the failed target itself was never touched");
+    assert.equal(existsSync(join(rtDir, 'data', 'ratelimit.db')), true, "atc-ratelimit's own db was never even moved — the failed target itself was never touched");
   } finally {
     chmodSync(join(rtDir, 'data'), 0o700);
   }
@@ -280,8 +280,8 @@ test('a real permission failure preparing one target rolls back everything and t
 
 test('regression: at least two targets applied successfully, a real I/O failure on the third rolls all three back to their pre-restore state', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'apply-fail-'));
-  const mediaDir = realServiceFixture(root, 'media', 'DATA_DIR=./data/files\n');
-  const rtDir = realServiceFixture(root, 'ratelimit');
+  const mediaDir = realServiceFixture(root, 'atc-media', 'DATA_DIR=./data/files\n');
+  const rtDir = realServiceFixture(root, 'atc-ratelimit');
   mkdirSync(join(mediaDir, 'data', 'files', 'objects'), { recursive: true });
   writeFileSync(join(mediaDir, 'data', 'files', 'objects', 'x.bin'), 'blob v1');
   const mdb = await openDb(mediaDir);
@@ -313,7 +313,7 @@ test('regression: at least two targets applied successfully, a real I/O failure 
     _fault: (op, target) => {
       if (op !== 'apply') return false;
       applyCount++;
-      return target.endsWith(join('ratelimit', 'data', 'ratelimit.db'));
+      return target.endsWith(join('atc-ratelimit', 'data', 'ratelimit.db'));
     },
   });
   const result = await snapWithFault.restore(snapshotDir);
@@ -321,9 +321,9 @@ test('regression: at least two targets applied successfully, a real I/O failure 
   assert.equal(result.outcome, 'rolled_back');
   assert.equal(applyCount, 3, 'both media items applied before the ratelimit apply was reached and faulted');
   assert.equal(result.failed?.phase, 'apply');
-  assert.equal(result.failed?.service, 'ratelimit');
+  assert.equal(result.failed?.service, 'atc-ratelimit');
   assert.equal(result.rollbackFailed.length, 0);
-  assert.deepEqual(result.rolledBack.sort(), ['media/data/files/objects', 'media/data/media.db', 'ratelimit/data/ratelimit.db'].sort());
+  assert.deepEqual(result.rolledBack.sort(), ['atc-media/data/files/objects', 'atc-media/data/media.db', 'atc-ratelimit/data/ratelimit.db'].sort());
 
   assert.equal(readFileSync(join(mediaDir, 'data', 'files', 'objects', 'x.bin'), 'utf8'), 'blob v2 (mutated after backup)', 'media object reverted to its pre-restore (mutated) content, not left on the snapshot');
   const mediaCheck = await openDb(mediaDir);
@@ -337,8 +337,8 @@ test('regression: at least two targets applied successfully, a real I/O failure 
 
 test('rollback-incomplete: a second failure during rollback itself is reported distinctly, never as an ordinary restore failure', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'rollback-incomplete-'));
-  const mediaDir = realServiceFixture(root, 'media', 'DATA_DIR=./data/files\n');
-  const rtDir = realServiceFixture(root, 'ratelimit');
+  const mediaDir = realServiceFixture(root, 'atc-media', 'DATA_DIR=./data/files\n');
+  const rtDir = realServiceFixture(root, 'atc-ratelimit');
   mkdirSync(join(mediaDir, 'data', 'files', 'objects'), { recursive: true });
   writeFileSync(join(mediaDir, 'data', 'files', 'objects', 'x.bin'), 'blob');
   (await openDb(mediaDir)).close();
@@ -352,8 +352,8 @@ test('rollback-incomplete: a second failure during rollback itself is reported d
   const snapWithFault = new Snapshot({
     root, exec: fakeExec,
     _fault: (op, target) => {
-      if (op === 'apply') return target.endsWith(join('ratelimit', 'data', 'ratelimit.db'));
-      if (op === 'rollback') return target.endsWith(join('media', 'data', 'media.db'));
+      if (op === 'apply') return target.endsWith(join('atc-ratelimit', 'data', 'ratelimit.db'));
+      if (op === 'rollback') return target.endsWith(join('atc-media', 'data', 'media.db'));
       return false;
     },
   });
@@ -361,27 +361,27 @@ test('rollback-incomplete: a second failure during rollback itself is reported d
 
   assert.equal(result.outcome, 'rollback_incomplete', 'never reported as a plain restore failure');
   assert.equal(result.restored.length, 0);
-  assert.equal(result.failed?.service, 'ratelimit');
-  assert.deepEqual(result.rollbackFailed, [{ service: 'media', path: 'data/media.db', error: `injected failure: rollback ${join(mediaDir, 'data', 'media.db')}` }]);
-  assert.deepEqual(result.rolledBack.sort(), ['media/data/files/objects', 'ratelimit/data/ratelimit.db'].sort(), 'the two items whose rollback did succeed are still named individually');
+  assert.equal(result.failed?.service, 'atc-ratelimit');
+  assert.deepEqual(result.rollbackFailed, [{ service: 'atc-media', path: 'data/media.db', error: `injected failure: rollback ${join(mediaDir, 'data', 'media.db')}` }]);
+  assert.deepEqual(result.rolledBack.sort(), ['atc-media/data/files/objects', 'atc-ratelimit/data/ratelimit.db'].sort(), 'the two items whose rollback did succeed are still named individually');
 });
 
 test('restore refuses a schema newer than the running service supports, via the real Database forward-version guard', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'newer-'));
-  const dir = realServiceFixture(root, 'ratelimit');
+  const dir = realServiceFixture(root, 'atc-ratelimit');
   (await openDb(dir)).close();
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir, manifest } = await snap.create();
   // The manifest's own schemaVersion bookkeeping isn't what gates this — the staged database's own
   // `PRAGMA user_version` is. Bump it past what this checkout's MIGRATIONS array supports.
   const { DatabaseSync } = await import('node:sqlite');
-  const staged = new DatabaseSync(join(snapshotDir, 'ratelimit', 'data', 'ratelimit.db'));
+  const staged = new DatabaseSync(join(snapshotDir, 'atc-ratelimit', 'data', 'ratelimit.db'));
   staged.exec('PRAGMA user_version = 999');
   staged.close();
   // Recompute the checksum the tampered file must match, so this fails on the version guard, not on
   // the (unrelated) checksum check.
   const { createHash } = await import('node:crypto');
-  manifest.entries[0].sha256 = createHash('sha256').update(readFileSync(join(snapshotDir, 'ratelimit', 'data', 'ratelimit.db'))).digest('hex');
+  manifest.entries[0].sha256 = createHash('sha256').update(readFileSync(join(snapshotDir, 'atc-ratelimit', 'data', 'ratelimit.db'))).digest('hex');
   writeFileSync(join(snapshotDir, 'manifest.json'), JSON.stringify(manifest));
 
   await assert.rejects(() => snap.restore(snapshotDir), /newer than this build supports/);
@@ -389,14 +389,14 @@ test('restore refuses a schema newer than the running service supports, via the 
 
 test('restored audit private key keeps its 0600 permissions, not the process umask default', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'audit-key-perms-'));
-  const dir = realServiceFixture(root, 'audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
+  const dir = realServiceFixture(root, 'atc-audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
   await generateAnchorKeys(dir);
   assert.equal(statSync(join(dir, 'keys', 'anchor-private.pem')).mode & 0o777, 0o600, 'sanity: AnchorKeyGenerator itself writes 0600');
   (await openDb(dir)).close();
 
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir } = await snap.create();
-  assert.equal(statSync(join(snapshotDir, 'audit', 'keys', 'anchor-private.pem')).mode & 0o777, 0o600, 'the backup copy itself keeps 0600, not writeFileSync\'s default umask mode');
+  assert.equal(statSync(join(snapshotDir, 'atc-audit', 'keys', 'anchor-private.pem')).mode & 0o777, 0o600, 'the backup copy itself keeps 0600, not writeFileSync\'s default umask mode');
 
   // Corrupt live permissions to prove restore actively re-asserts 0600 rather than happening to leave it alone.
   chmodSync(join(dir, 'keys', 'anchor-private.pem'), 0o644);
@@ -407,13 +407,13 @@ test('restored audit private key keeps its 0600 permissions, not the process uma
 
 test('audit anchor private key is included in stack backup and checksummed in the manifest', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'audit-key-'));
-  const dir = realServiceFixture(root, 'audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
+  const dir = realServiceFixture(root, 'atc-audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
   await generateAnchorKeys(dir);
   (await openDb(dir)).close();
 
   const snap = new Snapshot({ root, exec: fakeExec });
   const { manifest } = await snap.create();
-  const keyEntry = manifest.entries.find((/** @type {any} */ e) => e.service === 'audit' && e.path === 'keys/anchor-private.pem');
+  const keyEntry = manifest.entries.find((/** @type {any} */ e) => e.service === 'atc-audit' && e.path === 'keys/anchor-private.pem');
   assert.ok(keyEntry, `expected an audit/keys/anchor-private.pem entry, got: ${JSON.stringify(manifest.entries.map((/** @type {any} */ e) => e.path))}`);
   assert.equal(keyEntry.kind, 'file');
   const { createHash } = await import('node:crypto');
@@ -423,17 +423,17 @@ test('audit anchor private key is included in stack backup and checksummed in th
 
 test('anchoring not configured: no audit key entry, and no error', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'audit-no-key-'));
-  const dir = realServiceFixture(root, 'audit');
+  const dir = realServiceFixture(root, 'atc-audit');
   (await openDb(dir)).close();
 
   const snap = new Snapshot({ root, exec: fakeExec });
   const { manifest } = await snap.create();
-  assert.equal(manifest.entries.filter((/** @type {any} */ e) => e.service === 'audit').length, 1, 'only the database entry — anchoring is off, nothing else to back up');
+  assert.equal(manifest.entries.filter((/** @type {any} */ e) => e.service === 'atc-audit').length, 1, 'only the database entry — anchoring is off, nothing else to back up');
 });
 
 test('anchoring configured but the key file is missing: backup refuses rather than silently completing an incomplete snapshot', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'audit-missing-key-'));
-  const dir = realServiceFixture(root, 'audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
+  const dir = realServiceFixture(root, 'atc-audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
   (await openDb(dir)).close();
   // Deliberately never generated — ANCHOR_PRIVATE_KEY_PATH is configured but nothing exists there.
 
@@ -443,14 +443,14 @@ test('anchoring configured but the key file is missing: backup refuses rather th
 
 test('tampering with the snapshot copy of the audit private key is caught by checksum validation before anything live is touched', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'audit-tamper-'));
-  const dir = realServiceFixture(root, 'audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
+  const dir = realServiceFixture(root, 'atc-audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
   await generateAnchorKeys(dir);
   const liveKeyBefore = readFileSync(join(dir, 'keys', 'anchor-private.pem'));
   (await openDb(dir)).close();
 
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir } = await snap.create();
-  writeFileSync(join(snapshotDir, 'audit', 'keys', 'anchor-private.pem'), 'tampered, not a real key file');
+  writeFileSync(join(snapshotDir, 'atc-audit', 'keys', 'anchor-private.pem'), 'tampered, not a real key file');
 
   await assert.rejects(() => snap.restore(snapshotDir), /checksum mismatch/);
   assert.deepEqual(readFileSync(join(dir, 'keys', 'anchor-private.pem')), liveKeyBefore, 'the live private key file was never touched by the refused restore');
@@ -458,7 +458,7 @@ test('tampering with the snapshot copy of the audit private key is caught by che
 
 test('restore failure rolls the audit database and its anchor key back together, as one consistency unit', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'audit-key-rollback-'));
-  const dir = realServiceFixture(root, 'audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
+  const dir = realServiceFixture(root, 'atc-audit', 'ANCHOR_PRIVATE_KEY_PATH=./keys/anchor-private.pem\n');
   await generateAnchorKeys(dir);
   const db = await openDb(dir);
   db.prepare("INSERT INTO events (id, client_id, source, action, outcome, at, received_at, prev_hash, hash) VALUES ('e1', NULL, 'harness', 'seed', 'success', 0, 0, ?, 'h1')").run('0'.repeat(64));
@@ -480,15 +480,15 @@ test('restore failure rolls the audit database and its anchor key back together,
   // succeeded by the time this hits — proving rollback reverts both, not just the one that failed.
   const snapWithFault = new Snapshot({
     root, exec: fakeExec,
-    _fault: (op, target) => op === 'apply' && target.endsWith(join('audit', 'keys', 'anchor-private.pem')),
+    _fault: (op, target) => op === 'apply' && target.endsWith(join('atc-audit', 'keys', 'anchor-private.pem')),
   });
   const result = await snapWithFault.restore(snapshotDir);
 
   assert.equal(result.outcome, 'rolled_back');
-  assert.equal(result.failed?.service, 'audit');
+  assert.equal(result.failed?.service, 'atc-audit');
   assert.equal(result.failed?.path, 'keys/anchor-private.pem');
   assert.equal(result.rollbackFailed.length, 0);
-  assert.deepEqual(result.rolledBack.sort(), ['audit/data/audit.db', 'audit/keys/anchor-private.pem'].sort());
+  assert.deepEqual(result.rolledBack.sort(), ['atc-audit/data/audit.db', 'atc-audit/keys/anchor-private.pem'].sort());
 
   const restoredDb = await openDb(dir);
   assert.equal(/** @type {any} */ (restoredDb.prepare("SELECT action FROM events WHERE id = 'e1'").get())?.action, 'mutated-after-backup', 'db reverted to its pre-restore (mutated) state, not left on the (failed) snapshot apply');
@@ -498,7 +498,7 @@ test('restore failure rolls the audit database and its anchor key back together,
 
 test('auth regression: JWT signing keys are still included, restored, and manifest-validated after the audit key addition', async () => {
   const root = mkdtempSync(join(fixtureRoot, 'auth-key-regression-'));
-  const dir = realServiceFixture(root, 'auth');
+  const dir = realServiceFixture(root, 'atc-auth');
   const { generateKeyPairSync } = await import('node:crypto');
   const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
   mkdirSync(join(dir, 'keys'), { recursive: true });
@@ -508,7 +508,7 @@ test('auth regression: JWT signing keys are still included, restored, and manife
 
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir, manifest } = await snap.create();
-  const keyEntry = manifest.entries.find((/** @type {any} */ e) => e.service === 'auth' && e.path === 'keys');
+  const keyEntry = manifest.entries.find((/** @type {any} */ e) => e.service === 'atc-auth' && e.path === 'keys');
   assert.ok(keyEntry, 'auth/keys directory still included');
   assert.equal(keyEntry.kind, 'dir');
 

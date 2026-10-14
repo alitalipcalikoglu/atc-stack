@@ -42,7 +42,7 @@ const flags = createClient({
   headers: { Authorization: `Bearer ${apiKeySecret}` },
 });
 
-const { data, error, response } = await flags['flags.evaluate.post']({
+const { data, error, response } = await flags['atc-flags.evaluate.post']({
   body: { env: 'prod', context: { userId: 'u_123' } },
 });
 if (error) {
@@ -73,12 +73,12 @@ it silently omitted; the generated type will not compile without it.
 
 OpenAPI/JSON-Schema has no native binary type, so `openapi-typescript` maps a `format: binary`
 request body to `string` — this is documented upstream behavior, not a bug. For a real binary
-upload (currently only `media.files.upload` / `media.files.uploadTicketed`), pass the real bytes with
+upload (currently only `atc-media.files.upload` / `atc-media.files.uploadTicketed`), pass the real bytes with
 a matching `bodySerializer` override so `openapi-fetch` hands them straight to `fetch` instead of
 trying to serialize a `string`:
 
 ```ts
-await media['media.files.upload']({
+await media['atc-media.files.upload']({
   body: fileBytes as unknown as string,
   bodySerializer: (b: unknown) => b as unknown as BodyInit,
   headers: { 'content-type': 'image/png' },
@@ -95,7 +95,7 @@ content type an operation actually declares. For a real binary/non-JSON response
 delivery route, audit's NDJSON/CSV export, shortlink's QR image routes), pass `parseAs` explicitly:
 
 ```ts
-const { data, response } = await media['media.files.deliver']({
+const { data, response } = await media['atc-media.files.deliver']({
   params: { path: { id, variant: 'original' } },
   parseAs: 'arrayBuffer', // or 'blob' / 'text' / 'stream'
 });

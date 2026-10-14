@@ -5,7 +5,7 @@ import path from 'node:path';
 import { parse as parseYaml } from 'yaml';
 
 const WORKSPACE_ROOT = path.resolve(import.meta.dirname, '..', '..');
-const SERVICES = ['gateway', 'notify', 'auth', 'media', 'console', 'audit', 'shortlink', 'flags', 'scheduler', 'webhook-out', 'search', 'ratelimit', 'geo'];
+const SERVICES = ['atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink', 'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo'];
 
 function resolveSchema(schema, doc) {
   if (schema && schema.$ref) {

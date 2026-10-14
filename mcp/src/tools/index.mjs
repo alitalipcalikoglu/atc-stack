@@ -27,14 +27,14 @@ function summarize(res) {
 /** @type {ToolDef[]} */
 export const TOOLS = [
   // ---------------------------------------------------------------------------------------------
-  // stack.status -- MCP-native aggregate. Not one OpenAPI operationId: polls every configured
+  // atc-stack.status -- MCP-native aggregate. Not one OpenAPI operationId: polls every configured
   // service's own /health + /ready + /v1/info (all three unauthenticated on every service, per the
   // Phase 0/1 audits), exactly the "operational aggregate" stack status --matrix already does at
   // the CLI layer. One dead/unconfigured service never fails the whole call -- its row just reports
   // the failure, per-service, so the tool stays useful when the platform is partially up.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'stack.status',
+    name: 'atc-stack.status',
     description:
       'Reports liveness (/health), readiness (/ready) and identity (/v1/info: version, apiVersion, ' +
       'capabilities, schemaVersion) for every configured atc-web service. Read-only, safe to call ' +
@@ -51,8 +51,8 @@ export const TOOLS = [
             // operationId naming for the 3 operational probes is NOT consistent across the 13
             // specs (a real Phase 1 finding, worth fixing in a future contract pass, not silently
             // patched here): gateway/ratelimit/geo use "<svc>.health.check", most others
-            // "<svc>.health.get", media uses "media.ops.health", search uses
-            // "search.system.health" (entity and verb swapped). Matching on "does the operationId
+            // "<svc>.health.get", media uses "atc-media.ops.health", search uses
+            // "atc-search.system.health" (entity and verb swapped). Matching on "does the operationId
             // contain this whole dot-segment" is robust to all three shapes without guessing which
             // one a given service picked.
             /** @param {string} word */
@@ -87,11 +87,11 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // flags.evaluate -- authenticated read. flags/openapi.yaml operationId flags.evaluate.post,
+  // atc-flags.evaluate -- authenticated read. flags/openapi.yaml operationId atc-flags.evaluate.post,
   // request body EvaluateBody (env required; context.userId/email/attrs, keys, details all optional).
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'flags.evaluate',
+    name: 'atc-flags.evaluate',
     description:
       'Evaluates feature flags for one environment and (optional) targeting context. Read-only ' +
       '(no state changes -- evaluation only increments an in-process counter). An unknown key in ' +
@@ -106,20 +106,20 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('flags');
+      const client = await registry.client('atc-flags');
       const { env, userId, email, attrs, keys, details } = args;
       const context = userId || email || attrs ? { userId, email, attrs } : undefined;
-      const res = await client['flags.evaluate.post']({ body: { env, context, keys, details } });
+      const res = await client['atc-flags.evaluate.post']({ body: { env, context, keys, details } });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // geo.ip.lookup -- authenticated read. geo/openapi.yaml operationId geo.ip.lookup, path {ip}, query {lang?}.
+  // atc-geo.ip.lookup -- authenticated read. geo/openapi.yaml operationId atc-geo.ip.lookup, path {ip}, query {lang?}.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'geo.ip.lookup',
+    name: 'atc-geo.ip.lookup',
     description:
       'Looks up country/region/city/coordinates/timezone (and ASN, if configured) for a public ' +
       'IPv4/IPv6 address. Private/loopback/reserved addresses are classified without a database ' +
@@ -130,20 +130,20 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('geo');
-      const res = await client['geo.ip.lookup']({ params: { path: { ip: args.ip }, query: { lang: args.lang } } });
+      const client = await registry.client('atc-geo');
+      const res = await client['atc-geo.ip.lookup']({ params: { path: { ip: args.ip }, query: { lang: args.lang } } });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // media.files.get -- authenticated read + real error path. media/openapi.yaml operationId
-  // media.files.get, path {id}. Deliberately metadata-only: this tool never transports file bytes
+  // atc-media.files.get -- authenticated read + real error path. media/openapi.yaml operationId
+  // atc-media.files.get, path {id}. Deliberately metadata-only: this tool never transports file bytes
   // through MCP (see mcp/README.md's "binary" section for why).
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'media.files.get',
+    name: 'atc-media.files.get',
     description:
       "Reads one file's metadata (name, mime, size, dimensions, visibility, URLs) by id. Does not " +
       'return file bytes -- use the `url` fields in the response to fetch content directly. A ' +
@@ -151,20 +151,20 @@ export const TOOLS = [
     inputSchema: { id: z.string().uuid() },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('media');
-      const res = await client['media.files.get']({ params: { path: { id: args.id } } });
+      const client = await registry.client('atc-media');
+      const res = await client['atc-media.files.get']({ params: { path: { id: args.id } } });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // notify.messages.list -- pagination proof (cursor-based). notify/openapi.yaml operationId
-  // notify.messages.list, query {status?, limit?, cursor?}. Field names (items/nextCursor) are
+  // atc-notify.messages.list -- pagination proof (cursor-based). notify/openapi.yaml operationId
+  // atc-notify.messages.list, query {status?, limit?, cursor?}. Field names (items/nextCursor) are
   // notify's own real contract, not normalized to match any other service's list shape.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'notify.messages.list',
+    name: 'atc-notify.messages.list',
     description:
       "Lists the calling API key's own queued/sent/failed messages, newest first. Cursor-paginated: " +
       'pass the previous call\'s `nextCursor` back as `cursor` to get the next page; `nextCursor: ' +
@@ -176,8 +176,8 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('notify');
-      const res = await client['notify.messages.list']({
+      const client = await registry.client('atc-notify');
+      const res = await client['atc-notify.messages.list']({
         params: { query: { status: args.status, limit: args.limit !== undefined ? String(args.limit) : undefined, cursor: args.cursor } },
       });
       if (res.error) throw res;
@@ -186,17 +186,17 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // notify.messages.create -- async submit (safe mutation). notify/openapi.yaml operationId
-  // notify.messages.create, body oneOf(MessageCreateEmail, MessageCreateWebhook) discriminated on
+  // atc-notify.messages.create -- async submit (safe mutation). notify/openapi.yaml operationId
+  // atc-notify.messages.create, body oneOf(MessageCreateEmail, MessageCreateWebhook) discriminated on
   // `channel`. Per-template email `data` shape is intentionally NOT re-derived here (server-side
   // Ajv is the real validator for that) -- this schema only re-derives the OUTER contract shape.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'notify.messages.create',
+    name: 'atc-notify.messages.create',
     description:
       'Queues an email or webhook message for delivery. Returns immediately (202 new / 200 replay ' +
       'of an idempotencyKey) -- this does NOT mean delivery has happened, only that it was accepted. ' +
-      'Use notify.messages.get with the returned id to check real delivery status later.',
+      'Use atc-notify.messages.get with the returned id to check real delivery status later.',
     inputSchema: {
       channel: z.enum(['email', 'webhook']),
       // email branch
@@ -210,40 +210,40 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     async handler(args, registry) {
-      const client = await registry.client('notify');
+      const client = await registry.client('atc-notify');
       const body = args.channel === 'email'
         ? { channel: 'email', template: args.template, to: args.to, data: args.data ?? {}, idempotencyKey: args.idempotencyKey }
         : { channel: 'webhook', url: args.url, event: args.event, data: args.data ?? {}, idempotencyKey: args.idempotencyKey };
-      const res = await client['notify.messages.create']({ body });
+      const res = await client['atc-notify.messages.create']({ body });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data, summary: `message ${res.data?.id} queued, status ${res.response.status}` });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // notify.messages.get -- async status/read half of the same flow.
+  // atc-notify.messages.get -- async status/read half of the same flow.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'notify.messages.get',
+    name: 'atc-notify.messages.get',
     description:
       'Reads one message\'s current delivery state (queued/processing/sent/failed), attempt count ' +
-      'and last error, by id. Use this to check on a message created with notify.messages.create.',
+      'and last error, by id. Use this to check on a message created with atc-notify.messages.create.',
     inputSchema: { id: z.string().uuid() },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('notify');
-      const res = await client['notify.messages.get']({ params: { path: { id: args.id } } });
+      const client = await registry.client('atc-notify');
+      const res = await client['atc-notify.messages.get']({ params: { path: { id: args.id } } });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // shortlink.links.create -- safe mutation (create, non-destructive). shortlink/openapi.yaml
-  // operationId shortlink.links.create, body LinkCreate (url required).
+  // atc-shortlink.links.create -- safe mutation (create, non-destructive). shortlink/openapi.yaml
+  // operationId atc-shortlink.links.create, body LinkCreate (url required).
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'shortlink.links.create',
+    name: 'atc-shortlink.links.create',
     description:
       'Creates a new short link for a URL. Non-destructive -- creates a new resource, never ' +
       'overwrites or deletes anything. Slug is auto-generated if omitted.',
@@ -258,21 +258,21 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('shortlink');
-      const res = await client['shortlink.links.create']({ body: args });
+      const client = await registry.client('atc-shortlink');
+      const res = await client['atc-shortlink.links.create']({ body: args });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data, summary: `created ${res.data?.link?.shortUrl ?? res.data?.link?.code}` });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // ratelimit.check -- read-only by construction: `peek` is hard-coded true in the handler, never
+  // atc-ratelimit.check -- read-only by construction: `peek` is hard-coded true in the handler, never
   // caller-controlled, so this tool can never consume real quota (a non-peek check is a real
   // mutation of a subject's counters -- deliberately left out of the initial allowlist).
-  // ratelimit/openapi.yaml operationId ratelimit.check, body CheckRequest.
+  // ratelimit/openapi.yaml operationId atc-ratelimit.check, body CheckRequest.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'ratelimit.check',
+    name: 'atc-ratelimit.check',
     description:
       'Previews (does not consume) what a rate-limit decision would be for a subject against a ' +
       'policy. Always evaluated with peek:true -- this tool can never consume real quota. Note: ' +
@@ -285,22 +285,22 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('ratelimit');
-      const res = await client['ratelimit.check']({ body: { policy: args.policy, subject: args.subject, cost: args.cost, peek: true } });
+      const client = await registry.client('atc-ratelimit');
+      const res = await client['atc-ratelimit.check']({ body: { policy: args.policy, subject: args.subject, cost: args.cost, peek: true } });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data, summary: `allowed=${res.data?.allowed}` });
     },
   },
 
   // ---------------------------------------------------------------------------------------------
-  // search.query -- authenticated read, offset-based pagination (deliberately different pagination
-  // style from notify.messages.list's cursor style -- both are real, neither is normalized to
+  // atc-search.query -- authenticated read, offset-based pagination (deliberately different pagination
+  // style from atc-notify.messages.list's cursor style -- both are real, neither is normalized to
   // match the other; see stack/docs/API_CONTRACT_AUDIT.md §H on the platform's real field-naming
   // inconsistency across services, left as-is per that doc's own deferred-policy note).
-  // search/openapi.yaml operationId search.query.get, path {name}, query {q?, limit?, offset?, ...}.
+  // search/openapi.yaml operationId atc-search.query.get, path {name}, query {q?, limit?, offset?, ...}.
   // ---------------------------------------------------------------------------------------------
   {
-    name: 'search.query',
+    name: 'atc-search.query',
     description:
       'Full-text search over one index. Empty/omitted `q` is a browse (no ranking, score is null ' +
       'on every hit). Offset-based pagination: total/limit/offset in the response, not a cursor.',
@@ -313,8 +313,8 @@ export const TOOLS = [
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
-      const client = await registry.client('search');
-      const res = await client['search.query.get']({
+      const client = await registry.client('atc-search');
+      const res = await client['atc-search.query.get']({
         params: {
           path: { name: args.name },
           query: {

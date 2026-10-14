@@ -60,7 +60,7 @@ before(async () => {
   // `local: true` makes gatewayRoutes() always regenerate from the manifest, ignoring whatever
   // `gateway/routes.json` a real `npm run setup` may have left on disk in this workspace.
   context = new SetupContext({ root: workspaceRoot, host: '127.0.0.1', local: true, run: async () => {} });
-  jwtAudience = context.env('auth').get('JWT_AUDIENCE') || 'app';
+  jwtAudience = context.env('atc-auth').get('JWT_AUDIENCE') || 'app';
 
   const [auditPort, notifyPort, authPort] = await Promise.all([freePort(), freePort(), freePort()]);
   const authToAuditSecret = randomSecret();
@@ -71,17 +71,17 @@ before(async () => {
   authApiKeySecret = randomSecret();
 
   audit = new ServiceProcess({
-    name: 'audit', cwd: join(workspaceRoot, 'audit'), entry: 'src/index.js', port: auditPort,
+    name: 'atc-audit', cwd: join(workspaceRoot, 'atc-audit'), entry: 'src/index.js', port: auditPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(auditPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-      AUDIT_API_KEYS: `auth:${authToAuditSecret}:write,harness:${harnessAuditSecret}:read`,
+      AUDIT_API_KEYS: `atc-auth:${authToAuditSecret}:write,harness:${harnessAuditSecret}:read`,
     },
   });
   notify = new ServiceProcess({
-    name: 'notify', cwd: join(workspaceRoot, 'notify'), entry: 'src/index.js', port: notifyPort,
+    name: 'atc-notify', cwd: join(workspaceRoot, 'atc-notify'), entry: 'src/index.js', port: notifyPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(notifyPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-      NOTIFY_API_KEYS: `auth:${authToNotifySecret}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
+      NOTIFY_API_KEYS: `atc-auth:${authToNotifySecret}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
     },
   });
   await Promise.all([audit.start(), notify.start()]);
@@ -90,14 +90,14 @@ before(async () => {
   const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
   writeFileSync(jwtKeyPath, privateKey.export({ type: 'pkcs8', format: 'pem' }));
   auth = new ServiceProcess({
-    name: 'auth', cwd: join(workspaceRoot, 'auth'), entry: 'src/index.js', port: authPort,
+    name: 'atc-auth', cwd: join(workspaceRoot, 'atc-auth'), entry: 'src/index.js', port: authPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(authPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-      AUTH_API_KEYS: `gateway:${gatewayToAuthSecret},harness:${authApiKeySecret}`,
+      AUTH_API_KEYS: `atc-gateway:${gatewayToAuthSecret},harness:${authApiKeySecret}`,
       JWT_PRIVATE_KEY_PATH: jwtKeyPath,
       // Signed so the token's iss/aud match exactly what the real generated routes.json's jwt
-      // config expects (context.url('gateway') / the real JWT_AUDIENCE from auth's own env file).
-      JWT_ISSUER: context.url('gateway'), JWT_AUDIENCE: jwtAudience,
+      // config expects (context.url('atc-gateway') / the real JWT_AUDIENCE from auth's own env file).
+      JWT_ISSUER: context.url('atc-gateway'), JWT_AUDIENCE: jwtAudience,
       APP_NAME: 'Harness', VERIFY_URL_TEMPLATE: 'https://example.test/verify?token={token}', RESET_URL_TEMPLATE: 'https://example.test/reset?token={token}',
       NOTIFY_URL: notify.baseUrl, NOTIFY_API_KEY: authToNotifySecret,
       AUDIT_URL: audit.baseUrl, AUDIT_API_KEY: authToAuditSecret,
@@ -128,10 +128,10 @@ after(async () => {
  */
 function buildRoutes() {
   const generated = context.gatewayRoutes();
-  const isLive = (/** @type {string} */ url) => url.startsWith(context.url('auth')) || (media && url.startsWith(context.url('media')));
+  const isLive = (/** @type {string} */ url) => url.startsWith(context.url('atc-auth')) || (media && url.startsWith(context.url('atc-media')));
   const rebind = (/** @type {string} */ url) => {
-    if (url.startsWith(context.url('auth'))) return url.replace(context.url('auth'), auth.baseUrl);
-    if (media && url.startsWith(context.url('media'))) return url.replace(context.url('media'), media.baseUrl);
+    if (url.startsWith(context.url('atc-auth'))) return url.replace(context.url('atc-auth'), auth.baseUrl);
+    if (media && url.startsWith(context.url('atc-media'))) return url.replace(context.url('atc-media'), media.baseUrl);
     return url;
   };
   return {
@@ -146,7 +146,7 @@ async function startGateway({ trustProxy = false } = {}) {
   const routesPath = join(scratch, `routes-${port}.json`);
   writeFileSync(routesPath, JSON.stringify(buildRoutes()));
   const gateway = new ServiceProcess({
-    name: 'gateway', cwd: join(workspaceRoot, 'gateway'), entry: 'src/index.js', port,
+    name: 'atc-gateway', cwd: join(workspaceRoot, 'atc-gateway'), entry: 'src/index.js', port,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info',
       ROUTES_FILE: routesPath, AUTH_API_KEY: gatewayToAuthSecret, MEDIA_API_KEY: gatewayToMediaSecret, TRUST_PROXY: String(trustProxy),
@@ -208,7 +208,7 @@ test('gateway (default, untrusted) mints its own request id for a login through 
   let found = null;
   const deadline = Date.now() + 5_000;
   while (Date.now() < deadline && !found) {
-    const res = await fetch(`${audit.baseUrl}/v1/events?source=auth&action=auth.login.succeeded&limit=20`, { headers: { authorization: `Bearer ${harnessAuditSecret}` } });
+    const res = await fetch(`${audit.baseUrl}/v1/events?source=atc-auth&action=atc-auth.login.succeeded&limit=20`, { headers: { authorization: `Bearer ${harnessAuditSecret}` } });
     const body = await res.json();
     found = body.items?.find((/** @type {any} */ e) => e.target?.id === loginBody.user.id);
     if (!found) await new Promise((r) => setTimeout(r, 200));
@@ -267,10 +267,10 @@ test('Post-production Phase 5: a real traceparent gateway mints for a login cros
 test('media-user route (Stage 1.1 regression): the real generated routes.json resolves through gateway to media’s actual upload route, not a stripped-too-short one', { skip }, async (t) => {
   const mediaPort = await freePort();
   media = new ServiceProcess({
-    name: 'media', cwd: join(workspaceRoot, 'media'), entry: 'src/index.js', port: mediaPort,
+    name: 'atc-media', cwd: join(workspaceRoot, 'atc-media'), entry: 'src/index.js', port: mediaPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(mediaPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:', DATA_DIR: join(scratch, 'media-files'),
-      PUBLIC_BASE_URL: `http://127.0.0.1:${mediaPort}`, MEDIA_API_KEYS: `gateway:${gatewayToMediaSecret}`, SIGNING_SECRET: randomSecret(),
+      PUBLIC_BASE_URL: `http://127.0.0.1:${mediaPort}`, MEDIA_API_KEYS: `atc-gateway:${gatewayToMediaSecret}`, SIGNING_SECRET: randomSecret(),
     },
   });
   await media.start();

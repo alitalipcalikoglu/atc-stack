@@ -24,8 +24,8 @@ const WORKSPACE_ROOT = path.resolve(HERE, '..', '..');
 const ROUTES_DIR = path.join(HERE, 'routes');
 
 const ALL_SERVICES = [
-  'gateway', 'notify', 'auth', 'media', 'console', 'audit', 'shortlink',
-  'flags', 'scheduler', 'webhook-out', 'search', 'ratelimit', 'geo',
+  'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
+  'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo',
 ];
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);

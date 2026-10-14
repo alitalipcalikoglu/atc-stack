@@ -133,7 +133,7 @@ async function raceSplitStartup({ serviceId, env }) {
 
 test('notify: split api+worker simultaneous first start against a pending migration — both survive, migration applies once', { skip }, async () => {
   await raceSplitStartup({
-    serviceId: 'notify',
+    serviceId: 'atc-notify',
     env: ({ dbPath, apiPort }) => ({
       PATH: process.env.PATH ?? '', PORT: String(apiPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: dbPath,
       NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
@@ -143,7 +143,7 @@ test('notify: split api+worker simultaneous first start against a pending migrat
 
 test('scheduler: split api+worker simultaneous first start against a pending migration — both survive, migration applies once', { skip }, async () => {
   await raceSplitStartup({
-    serviceId: 'scheduler',
+    serviceId: 'atc-scheduler',
     env: ({ dbPath, apiPort }) => ({
       PATH: process.env.PATH ?? '', PORT: String(apiPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: dbPath,
       SIGNING_SECRET: randomSecret(), SCHEDULER_API_KEYS: `harness:${randomSecret()}:readwrite`,
@@ -154,7 +154,7 @@ test('scheduler: split api+worker simultaneous first start against a pending mig
 
 test('webhook-out: split api+worker simultaneous first start against a pending migration — both survive, migration applies once', { skip }, async () => {
   await raceSplitStartup({
-    serviceId: 'webhook-out',
+    serviceId: 'atc-webhook-out',
     env: ({ dbPath, apiPort }) => ({
       PATH: process.env.PATH ?? '', PORT: String(apiPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: dbPath,
       WEBHOOK_API_KEYS: `harness:${randomSecret()}:readwrite`, SECRETS_KEY: randomSecret(32),

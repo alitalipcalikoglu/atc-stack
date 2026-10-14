@@ -30,103 +30,103 @@
  * @param {string} id
  * @returns {{ AUDIT_URL: string, AUDIT_API_KEY: string }}
  */
-const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('audit')), AUDIT_API_KEY: String(c.issue('audit', id, 'write')) });
+const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_KEY: String(c.issue('atc-audit', id, 'write')) });
 
 /** @type {Service[]} */
 export const SERVICES = [
   {
-    id: 'notify', port: 3001, keysVar: 'NOTIFY_API_KEYS', splitWorkers: true,
-    env: (c) => ({ ...auditEnv(c, 'notify'), SMTP_URL: c.keep('notify', 'SMTP_URL', 'json:'), SMTP_FROM: c.keep('notify', 'SMTP_FROM', '"atc-web <no-reply@localhost>"'), WEBHOOK_SIGNING_SECRET: c.secret('notify', 'WEBHOOK_SIGNING_SECRET'), WEBHOOK_ALLOW_HTTP: c.local ? 'true' : c.keep('notify', 'WEBHOOK_ALLOW_HTTP', 'false') }),
-    console: { type: 'notify', label: 'Notify', keyEnv: 'NOTIFY_API_KEY', polling: { enabled: true, intervalSec: 30 } },
+    id: 'atc-notify', port: 3001, keysVar: 'NOTIFY_API_KEYS', splitWorkers: true,
+    env: (c) => ({ ...auditEnv(c, 'atc-notify'), SMTP_URL: c.keep('atc-notify', 'SMTP_URL', 'json:'), SMTP_FROM: c.keep('atc-notify', 'SMTP_FROM', '"atc-web <no-reply@localhost>"'), WEBHOOK_SIGNING_SECRET: c.secret('atc-notify', 'WEBHOOK_SIGNING_SECRET'), WEBHOOK_ALLOW_HTTP: c.local ? 'true' : c.keep('atc-notify', 'WEBHOOK_ALLOW_HTTP', 'false') }),
+    console: { type: 'atc-notify', label: 'Notify', keyEnv: 'NOTIFY_API_KEY', polling: { enabled: true, intervalSec: 30 } },
   },
   {
-    id: 'auth', port: 3002, keysVar: 'AUTH_API_KEYS',
-    prepare: async (c) => { if (!c.exists('auth', 'keys/jwt-private.pem')) await c.run('auth', ['npm', 'run', 'keygen']); },
+    id: 'atc-auth', port: 3002, keysVar: 'AUTH_API_KEYS',
+    prepare: async (c) => { if (!c.exists('atc-auth', 'keys/jwt-private.pem')) await c.run('atc-auth', ['npm', 'run', 'keygen']); },
     env: (c) => ({
-      ...auditEnv(c, 'auth'),
-      NOTIFY_URL: c.url('notify'), NOTIFY_API_KEY: c.issue('notify', 'auth'), JWT_ISSUER: c.url('gateway'), JWT_AUDIENCE: c.keep('auth', 'JWT_AUDIENCE', 'app'),
-      APP_NAME: c.keep('auth', 'APP_NAME', 'atc-web'), // Links in verification mails point at your web app, which auth insists is https; a local stack has no app yet.
-      VERIFY_URL_TEMPLATE: c.keep('auth', 'VERIFY_URL_TEMPLATE', `https://${c.host}/verify-email?token={token}`), RESET_URL_TEMPLATE: c.keep('auth', 'RESET_URL_TEMPLATE', `https://${c.host}/reset-password?token={token}`),
+      ...auditEnv(c, 'atc-auth'),
+      NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-auth'), JWT_ISSUER: c.url('atc-gateway'), JWT_AUDIENCE: c.keep('atc-auth', 'JWT_AUDIENCE', 'app'),
+      APP_NAME: c.keep('atc-auth', 'APP_NAME', 'atc-web'), // Links in verification mails point at your web app, which auth insists is https; a local stack has no app yet.
+      VERIFY_URL_TEMPLATE: c.keep('atc-auth', 'VERIFY_URL_TEMPLATE', `https://${c.host}/verify-email?token={token}`), RESET_URL_TEMPLATE: c.keep('atc-auth', 'RESET_URL_TEMPLATE', `https://${c.host}/reset-password?token={token}`),
     }),
-    console: { type: 'auth', label: 'Auth', keyEnv: 'AUTH_API_KEY' },
+    console: { type: 'atc-auth', label: 'Auth', keyEnv: 'AUTH_API_KEY' },
   },
   {
-    id: 'media', port: 3003, keysVar: 'MEDIA_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'media'), PUBLIC_BASE_URL: c.publicUrl('media'), SIGNING_SECRET: c.secret('media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('media', 'CORS_ORIGINS', c.url('gateway')) }),
-    console: { type: 'media', label: 'Media', keyEnv: 'MEDIA_API_KEY' },
+    id: 'atc-media', port: 3003, keysVar: 'MEDIA_API_KEYS',
+    env: (c) => ({ ...auditEnv(c, 'atc-media'), PUBLIC_BASE_URL: c.publicUrl('atc-media'), SIGNING_SECRET: c.secret('atc-media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('atc-media', 'CORS_ORIGINS', c.url('atc-gateway')) }),
+    console: { type: 'atc-media', label: 'Media', keyEnv: 'MEDIA_API_KEY' },
   },
   {
-    id: 'audit', port: 3005, keysVar: 'AUDIT_API_KEYS',
+    id: 'atc-audit', port: 3005, keysVar: 'AUDIT_API_KEYS',
     env: () => ({}),
-    console: { type: 'audit', label: 'Audit', keyEnv: 'AUDIT_API_KEY', polling: { enabled: true, intervalSec: 60 } },
+    console: { type: 'atc-audit', label: 'Audit', keyEnv: 'AUDIT_API_KEY', polling: { enabled: true, intervalSec: 60 } },
   },
   {
-    id: 'shortlink', port: 3006, keysVar: 'SHORTLINK_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'shortlink'), PUBLIC_BASE_URL: c.publicUrl('shortlink'), HASH_SECRET: c.secret('shortlink', 'HASH_SECRET') }),
-    console: { type: 'shortlink', label: 'Shortlink', keyEnv: 'SHORTLINK_API_KEY' },
+    id: 'atc-shortlink', port: 3006, keysVar: 'SHORTLINK_API_KEYS',
+    env: (c) => ({ ...auditEnv(c, 'atc-shortlink'), PUBLIC_BASE_URL: c.publicUrl('atc-shortlink'), HASH_SECRET: c.secret('atc-shortlink', 'HASH_SECRET') }),
+    console: { type: 'atc-shortlink', label: 'Shortlink', keyEnv: 'SHORTLINK_API_KEY' },
   },
   {
-    id: 'flags', port: 3007, keysVar: 'FLAGS_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'flags'),}),
-    console: { type: 'flags', label: 'Flags', keyEnv: 'FLAGS_API_KEY' },
+    id: 'atc-flags', port: 3007, keysVar: 'FLAGS_API_KEYS',
+    env: (c) => ({ ...auditEnv(c, 'atc-flags'),}),
+    console: { type: 'atc-flags', label: 'Flags', keyEnv: 'FLAGS_API_KEY' },
   },
   {
-    id: 'scheduler', port: 3008, keysVar: 'SCHEDULER_API_KEYS', splitWorkers: true,
+    id: 'atc-scheduler', port: 3008, keysVar: 'SCHEDULER_API_KEYS', splitWorkers: true,
     env: (c) => ({
-      SIGNING_SECRET: c.secret('scheduler', 'SIGNING_SECRET'),
-      ...auditEnv(c, 'scheduler'),
-      TARGET_KEYS: `flags:${c.issue('flags', 'scheduler', 'write')},notify:${c.issue('notify', 'scheduler')},webhook-out:${c.issue('webhook-out', 'scheduler', 'publish')}`,
-      ...c.outbound('scheduler'),
+      SIGNING_SECRET: c.secret('atc-scheduler', 'SIGNING_SECRET'),
+      ...auditEnv(c, 'atc-scheduler'),
+      TARGET_KEYS: `atc-flags:${c.issue('atc-flags', 'atc-scheduler', 'write')},atc-notify:${c.issue('atc-notify', 'atc-scheduler')},atc-webhook-out:${c.issue('atc-webhook-out', 'atc-scheduler', 'publish')}`,
+      ...c.outbound('atc-scheduler'),
     }),
-    console: { type: 'scheduler', label: 'Scheduler', keyEnv: 'SCHEDULER_API_KEY' },
+    console: { type: 'atc-scheduler', label: 'Scheduler', keyEnv: 'SCHEDULER_API_KEY' },
   },
   {
-    id: 'webhook-out', port: 3009, keysVar: 'WEBHOOK_API_KEYS', splitWorkers: true,
-    env: (c) => ({ ...auditEnv(c, 'webhook-out'), SECRETS_KEY: c.secret('webhook-out', 'SECRETS_KEY'), ...c.outbound('webhook-out') }),
-    console: { type: 'webhook-out', label: 'Webhooks', keyEnv: 'WEBHOOK_OUT_API_KEY' },
+    id: 'atc-webhook-out', port: 3009, keysVar: 'WEBHOOK_API_KEYS', splitWorkers: true,
+    env: (c) => ({ ...auditEnv(c, 'atc-webhook-out'), SECRETS_KEY: c.secret('atc-webhook-out', 'SECRETS_KEY'), ...c.outbound('atc-webhook-out') }),
+    console: { type: 'atc-webhook-out', label: 'Webhooks', keyEnv: 'WEBHOOK_OUT_API_KEY' },
   },
   {
-    id: 'search', port: 3010, keysVar: 'SEARCH_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'search'),}),
-    console: { type: 'search', label: 'Search', keyEnv: 'SEARCH_API_KEY' },
+    id: 'atc-search', port: 3010, keysVar: 'SEARCH_API_KEYS',
+    env: (c) => ({ ...auditEnv(c, 'atc-search'),}),
+    console: { type: 'atc-search', label: 'Search', keyEnv: 'SEARCH_API_KEY' },
   },
   {
-    id: 'ratelimit', port: 3011, keysVar: 'RATELIMIT_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'ratelimit'),}),
-    console: { type: 'ratelimit', label: 'Rate limits', keyEnv: 'RATELIMIT_API_KEY' },
+    id: 'atc-ratelimit', port: 3011, keysVar: 'RATELIMIT_API_KEYS',
+    env: (c) => ({ ...auditEnv(c, 'atc-ratelimit'),}),
+    console: { type: 'atc-ratelimit', label: 'Rate limits', keyEnv: 'RATELIMIT_API_KEY' },
   },
   {
-    id: 'geo', port: 3012, keysVar: 'GEO_API_KEYS',
+    id: 'atc-geo', port: 3012, keysVar: 'GEO_API_KEYS',
     // MMDB_PATH stays as the operator sets it (empty = no IP geolocation; see geo/examples/ip-databases.md).
-    env: (c) => ({ ...auditEnv(c, 'geo'), MMDB_PATH: c.keep('geo', 'MMDB_PATH', ''), ASN_MMDB_PATH: c.keep('geo', 'ASN_MMDB_PATH', '') }),
-    console: { type: 'geo', label: 'Geo', keyEnv: 'GEO_API_KEY' },
+    env: (c) => ({ ...auditEnv(c, 'atc-geo'), MMDB_PATH: c.keep('atc-geo', 'MMDB_PATH', ''), ASN_MMDB_PATH: c.keep('atc-geo', 'ASN_MMDB_PATH', '') }),
+    console: { type: 'atc-geo', label: 'Geo', keyEnv: 'GEO_API_KEY' },
   },
   {
-    id: 'gateway', port: 3000,
+    id: 'atc-gateway', port: 3000,
     env: (c) => ({
-      METRICS_TOKEN: c.secret('gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('auth', 'gateway'), MEDIA_API_KEY: c.issue('media', 'gateway'), NOTIFY_API_KEY: c.issue('notify', 'gateway'),
-      // Routes may declare "policy" (central rate limits) and "geo": true (X-Geo-* headers); the keys are issued here so routes.json can use them at once.
-      RATELIMIT_URL: c.url('ratelimit'), RATELIMIT_API_KEY: c.issue('ratelimit', 'gateway', 'check'), GEO_URL: c.url('geo'), GEO_API_KEY: c.issue('geo', 'gateway', 'read'),
+      METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
+      // Routes may declare "policy" (central rate limits) and "atc-geo": true (X-Geo-* headers); the keys are issued here so routes.json can use them at once.
+      RATELIMIT_URL: c.url('atc-ratelimit'), RATELIMIT_API_KEY: c.issue('atc-ratelimit', 'atc-gateway', 'check'), GEO_URL: c.url('atc-geo'), GEO_API_KEY: c.issue('atc-geo', 'atc-gateway', 'read'),
     }),
     files: (c) => ({ 'routes.json': `${JSON.stringify(c.gatewayRoutes(), null, 2)}\n` }),
-    console: { type: 'gateway', label: 'Gateway', metricsTokenEnv: 'GATEWAY_METRICS_TOKEN' },
+    console: { type: 'atc-gateway', label: 'Gateway', metricsTokenEnv: 'GATEWAY_METRICS_TOKEN' },
   },
   {
-    id: 'console', port: 3004, entry: 'server.mjs',
+    id: 'atc-console', port: 3004, entry: 'server.mjs',
     env: (c) => ({
       COOKIE_SECURE: c.local ? 'false' : 'true',
-      GATEWAY_METRICS_TOKEN: c.secret('gateway', 'METRICS_TOKEN'),
-      ...Object.fromEntries(c.consoleServices().filter((s) => s.console?.keyEnv).map((s) => [/** @type {string} */ (s.console?.keyEnv), c.issue(s.id, 'console', c.consoleRole(s.id))])),
+      GATEWAY_METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'),
+      ...Object.fromEntries(c.consoleServices().filter((s) => s.console?.keyEnv).map((s) => [/** @type {string} */ (s.console?.keyEnv), c.issue(s.id, 'atc-console', c.consoleRole(s.id))])),
     }),
     files: (c) => ({ 'services.json': `${JSON.stringify(c.consoleServicesJson(), null, 2)}\n` }),
     prepare: async (c) => {
-      if (!c.exists('console', 'server.mjs')) throw new Error('console: canonical adapter-node wrapper server.mjs is missing');
+      if (!c.exists('atc-console', 'server.mjs')) throw new Error('console: canonical adapter-node wrapper server.mjs is missing');
       // A surviving handler can belong to an older source checkout. Setup is the production
       // preparation boundary, so rebuild here instead of treating file existence as freshness.
-      await c.run('console', ['npm', 'run', 'build']);
+      await c.run('atc-console', ['npm', 'run', 'build']);
     },
   },
 ];
 
 /** Roles the console's key needs per service; everything else gets the issuer's default role. */
-export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({ audit: 'readwrite' }); // reads events and forwards its own log
+export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({ 'atc-audit': 'readwrite' }); // reads events and forwards its own log

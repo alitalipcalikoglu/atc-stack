@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-20",
+  "generatedAt": "2026-10-14",
   "totalOperations": 376,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
-      "service": "audit",
-      "operationId": "audit.anchorKey.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.anchorKey.get",
       "method": "GET",
       "path": "/.well-known/audit-anchor-key",
       "flags": [
@@ -14,8 +14,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.anchors.getLatest",
+      "service": "atc-audit",
+      "operationId": "atc-audit.anchors.getLatest",
       "method": "GET",
       "path": "/v1/chain/anchors/latest",
       "flags": [
@@ -24,8 +24,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.anchors.list",
+      "service": "atc-audit",
+      "operationId": "atc-audit.anchors.list",
       "method": "GET",
       "path": "/v1/chain/anchors",
       "flags": [
@@ -34,8 +34,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.chain.getHead",
+      "service": "atc-audit",
+      "operationId": "atc-audit.chain.getHead",
       "method": "GET",
       "path": "/v1/chain/head",
       "flags": [
@@ -44,8 +44,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.chain.verify",
+      "service": "atc-audit",
+      "operationId": "atc-audit.chain.verify",
       "method": "GET",
       "path": "/v1/chain/verify",
       "flags": [
@@ -54,8 +54,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.events.create",
+      "service": "atc-audit",
+      "operationId": "atc-audit.events.create",
       "method": "POST",
       "path": "/v1/events",
       "flags": [
@@ -64,8 +64,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.events.createBatch",
+      "service": "atc-audit",
+      "operationId": "atc-audit.events.createBatch",
       "method": "POST",
       "path": "/v1/events/batch",
       "flags": [
@@ -74,8 +74,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.events.export",
+      "service": "atc-audit",
+      "operationId": "atc-audit.events.export",
       "method": "GET",
       "path": "/v1/events/export",
       "flags": [
@@ -85,8 +85,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.events.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.events.get",
       "method": "GET",
       "path": "/v1/events/{id}",
       "flags": [
@@ -95,8 +95,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.events.list",
+      "service": "atc-audit",
+      "operationId": "atc-audit.events.list",
       "method": "GET",
       "path": "/v1/events",
       "flags": [
@@ -105,8 +105,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.health.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -116,8 +116,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "audit",
-      "operationId": "audit.info.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -127,8 +127,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "audit",
-      "operationId": "audit.metrics.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -138,8 +138,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.openapi",
+      "service": "atc-audit",
+      "operationId": "atc-audit.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -148,8 +148,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "audit",
-      "operationId": "audit.ready.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -159,8 +159,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "audit",
-      "operationId": "audit.stats.get",
+      "service": "atc-audit",
+      "operationId": "atc-audit.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -169,8 +169,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.emailVerification.resend",
+      "service": "atc-auth",
+      "operationId": "atc-auth.emailVerification.resend",
       "method": "POST",
       "path": "/v1/auth/verify-email/resend",
       "flags": [
@@ -180,8 +180,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.emailVerification.verify",
+      "service": "atc-auth",
+      "operationId": "atc-auth.emailVerification.verify",
       "method": "POST",
       "path": "/v1/auth/verify-email",
       "flags": [
@@ -191,8 +191,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.events.list",
+      "service": "atc-auth",
+      "operationId": "atc-auth.events.list",
       "method": "GET",
       "path": "/v1/users/{id}/events",
       "flags": [
@@ -202,8 +202,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.health.get",
+      "service": "atc-auth",
+      "operationId": "atc-auth.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -213,8 +213,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "auth",
-      "operationId": "auth.info.get",
+      "service": "atc-auth",
+      "operationId": "atc-auth.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -224,8 +224,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "auth",
-      "operationId": "auth.introspect",
+      "service": "atc-auth",
+      "operationId": "atc-auth.introspect",
       "method": "POST",
       "path": "/v1/auth/introspect",
       "flags": [
@@ -235,8 +235,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.jwks.get",
+      "service": "atc-auth",
+      "operationId": "atc-auth.jwks.get",
       "method": "GET",
       "path": "/.well-known/jwks.json",
       "flags": [
@@ -246,8 +246,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.login",
+      "service": "atc-auth",
+      "operationId": "atc-auth.login",
       "method": "POST",
       "path": "/v1/auth/login",
       "flags": [
@@ -257,8 +257,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.logout",
+      "service": "atc-auth",
+      "operationId": "atc-auth.logout",
       "method": "POST",
       "path": "/v1/auth/logout",
       "flags": [
@@ -268,8 +268,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.metrics.get",
+      "service": "atc-auth",
+      "operationId": "atc-auth.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -279,8 +279,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.openapi",
+      "service": "atc-auth",
+      "operationId": "atc-auth.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -290,8 +290,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.password.change",
+      "service": "atc-auth",
+      "operationId": "atc-auth.password.change",
       "method": "POST",
       "path": "/v1/auth/password/change",
       "flags": [
@@ -301,8 +301,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.password.forgot",
+      "service": "atc-auth",
+      "operationId": "atc-auth.password.forgot",
       "method": "POST",
       "path": "/v1/auth/password/forgot",
       "flags": [
@@ -312,8 +312,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.password.reset",
+      "service": "atc-auth",
+      "operationId": "atc-auth.password.reset",
       "method": "POST",
       "path": "/v1/auth/password/reset",
       "flags": [
@@ -323,8 +323,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.ready.get",
+      "service": "atc-auth",
+      "operationId": "atc-auth.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -334,8 +334,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "auth",
-      "operationId": "auth.refresh",
+      "service": "atc-auth",
+      "operationId": "atc-auth.refresh",
       "method": "POST",
       "path": "/v1/auth/refresh",
       "flags": [
@@ -345,8 +345,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.sessions.list",
+      "service": "atc-auth",
+      "operationId": "atc-auth.sessions.list",
       "method": "GET",
       "path": "/v1/users/{id}/sessions",
       "flags": [
@@ -356,8 +356,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.sessions.revokeAll",
+      "service": "atc-auth",
+      "operationId": "atc-auth.sessions.revokeAll",
       "method": "DELETE",
       "path": "/v1/users/{id}/sessions",
       "flags": [
@@ -367,8 +367,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.sessions.revokeOne",
+      "service": "atc-auth",
+      "operationId": "atc-auth.sessions.revokeOne",
       "method": "DELETE",
       "path": "/v1/users/{id}/sessions/{sid}",
       "flags": [
@@ -378,8 +378,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.users.create",
+      "service": "atc-auth",
+      "operationId": "atc-auth.users.create",
       "method": "POST",
       "path": "/v1/users",
       "flags": [
@@ -389,8 +389,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.users.delete",
+      "service": "atc-auth",
+      "operationId": "atc-auth.users.delete",
       "method": "DELETE",
       "path": "/v1/users/{id}",
       "flags": [
@@ -400,8 +400,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.users.get",
+      "service": "atc-auth",
+      "operationId": "atc-auth.users.get",
       "method": "GET",
       "path": "/v1/users/{id}",
       "flags": [
@@ -411,8 +411,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.users.list",
+      "service": "atc-auth",
+      "operationId": "atc-auth.users.list",
       "method": "GET",
       "path": "/v1/users",
       "flags": [
@@ -422,8 +422,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "auth",
-      "operationId": "auth.users.patch",
+      "service": "atc-auth",
+      "operationId": "atc-auth.users.patch",
       "method": "PATCH",
       "path": "/v1/users/{id}",
       "flags": [
@@ -433,8 +433,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.activity.list",
+      "service": "atc-console",
+      "operationId": "atc-console.activity.list",
       "method": "GET",
       "path": "/api/audit",
       "flags": [
@@ -445,8 +445,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.admins.create",
+      "service": "atc-console",
+      "operationId": "atc-console.admins.create",
       "method": "POST",
       "path": "/api/admins",
       "flags": [
@@ -457,8 +457,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.admins.delete",
+      "service": "atc-console",
+      "operationId": "atc-console.admins.delete",
       "method": "DELETE",
       "path": "/api/admins/{id}",
       "flags": [
@@ -469,8 +469,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.admins.list",
+      "service": "atc-console",
+      "operationId": "atc-console.admins.list",
       "method": "GET",
       "path": "/api/admins",
       "flags": [
@@ -481,8 +481,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.admins.resetPassword",
+      "service": "atc-console",
+      "operationId": "atc-console.admins.resetPassword",
       "method": "POST",
       "path": "/api/admins/{id}/password",
       "flags": [
@@ -494,8 +494,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.admins.unlock",
+      "service": "atc-console",
+      "operationId": "atc-console.admins.unlock",
       "method": "POST",
       "path": "/api/admins/{id}/unlock",
       "flags": [
@@ -506,8 +506,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.admins.update",
+      "service": "atc-console",
+      "operationId": "atc-console.admins.update",
       "method": "PATCH",
       "path": "/api/admins/{id}",
       "flags": [
@@ -518,10 +518,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.audit.chain.head",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-audit.chain.head",
       "method": "GET",
-      "path": "/api/services/{sid}/audit/chain/head",
+      "path": "/api/services/{sid}/atc-audit/chain/head",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -530,10 +530,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.audit.chain.verify",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-audit.chain.verify",
       "method": "GET",
-      "path": "/api/services/{sid}/audit/chain/verify",
+      "path": "/api/services/{sid}/atc-audit/chain/verify",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -542,10 +542,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.audit.events.export",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-audit.events.export",
       "method": "GET",
-      "path": "/api/services/{sid}/audit/events/export",
+      "path": "/api/services/{sid}/atc-audit/events/export",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -554,10 +554,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.audit.events.get",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-audit.events.get",
       "method": "GET",
-      "path": "/api/services/{sid}/audit/events/{id}",
+      "path": "/api/services/{sid}/atc-audit/events/{id}",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -566,10 +566,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.audit.events.list",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-audit.events.list",
       "method": "GET",
-      "path": "/api/services/{sid}/audit/events",
+      "path": "/api/services/{sid}/atc-audit/events",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -578,10 +578,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.audit.stats.get",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-audit.stats.get",
       "method": "GET",
-      "path": "/api/services/{sid}/audit/stats",
+      "path": "/api/services/{sid}/atc-audit/stats",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -590,10 +590,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.jwks.get",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.jwks.get",
       "method": "GET",
-      "path": "/api/services/{sid}/auth/jwks",
+      "path": "/api/services/{sid}/atc-auth/jwks",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -602,10 +602,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.create",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.create",
       "method": "POST",
-      "path": "/api/services/{sid}/auth/users",
+      "path": "/api/services/{sid}/atc-auth/users",
       "flags": [
         "MUTATION",
         "OPERATOR",
@@ -614,10 +614,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.delete",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.delete",
       "method": "DELETE",
-      "path": "/api/services/{sid}/auth/users/{id}",
+      "path": "/api/services/{sid}/atc-auth/users/{id}",
       "flags": [
         "DESTRUCTIVE",
         "OPERATOR",
@@ -626,10 +626,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.events",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.events",
       "method": "GET",
-      "path": "/api/services/{sid}/auth/users/{id}/events",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/events",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -638,10 +638,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.get",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.get",
       "method": "GET",
-      "path": "/api/services/{sid}/auth/users/{id}",
+      "path": "/api/services/{sid}/atc-auth/users/{id}",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -650,10 +650,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.list",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.list",
       "method": "GET",
-      "path": "/api/services/{sid}/auth/users",
+      "path": "/api/services/{sid}/atc-auth/users",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -662,10 +662,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.passwordResetEmail",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.passwordResetEmail",
       "method": "POST",
-      "path": "/api/services/{sid}/auth/users/{id}/password-reset-email",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/password-reset-email",
       "flags": [
         "MUTATION",
         "OPERATOR",
@@ -674,10 +674,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.resendVerification",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.resendVerification",
       "method": "POST",
-      "path": "/api/services/{sid}/auth/users/{id}/resend-verification",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/resend-verification",
       "flags": [
         "MUTATION",
         "OPERATOR",
@@ -686,23 +686,10 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.revokeAllSessions",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.revokeAllSessions",
       "method": "DELETE",
-      "path": "/api/services/{sid}/auth/users/{id}/sessions",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.auth.users.revokeSession",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/auth/users/{id}/sessions/{sub}",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/sessions",
       "flags": [
         "DESTRUCTIVE",
         "OPERATOR",
@@ -712,10 +699,23 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.auth.users.update",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.revokeSession",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-auth/users/{id}/sessions/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-auth.users.update",
       "method": "PATCH",
-      "path": "/api/services/{sid}/auth/users/{id}",
+      "path": "/api/services/{sid}/atc-auth/users/{id}",
       "flags": [
         "MUTATION",
         "OPERATOR",
@@ -724,8 +724,1347 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.docs.openapi.get",
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.environments.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/environments",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.envs.copy",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}/copy",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.envs.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.evaluate.post",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-flags/evaluate",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.flags.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-flags/flags",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.flags.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-flags/flags/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.flags.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/flags/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.flags.history",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/flags/{id}/history",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.flags.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/flags",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.flags.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-flags/flags/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.history.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/history",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.clear",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}/clear",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-geo/collections",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/collections",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.nearby",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}/nearby",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.collections.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.countries.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/countries/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.countries.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/countries",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.currencies.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/currencies",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.database.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/database",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.database.reload",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-geo/database/reload",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.distance.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/distance",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.ip.batch",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-geo/ip/batch",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.ip.lookup",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/ip",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.phone.lookup",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/phone",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.places.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}/places/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.places.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}/places",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.places.upsert",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-geo/collections/{id}/places",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-geo.timezones.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-geo/timezones",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.bytes",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-media/files/{id}/bytes/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-media/files/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-media/files/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-media/files",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.restore",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-media/files/{id}/restore",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-media/files/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.uploadTicketed",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-media/files",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.files.urls",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-media/files/{id}/urls",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.tickets.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-media/tickets",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.messages.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-notify/messages/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.messages.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-notify/messages",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.messages.retry",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-notify/messages/{id}/retry",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.messages.send",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-notify/messages",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.templates.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-notify/templates",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.check.post",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-ratelimit/check",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.overrides.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/overrides/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.overrides.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/overrides",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.overrides.set",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/overrides/{sub}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-ratelimit/policies",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/policies",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.stats",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.top",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/top",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.policies.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.subjects.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-ratelimit.subjects.resetUsage",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}/usage",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-scheduler/jobs",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-scheduler/jobs/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/jobs/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/jobs",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.run",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-scheduler/jobs/{id}/run",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.runs",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/jobs/{id}/runs",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.jobs.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-scheduler/jobs/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.preview.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/preview",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.runs.cancel",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-scheduler/runs/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.runs.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/runs/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.runs.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/runs",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.targetKeys.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/target-keys",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-scheduler.timezones.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-scheduler/timezones",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.documents.browse",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}/documents",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.documents.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}/documents/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.documents.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}/documents/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.documents.upsert",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}/documents",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.clear",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}/clear",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-search/indexes",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-search/indexes",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.search",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}/search",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.indexes.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-search/indexes/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-search.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-search/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-shortlink/links",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-shortlink/links/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-shortlink/links/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-shortlink/links",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.qr",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-shortlink/links/{id}/qr.png",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.stats",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-shortlink/links/{id}/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-shortlink/links/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-shortlink/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.deliveries.cancel",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-webhook-out/deliveries/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.deliveries.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/deliveries/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.deliveries.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/deliveries",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.deliveries.redeliver",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-webhook-out/deliveries/{id}/redeliver",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.events.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/events/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.events.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/events",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.eventTypes.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/event-types",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.replay",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions/{id}/replay",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.rotate",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions/{id}/rotate",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.test",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions/{id}/test",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-webhook-out.subscriptions.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-webhook-out/subscriptions/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.docs.openapi.get",
       "method": "GET",
       "path": "/api/docs/services/{sid}/openapi",
       "flags": [
@@ -736,8 +2075,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.docs.services.list",
+      "service": "atc-console",
+      "operationId": "atc-console.docs.services.list",
       "method": "GET",
       "path": "/api/docs/services",
       "flags": [
@@ -748,406 +2087,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.flags.environments.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/flags/environments",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.envs.copy",
-      "method": "POST",
-      "path": "/api/services/{sid}/flags/flags/{id}/envs/{sub}/copy",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.envs.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/flags/flags/{id}/envs/{sub}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.evaluate.post",
-      "method": "POST",
-      "path": "/api/services/{sid}/flags/evaluate",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.flags.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/flags/flags",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.flags.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/flags/flags/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.flags.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/flags/flags/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.flags.history",
-      "method": "GET",
-      "path": "/api/services/{sid}/flags/flags/{id}/history",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.flags.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/flags/flags",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.flags.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/flags/flags/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.history.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/flags/history",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.flags.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/flags/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.clear",
-      "method": "POST",
-      "path": "/api/services/{sid}/geo/collections/{id}/clear",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/geo/collections",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/geo/collections/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/collections/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/collections",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.nearby",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/collections/{id}/nearby",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.collections.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/geo/collections/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.countries.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/countries/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.countries.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/countries",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.currencies.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/currencies",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.database.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/database",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.database.reload",
-      "method": "POST",
-      "path": "/api/services/{sid}/geo/database/reload",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.distance.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/distance",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.ip.batch",
-      "method": "POST",
-      "path": "/api/services/{sid}/geo/ip/batch",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.ip.lookup",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/ip",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.phone.lookup",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/phone",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.places.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/geo/collections/{id}/places/{sub}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.places.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/collections/{id}/places",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.places.upsert",
-      "method": "PUT",
-      "path": "/api/services/{sid}/geo/collections/{id}/places",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.geo.timezones.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/geo/timezones",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.health.get",
+      "service": "atc-console",
+      "operationId": "atc-console.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -1157,8 +2098,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "console",
-      "operationId": "console.info.get",
+      "service": "atc-console",
+      "operationId": "atc-console.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -1168,8 +2109,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "console",
-      "operationId": "console.me.password.change",
+      "service": "atc-console",
+      "operationId": "atc-console.me.password.change",
       "method": "POST",
       "path": "/api/me/password",
       "flags": [
@@ -1180,8 +2121,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.me.sessions.list",
+      "service": "atc-console",
+      "operationId": "atc-console.me.sessions.list",
       "method": "GET",
       "path": "/api/me/sessions",
       "flags": [
@@ -1192,8 +2133,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.me.sessions.logoutOthers",
+      "service": "atc-console",
+      "operationId": "atc-console.me.sessions.logoutOthers",
       "method": "POST",
       "path": "/api/me/sessions/logout-others",
       "flags": [
@@ -1204,8 +2145,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.me.totp.confirm",
+      "service": "atc-console",
+      "operationId": "atc-console.me.totp.confirm",
       "method": "POST",
       "path": "/api/me/totp/confirm",
       "flags": [
@@ -1216,8 +2157,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.me.totp.disable",
+      "service": "atc-console",
+      "operationId": "atc-console.me.totp.disable",
       "method": "POST",
       "path": "/api/me/totp/disable",
       "flags": [
@@ -1228,8 +2169,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.me.totp.start",
+      "service": "atc-console",
+      "operationId": "atc-console.me.totp.start",
       "method": "POST",
       "path": "/api/me/totp/start",
       "flags": [
@@ -1240,176 +2181,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.media.files.bytes",
-      "method": "GET",
-      "path": "/api/services/{sid}/media/files/{id}/bytes/{sub}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/media/files/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/media/files/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/media/files",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.restore",
-      "method": "POST",
-      "path": "/api/services/{sid}/media/files/{id}/restore",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/media/files/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.uploadTicketed",
-      "method": "PUT",
-      "path": "/api/services/{sid}/media/files",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.files.urls",
-      "method": "POST",
-      "path": "/api/services/{sid}/media/files/{id}/urls",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.media.tickets.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/media/tickets",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.notify.messages.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/notify/messages/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.notify.messages.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/notify/messages",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.notify.messages.retry",
-      "method": "POST",
-      "path": "/api/services/{sid}/notify/messages/{id}/retry",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.notify.messages.send",
-      "method": "POST",
-      "path": "/api/services/{sid}/notify/messages",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.notify.templates.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/notify/templates",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.openapi",
+      "service": "atc-console",
+      "operationId": "atc-console.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -1420,177 +2193,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.ratelimit.check.post",
-      "method": "POST",
-      "path": "/api/services/{sid}/ratelimit/check",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.overrides.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/overrides/{sub}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.overrides.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/overrides",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.overrides.set",
-      "method": "PUT",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/overrides/{sub}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/ratelimit/policies",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/policies",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.stats",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.top",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/top",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.policies.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.subjects.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/subjects/{sub}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ratelimit.subjects.resetUsage",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/ratelimit/policies/{id}/subjects/{sub}/usage",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.ready.get",
+      "service": "atc-console",
+      "operationId": "atc-console.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -1600,322 +2204,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/scheduler/jobs",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/scheduler/jobs/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/jobs/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/jobs",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.run",
-      "method": "POST",
-      "path": "/api/services/{sid}/scheduler/jobs/{id}/run",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.runs",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/jobs/{id}/runs",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.jobs.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/scheduler/jobs/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.preview.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/preview",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.runs.cancel",
-      "method": "POST",
-      "path": "/api/services/{sid}/scheduler/runs/{id}/cancel",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.runs.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/runs/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.runs.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/runs",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.targetKeys.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/target-keys",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.scheduler.timezones.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/scheduler/timezones",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.documents.browse",
-      "method": "GET",
-      "path": "/api/services/{sid}/search/indexes/{id}/documents",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.documents.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/search/indexes/{id}/documents/{sub}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.documents.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/search/indexes/{id}/documents/{sub}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.documents.upsert",
-      "method": "PUT",
-      "path": "/api/services/{sid}/search/indexes/{id}/documents",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.clear",
-      "method": "POST",
-      "path": "/api/services/{sid}/search/indexes/{id}/clear",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/search/indexes",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/search/indexes/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/search/indexes/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/search/indexes",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.search",
-      "method": "POST",
-      "path": "/api/services/{sid}/search/indexes/{id}/search",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.indexes.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/search/indexes/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.search.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/search/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.services.about",
+      "service": "atc-console",
+      "operationId": "atc-console.services.about",
       "method": "GET",
       "path": "/api/services/about",
       "flags": [
@@ -1926,8 +2216,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.services.list",
+      "service": "atc-console",
+      "operationId": "atc-console.services.list",
       "method": "GET",
       "path": "/api/services",
       "flags": [
@@ -1938,8 +2228,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.services.overview",
+      "service": "atc-console",
+      "operationId": "atc-console.services.overview",
       "method": "GET",
       "path": "/api/services/overview",
       "flags": [
@@ -1950,8 +2240,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.services.status",
+      "service": "atc-console",
+      "operationId": "atc-console.services.status",
       "method": "GET",
       "path": "/api/services/{sid}/status",
       "flags": [
@@ -1962,8 +2252,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.services.updateSettings",
+      "service": "atc-console",
+      "operationId": "atc-console.services.updateSettings",
       "method": "PATCH",
       "path": "/api/services/{sid}/settings",
       "flags": [
@@ -1974,8 +2264,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.session.get",
+      "service": "atc-console",
+      "operationId": "atc-console.session.get",
       "method": "GET",
       "path": "/api/session",
       "flags": [
@@ -1986,8 +2276,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.session.login",
+      "service": "atc-console",
+      "operationId": "atc-console.session.login",
       "method": "POST",
       "path": "/api/session/login",
       "flags": [
@@ -1998,8 +2288,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.session.logout",
+      "service": "atc-console",
+      "operationId": "atc-console.session.logout",
       "method": "POST",
       "path": "/api/session/logout",
       "flags": [
@@ -2010,8 +2300,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.session.totp",
+      "service": "atc-console",
+      "operationId": "atc-console.session.totp",
       "method": "POST",
       "path": "/api/session/totp",
       "flags": [
@@ -2022,298 +2312,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "console",
-      "operationId": "console.shortlink.links.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/shortlink/links",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.links.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/shortlink/links/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.links.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/shortlink/links/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.links.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/shortlink/links",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.links.qr",
-      "method": "GET",
-      "path": "/api/services/{sid}/shortlink/links/{id}/qr.png",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.links.stats",
-      "method": "GET",
-      "path": "/api/services/{sid}/shortlink/links/{id}/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.links.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/shortlink/links/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.shortlink.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/shortlink/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.deliveries.cancel",
-      "method": "POST",
-      "path": "/api/services/{sid}/webhook-out/deliveries/{id}/cancel",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.deliveries.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/deliveries/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.deliveries.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/deliveries",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.deliveries.redeliver",
-      "method": "POST",
-      "path": "/api/services/{sid}/webhook-out/deliveries/{id}/redeliver",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.events.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/events/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.events.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/events",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.eventTypes.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/event-types",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.stats.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/stats",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.create",
-      "method": "POST",
-      "path": "/api/services/{sid}/webhook-out/subscriptions",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.delete",
-      "method": "DELETE",
-      "path": "/api/services/{sid}/webhook-out/subscriptions/{id}",
-      "flags": [
-        "DESTRUCTIVE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.get",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/subscriptions/{id}",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.list",
-      "method": "GET",
-      "path": "/api/services/{sid}/webhook-out/subscriptions",
-      "flags": [
-        "READ_SAFE",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.replay",
-      "method": "POST",
-      "path": "/api/services/{sid}/webhook-out/subscriptions/{id}/replay",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.rotate",
-      "method": "POST",
-      "path": "/api/services/{sid}/webhook-out/subscriptions/{id}/rotate",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT",
-        "HIGH_RISK"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.test",
-      "method": "POST",
-      "path": "/api/services/{sid}/webhook-out/subscriptions/{id}/test",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "console",
-      "operationId": "console.webhookOut.subscriptions.update",
-      "method": "PATCH",
-      "path": "/api/services/{sid}/webhook-out/subscriptions/{id}",
-      "flags": [
-        "MUTATION",
-        "OPERATOR",
-        "POOR_MCP_FIT"
-      ],
-      "exposedInPhase3": false
-    },
-    {
-      "service": "flags",
-      "operationId": "flags.environments.list",
+      "service": "atc-flags",
+      "operationId": "atc-flags.environments.list",
       "method": "GET",
       "path": "/v1/environments",
       "flags": [
@@ -2322,8 +2322,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.envs.copy",
+      "service": "atc-flags",
+      "operationId": "atc-flags.envs.copy",
       "method": "POST",
       "path": "/v1/flags/{key}/envs/{env}/copy",
       "flags": [
@@ -2332,8 +2332,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.envs.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.envs.get",
       "method": "GET",
       "path": "/v1/flags/{key}/envs/{env}",
       "flags": [
@@ -2342,8 +2342,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.envs.patch",
+      "service": "atc-flags",
+      "operationId": "atc-flags.envs.patch",
       "method": "PATCH",
       "path": "/v1/flags/{key}/envs/{env}",
       "flags": [
@@ -2352,8 +2352,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.evaluate.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.evaluate.get",
       "method": "GET",
       "path": "/v1/evaluate",
       "flags": [
@@ -2362,8 +2362,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.evaluate.post",
+      "service": "atc-flags",
+      "operationId": "atc-flags.evaluate.post",
       "method": "POST",
       "path": "/v1/evaluate",
       "flags": [
@@ -2372,8 +2372,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "flags",
-      "operationId": "flags.flags.create",
+      "service": "atc-flags",
+      "operationId": "atc-flags.flags.create",
       "method": "POST",
       "path": "/v1/flags",
       "flags": [
@@ -2382,8 +2382,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.flags.delete",
+      "service": "atc-flags",
+      "operationId": "atc-flags.flags.delete",
       "method": "DELETE",
       "path": "/v1/flags/{key}",
       "flags": [
@@ -2392,8 +2392,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.flags.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.flags.get",
       "method": "GET",
       "path": "/v1/flags/{key}",
       "flags": [
@@ -2402,8 +2402,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.flags.getHistory",
+      "service": "atc-flags",
+      "operationId": "atc-flags.flags.getHistory",
       "method": "GET",
       "path": "/v1/flags/{key}/history",
       "flags": [
@@ -2412,8 +2412,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.flags.list",
+      "service": "atc-flags",
+      "operationId": "atc-flags.flags.list",
       "method": "GET",
       "path": "/v1/flags",
       "flags": [
@@ -2422,8 +2422,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.flags.patch",
+      "service": "atc-flags",
+      "operationId": "atc-flags.flags.patch",
       "method": "PATCH",
       "path": "/v1/flags/{key}",
       "flags": [
@@ -2432,8 +2432,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.health.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -2443,8 +2443,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "flags",
-      "operationId": "flags.history.list",
+      "service": "atc-flags",
+      "operationId": "atc-flags.history.list",
       "method": "GET",
       "path": "/v1/history",
       "flags": [
@@ -2453,8 +2453,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.info.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -2464,8 +2464,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "flags",
-      "operationId": "flags.metrics.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -2475,8 +2475,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.openapi",
+      "service": "atc-flags",
+      "operationId": "atc-flags.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -2485,8 +2485,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.ready.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -2496,8 +2496,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "flags",
-      "operationId": "flags.snapshot.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.snapshot.get",
       "method": "GET",
       "path": "/v1/snapshot/{env}",
       "flags": [
@@ -2506,8 +2506,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "flags",
-      "operationId": "flags.stats.get",
+      "service": "atc-flags",
+      "operationId": "atc-flags.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -2516,8 +2516,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "gateway",
-      "operationId": "gateway.health.check",
+      "service": "atc-gateway",
+      "operationId": "atc-gateway.health.check",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -2527,8 +2527,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "gateway",
-      "operationId": "gateway.info.get",
+      "service": "atc-gateway",
+      "operationId": "atc-gateway.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -2538,8 +2538,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "gateway",
-      "operationId": "gateway.metrics.get",
+      "service": "atc-gateway",
+      "operationId": "atc-gateway.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -2549,8 +2549,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "gateway",
-      "operationId": "gateway.openapi",
+      "service": "atc-gateway",
+      "operationId": "atc-gateway.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -2560,8 +2560,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "gateway",
-      "operationId": "gateway.ready.check",
+      "service": "atc-gateway",
+      "operationId": "atc-gateway.ready.check",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -2571,8 +2571,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "geo",
-      "operationId": "geo.collections.clear",
+      "service": "atc-geo",
+      "operationId": "atc-geo.collections.clear",
       "method": "POST",
       "path": "/v1/collections/{name}/clear",
       "flags": [
@@ -2582,8 +2582,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.collections.create",
+      "service": "atc-geo",
+      "operationId": "atc-geo.collections.create",
       "method": "POST",
       "path": "/v1/collections",
       "flags": [
@@ -2592,8 +2592,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.collections.delete",
+      "service": "atc-geo",
+      "operationId": "atc-geo.collections.delete",
       "method": "DELETE",
       "path": "/v1/collections/{name}",
       "flags": [
@@ -2602,8 +2602,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.collections.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.collections.get",
       "method": "GET",
       "path": "/v1/collections/{name}",
       "flags": [
@@ -2612,8 +2612,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.collections.list",
+      "service": "atc-geo",
+      "operationId": "atc-geo.collections.list",
       "method": "GET",
       "path": "/v1/collections",
       "flags": [
@@ -2622,8 +2622,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.collections.patch",
+      "service": "atc-geo",
+      "operationId": "atc-geo.collections.patch",
       "method": "PATCH",
       "path": "/v1/collections/{name}",
       "flags": [
@@ -2632,8 +2632,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.countries.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.countries.get",
       "method": "GET",
       "path": "/v1/countries/{code}",
       "flags": [
@@ -2642,8 +2642,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.countries.list",
+      "service": "atc-geo",
+      "operationId": "atc-geo.countries.list",
       "method": "GET",
       "path": "/v1/countries",
       "flags": [
@@ -2652,8 +2652,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.currencies.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.currencies.get",
       "method": "GET",
       "path": "/v1/currencies/{code}",
       "flags": [
@@ -2662,8 +2662,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.currencies.list",
+      "service": "atc-geo",
+      "operationId": "atc-geo.currencies.list",
       "method": "GET",
       "path": "/v1/currencies",
       "flags": [
@@ -2672,8 +2672,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.database.getInfo",
+      "service": "atc-geo",
+      "operationId": "atc-geo.database.getInfo",
       "method": "GET",
       "path": "/v1/database",
       "flags": [
@@ -2682,8 +2682,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.database.reload",
+      "service": "atc-geo",
+      "operationId": "atc-geo.database.reload",
       "method": "POST",
       "path": "/v1/database/reload",
       "flags": [
@@ -2693,8 +2693,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.distance.compute",
+      "service": "atc-geo",
+      "operationId": "atc-geo.distance.compute",
       "method": "GET",
       "path": "/v1/distance",
       "flags": [
@@ -2703,8 +2703,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.health.check",
+      "service": "atc-geo",
+      "operationId": "atc-geo.health.check",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -2714,8 +2714,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "geo",
-      "operationId": "geo.info.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -2725,8 +2725,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "geo",
-      "operationId": "geo.ip.lookup",
+      "service": "atc-geo",
+      "operationId": "atc-geo.ip.lookup",
       "method": "GET",
       "path": "/v1/ip/{ip}",
       "flags": [
@@ -2735,8 +2735,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "geo",
-      "operationId": "geo.ip.lookupBatch",
+      "service": "atc-geo",
+      "operationId": "atc-geo.ip.lookupBatch",
       "method": "POST",
       "path": "/v1/ip/batch",
       "flags": [
@@ -2745,8 +2745,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.ip.lookupSelf",
+      "service": "atc-geo",
+      "operationId": "atc-geo.ip.lookupSelf",
       "method": "GET",
       "path": "/v1/ip/self",
       "flags": [
@@ -2755,8 +2755,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.metrics.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -2766,8 +2766,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.openapi",
+      "service": "atc-geo",
+      "operationId": "atc-geo.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -2776,8 +2776,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.phone.normalize",
+      "service": "atc-geo",
+      "operationId": "atc-geo.phone.normalize",
       "method": "GET",
       "path": "/v1/phone",
       "flags": [
@@ -2786,8 +2786,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.phone.normalizeBatch",
+      "service": "atc-geo",
+      "operationId": "atc-geo.phone.normalizeBatch",
       "method": "POST",
       "path": "/v1/phone/batch",
       "flags": [
@@ -2796,8 +2796,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.places.delete",
+      "service": "atc-geo",
+      "operationId": "atc-geo.places.delete",
       "method": "DELETE",
       "path": "/v1/collections/{name}/places/{id}",
       "flags": [
@@ -2806,8 +2806,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.places.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.places.get",
       "method": "GET",
       "path": "/v1/collections/{name}/places/{id}",
       "flags": [
@@ -2816,8 +2816,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.places.list",
+      "service": "atc-geo",
+      "operationId": "atc-geo.places.list",
       "method": "GET",
       "path": "/v1/collections/{name}/places",
       "flags": [
@@ -2826,8 +2826,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.places.nearby",
+      "service": "atc-geo",
+      "operationId": "atc-geo.places.nearby",
       "method": "GET",
       "path": "/v1/collections/{name}/nearby",
       "flags": [
@@ -2836,8 +2836,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.places.upsert",
+      "service": "atc-geo",
+      "operationId": "atc-geo.places.upsert",
       "method": "PUT",
       "path": "/v1/collections/{name}/places",
       "flags": [
@@ -2846,8 +2846,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.ready.check",
+      "service": "atc-geo",
+      "operationId": "atc-geo.ready.check",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -2857,8 +2857,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "geo",
-      "operationId": "geo.stats.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -2867,8 +2867,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.timezones.get",
+      "service": "atc-geo",
+      "operationId": "atc-geo.timezones.get",
       "method": "GET",
       "path": "/v1/timezones/{tzPath}",
       "flags": [
@@ -2877,8 +2877,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "geo",
-      "operationId": "geo.timezones.list",
+      "service": "atc-geo",
+      "operationId": "atc-geo.timezones.list",
       "method": "GET",
       "path": "/v1/timezones",
       "flags": [
@@ -2887,8 +2887,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.delete",
+      "service": "atc-media",
+      "operationId": "atc-media.files.delete",
       "method": "DELETE",
       "path": "/v1/files/{id}",
       "flags": [
@@ -2897,8 +2897,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.deliver",
+      "service": "atc-media",
+      "operationId": "atc-media.files.deliver",
       "method": "GET",
       "path": "/files/{id}/{variant}",
       "flags": [
@@ -2909,8 +2909,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.get",
+      "service": "atc-media",
+      "operationId": "atc-media.files.get",
       "method": "GET",
       "path": "/v1/files/{id}",
       "flags": [
@@ -2919,8 +2919,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "media",
-      "operationId": "media.files.list",
+      "service": "atc-media",
+      "operationId": "atc-media.files.list",
       "method": "GET",
       "path": "/v1/files",
       "flags": [
@@ -2929,8 +2929,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.patch",
+      "service": "atc-media",
+      "operationId": "atc-media.files.patch",
       "method": "PATCH",
       "path": "/v1/files/{id}",
       "flags": [
@@ -2939,8 +2939,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.restore",
+      "service": "atc-media",
+      "operationId": "atc-media.files.restore",
       "method": "POST",
       "path": "/v1/files/{id}/restore",
       "flags": [
@@ -2949,8 +2949,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.signUrls",
+      "service": "atc-media",
+      "operationId": "atc-media.files.signUrls",
       "method": "POST",
       "path": "/v1/files/{id}/urls",
       "flags": [
@@ -2959,8 +2959,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.upload",
+      "service": "atc-media",
+      "operationId": "atc-media.files.upload",
       "method": "PUT",
       "path": "/v1/files",
       "flags": [
@@ -2970,8 +2970,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.files.uploadTicketed",
+      "service": "atc-media",
+      "operationId": "atc-media.files.uploadTicketed",
       "method": "PUT",
       "path": "/v1/uploads/{token}",
       "flags": [
@@ -2981,8 +2981,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.openapi",
+      "service": "atc-media",
+      "operationId": "atc-media.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -2991,8 +2991,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.ops.health",
+      "service": "atc-media",
+      "operationId": "atc-media.ops.health",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -3002,8 +3002,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "media",
-      "operationId": "media.ops.info",
+      "service": "atc-media",
+      "operationId": "atc-media.ops.info",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -3013,8 +3013,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "media",
-      "operationId": "media.ops.metrics",
+      "service": "atc-media",
+      "operationId": "atc-media.ops.metrics",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -3024,8 +3024,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "media",
-      "operationId": "media.ops.ready",
+      "service": "atc-media",
+      "operationId": "atc-media.ops.ready",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -3035,8 +3035,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "media",
-      "operationId": "media.tickets.create",
+      "service": "atc-media",
+      "operationId": "atc-media.tickets.create",
       "method": "POST",
       "path": "/v1/uploads",
       "flags": [
@@ -3045,8 +3045,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "notify",
-      "operationId": "notify.health.get",
+      "service": "atc-notify",
+      "operationId": "atc-notify.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -3056,8 +3056,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "notify",
-      "operationId": "notify.info.get",
+      "service": "atc-notify",
+      "operationId": "atc-notify.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -3067,8 +3067,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "notify",
-      "operationId": "notify.messages.create",
+      "service": "atc-notify",
+      "operationId": "atc-notify.messages.create",
       "method": "POST",
       "path": "/v1/messages",
       "flags": [
@@ -3078,8 +3078,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "notify",
-      "operationId": "notify.messages.get",
+      "service": "atc-notify",
+      "operationId": "atc-notify.messages.get",
       "method": "GET",
       "path": "/v1/messages/{id}",
       "flags": [
@@ -3089,8 +3089,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "notify",
-      "operationId": "notify.messages.list",
+      "service": "atc-notify",
+      "operationId": "atc-notify.messages.list",
       "method": "GET",
       "path": "/v1/messages",
       "flags": [
@@ -3100,8 +3100,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "notify",
-      "operationId": "notify.messages.retry",
+      "service": "atc-notify",
+      "operationId": "atc-notify.messages.retry",
       "method": "POST",
       "path": "/v1/messages/{id}/retry",
       "flags": [
@@ -3111,8 +3111,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "notify",
-      "operationId": "notify.metrics.get",
+      "service": "atc-notify",
+      "operationId": "atc-notify.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -3122,8 +3122,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "notify",
-      "operationId": "notify.openapi",
+      "service": "atc-notify",
+      "operationId": "atc-notify.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -3132,8 +3132,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "notify",
-      "operationId": "notify.ready.get",
+      "service": "atc-notify",
+      "operationId": "atc-notify.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -3143,8 +3143,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "notify",
-      "operationId": "notify.templates.list",
+      "service": "atc-notify",
+      "operationId": "atc-notify.templates.list",
       "method": "GET",
       "path": "/v1/templates",
       "flags": [
@@ -3153,8 +3153,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.check",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.check",
       "method": "POST",
       "path": "/v1/check",
       "flags": [
@@ -3163,8 +3163,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.checkBatch",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.checkBatch",
       "method": "POST",
       "path": "/v1/check/batch",
       "flags": [
@@ -3173,8 +3173,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.health.check",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.health.check",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -3184,8 +3184,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.info.get",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -3195,8 +3195,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.metrics.get",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -3206,8 +3206,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.openapi",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -3216,8 +3216,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.overrides.delete",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.overrides.delete",
       "method": "DELETE",
       "path": "/v1/policies/{name}/overrides/{subject}",
       "flags": [
@@ -3227,8 +3227,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.overrides.list",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.overrides.list",
       "method": "GET",
       "path": "/v1/policies/{name}/overrides",
       "flags": [
@@ -3238,8 +3238,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.overrides.set",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.overrides.set",
       "method": "PUT",
       "path": "/v1/policies/{name}/overrides/{subject}",
       "flags": [
@@ -3249,8 +3249,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.create",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.create",
       "method": "POST",
       "path": "/v1/policies",
       "flags": [
@@ -3259,8 +3259,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.delete",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.delete",
       "method": "DELETE",
       "path": "/v1/policies/{name}",
       "flags": [
@@ -3269,8 +3269,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.get",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.get",
       "method": "GET",
       "path": "/v1/policies/{name}",
       "flags": [
@@ -3279,8 +3279,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.getStats",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.getStats",
       "method": "GET",
       "path": "/v1/policies/{name}/stats",
       "flags": [
@@ -3289,8 +3289,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.getTop",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.getTop",
       "method": "GET",
       "path": "/v1/policies/{name}/top",
       "flags": [
@@ -3299,8 +3299,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.list",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.list",
       "method": "GET",
       "path": "/v1/policies",
       "flags": [
@@ -3309,8 +3309,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.policies.patch",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.policies.patch",
       "method": "PATCH",
       "path": "/v1/policies/{name}",
       "flags": [
@@ -3319,8 +3319,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.ready.check",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.ready.check",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -3330,8 +3330,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.release",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.release",
       "method": "POST",
       "path": "/v1/release",
       "flags": [
@@ -3340,8 +3340,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.stats.get",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -3350,8 +3350,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.subjects.getUsage",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.subjects.getUsage",
       "method": "GET",
       "path": "/v1/policies/{name}/subjects/{subject}",
       "flags": [
@@ -3360,8 +3360,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "ratelimit",
-      "operationId": "ratelimit.subjects.resetUsage",
+      "service": "atc-ratelimit",
+      "operationId": "atc-ratelimit.subjects.resetUsage",
       "method": "DELETE",
       "path": "/v1/policies/{name}/subjects/{subject}/usage",
       "flags": [
@@ -3371,8 +3371,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.health.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -3382,8 +3382,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.info.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -3393,8 +3393,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.create",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.create",
       "method": "POST",
       "path": "/v1/jobs",
       "flags": [
@@ -3403,8 +3403,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.delete",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.delete",
       "method": "DELETE",
       "path": "/v1/jobs/{name}",
       "flags": [
@@ -3413,8 +3413,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.get",
       "method": "GET",
       "path": "/v1/jobs/{name}",
       "flags": [
@@ -3423,8 +3423,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.list",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.list",
       "method": "GET",
       "path": "/v1/jobs",
       "flags": [
@@ -3433,8 +3433,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.listRuns",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.listRuns",
       "method": "GET",
       "path": "/v1/jobs/{name}/runs",
       "flags": [
@@ -3443,8 +3443,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.patch",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.patch",
       "method": "PATCH",
       "path": "/v1/jobs/{name}",
       "flags": [
@@ -3453,8 +3453,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.jobs.run",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.jobs.run",
       "method": "POST",
       "path": "/v1/jobs/{name}/run",
       "flags": [
@@ -3464,8 +3464,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.metrics.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -3475,8 +3475,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.openapi",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -3485,8 +3485,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.ready.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -3496,8 +3496,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.runs.cancel",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.runs.cancel",
       "method": "POST",
       "path": "/v1/runs/{id}/cancel",
       "flags": [
@@ -3508,8 +3508,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.runs.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.runs.get",
       "method": "GET",
       "path": "/v1/runs/{id}",
       "flags": [
@@ -3519,8 +3519,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.runs.list",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.runs.list",
       "method": "GET",
       "path": "/v1/runs",
       "flags": [
@@ -3530,8 +3530,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.schedule.preview",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.schedule.preview",
       "method": "GET",
       "path": "/v1/schedule/preview",
       "flags": [
@@ -3540,8 +3540,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.stats.get",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -3550,8 +3550,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.targetKeys.list",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.targetKeys.list",
       "method": "GET",
       "path": "/v1/target-keys",
       "flags": [
@@ -3560,8 +3560,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "scheduler",
-      "operationId": "scheduler.timezones.list",
+      "service": "atc-scheduler",
+      "operationId": "atc-scheduler.timezones.list",
       "method": "GET",
       "path": "/v1/timezones",
       "flags": [
@@ -3570,8 +3570,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.documents.browse",
+      "service": "atc-search",
+      "operationId": "atc-search.documents.browse",
       "method": "GET",
       "path": "/v1/indexes/{name}/documents",
       "flags": [
@@ -3580,8 +3580,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.documents.delete",
+      "service": "atc-search",
+      "operationId": "atc-search.documents.delete",
       "method": "DELETE",
       "path": "/v1/indexes/{name}/documents/{id}",
       "flags": [
@@ -3590,8 +3590,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.documents.get",
+      "service": "atc-search",
+      "operationId": "atc-search.documents.get",
       "method": "GET",
       "path": "/v1/indexes/{name}/documents/{id}",
       "flags": [
@@ -3600,8 +3600,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.documents.upsert",
+      "service": "atc-search",
+      "operationId": "atc-search.documents.upsert",
       "method": "PUT",
       "path": "/v1/indexes/{name}/documents",
       "flags": [
@@ -3610,8 +3610,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.indexes.clear",
+      "service": "atc-search",
+      "operationId": "atc-search.indexes.clear",
       "method": "POST",
       "path": "/v1/indexes/{name}/clear",
       "flags": [
@@ -3621,8 +3621,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.indexes.create",
+      "service": "atc-search",
+      "operationId": "atc-search.indexes.create",
       "method": "POST",
       "path": "/v1/indexes",
       "flags": [
@@ -3631,8 +3631,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.indexes.delete",
+      "service": "atc-search",
+      "operationId": "atc-search.indexes.delete",
       "method": "DELETE",
       "path": "/v1/indexes/{name}",
       "flags": [
@@ -3641,8 +3641,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.indexes.get",
+      "service": "atc-search",
+      "operationId": "atc-search.indexes.get",
       "method": "GET",
       "path": "/v1/indexes/{name}",
       "flags": [
@@ -3651,8 +3651,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.indexes.list",
+      "service": "atc-search",
+      "operationId": "atc-search.indexes.list",
       "method": "GET",
       "path": "/v1/indexes",
       "flags": [
@@ -3661,8 +3661,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.indexes.patch",
+      "service": "atc-search",
+      "operationId": "atc-search.indexes.patch",
       "method": "PATCH",
       "path": "/v1/indexes/{name}",
       "flags": [
@@ -3671,8 +3671,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.openapi",
+      "service": "atc-search",
+      "operationId": "atc-search.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -3681,8 +3681,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.query.get",
+      "service": "atc-search",
+      "operationId": "atc-search.query.get",
       "method": "GET",
       "path": "/v1/indexes/{name}/search",
       "flags": [
@@ -3691,8 +3691,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "search",
-      "operationId": "search.query.post",
+      "service": "atc-search",
+      "operationId": "atc-search.query.post",
       "method": "POST",
       "path": "/v1/indexes/{name}/search",
       "flags": [
@@ -3701,8 +3701,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.stats.get",
+      "service": "atc-search",
+      "operationId": "atc-search.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -3711,8 +3711,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.suggest",
+      "service": "atc-search",
+      "operationId": "atc-search.suggest",
       "method": "GET",
       "path": "/v1/indexes/{name}/suggest",
       "flags": [
@@ -3721,8 +3721,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.system.health",
+      "service": "atc-search",
+      "operationId": "atc-search.system.health",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -3732,8 +3732,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "search",
-      "operationId": "search.system.info",
+      "service": "atc-search",
+      "operationId": "atc-search.system.info",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -3743,8 +3743,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "search",
-      "operationId": "search.system.metrics",
+      "service": "atc-search",
+      "operationId": "atc-search.system.metrics",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -3754,8 +3754,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "search",
-      "operationId": "search.system.ready",
+      "service": "atc-search",
+      "operationId": "atc-search.system.ready",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -3765,8 +3765,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.health.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -3776,8 +3776,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.info.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -3787,8 +3787,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.create",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.create",
       "method": "POST",
       "path": "/v1/links",
       "flags": [
@@ -3797,8 +3797,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.delete",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.delete",
       "method": "DELETE",
       "path": "/v1/links/{code}",
       "flags": [
@@ -3807,8 +3807,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.get",
       "method": "GET",
       "path": "/v1/links/{code}",
       "flags": [
@@ -3817,8 +3817,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.getQr",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.getQr",
       "method": "GET",
       "path": "/v1/links/{code}/qr",
       "flags": [
@@ -3828,8 +3828,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.getStats",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.getStats",
       "method": "GET",
       "path": "/v1/links/{code}/stats",
       "flags": [
@@ -3838,8 +3838,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.list",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.list",
       "method": "GET",
       "path": "/v1/links",
       "flags": [
@@ -3848,8 +3848,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.links.patch",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.patch",
       "method": "PATCH",
       "path": "/v1/links/{code}",
       "flags": [
@@ -3858,8 +3858,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.metrics.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -3869,8 +3869,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.openapi",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -3879,8 +3879,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.qr.getForText",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.qr.getForText",
       "method": "GET",
       "path": "/v1/qr",
       "flags": [
@@ -3890,8 +3890,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.qr.getPublic",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.qr.getPublic",
       "method": "GET",
       "path": "/{code}/qr",
       "flags": [
@@ -3901,8 +3901,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.ready.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -3912,8 +3912,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.redirect.follow",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.redirect.follow",
       "method": "GET",
       "path": "/{code}",
       "flags": [
@@ -3922,8 +3922,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.robots.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.robots.get",
       "method": "GET",
       "path": "/robots.txt",
       "flags": [
@@ -3932,8 +3932,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "shortlink",
-      "operationId": "shortlink.stats.get",
+      "service": "atc-shortlink",
+      "operationId": "atc-shortlink.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -3942,8 +3942,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.deliveries.cancel",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.deliveries.cancel",
       "method": "POST",
       "path": "/v1/deliveries/{id}/cancel",
       "flags": [
@@ -3954,8 +3954,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.deliveries.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.deliveries.get",
       "method": "GET",
       "path": "/v1/deliveries/{id}",
       "flags": [
@@ -3965,8 +3965,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.deliveries.list",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.deliveries.list",
       "method": "GET",
       "path": "/v1/deliveries",
       "flags": [
@@ -3976,8 +3976,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.deliveries.redeliver",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.deliveries.redeliver",
       "method": "POST",
       "path": "/v1/deliveries/{id}/redeliver",
       "flags": [
@@ -3987,8 +3987,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.events.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.events.get",
       "method": "GET",
       "path": "/v1/events/{id}",
       "flags": [
@@ -3997,8 +3997,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.events.list",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.events.list",
       "method": "GET",
       "path": "/v1/events",
       "flags": [
@@ -4007,8 +4007,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.events.publish",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.events.publish",
       "method": "POST",
       "path": "/v1/events",
       "flags": [
@@ -4018,8 +4018,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.eventTypes.list",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.eventTypes.list",
       "method": "GET",
       "path": "/v1/event-types",
       "flags": [
@@ -4028,8 +4028,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.health.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.health.get",
       "method": "GET",
       "path": "/health",
       "flags": [
@@ -4039,8 +4039,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.info.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.info.get",
       "method": "GET",
       "path": "/v1/info",
       "flags": [
@@ -4050,8 +4050,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.metrics.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.metrics.get",
       "method": "GET",
       "path": "/metrics",
       "flags": [
@@ -4061,8 +4061,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookout.openapi",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.openapi",
       "method": "GET",
       "path": "/openapi.yaml",
       "flags": [
@@ -4071,8 +4071,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.ready.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.ready.get",
       "method": "GET",
       "path": "/ready",
       "flags": [
@@ -4082,8 +4082,8 @@
       "exposedInPhase3": true
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.stats.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [
@@ -4092,8 +4092,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.create",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.create",
       "method": "POST",
       "path": "/v1/subscriptions",
       "flags": [
@@ -4102,8 +4102,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.delete",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.delete",
       "method": "DELETE",
       "path": "/v1/subscriptions/{id}",
       "flags": [
@@ -4112,8 +4112,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.get",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.get",
       "method": "GET",
       "path": "/v1/subscriptions/{id}",
       "flags": [
@@ -4122,8 +4122,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.list",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.list",
       "method": "GET",
       "path": "/v1/subscriptions",
       "flags": [
@@ -4132,8 +4132,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.listDeliveries",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.listDeliveries",
       "method": "GET",
       "path": "/v1/subscriptions/{id}/deliveries",
       "flags": [
@@ -4142,8 +4142,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.patch",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.patch",
       "method": "PATCH",
       "path": "/v1/subscriptions/{id}",
       "flags": [
@@ -4152,8 +4152,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.replay",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.replay",
       "method": "POST",
       "path": "/v1/subscriptions/{id}/replay",
       "flags": [
@@ -4163,8 +4163,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.rotate",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.rotate",
       "method": "POST",
       "path": "/v1/subscriptions/{id}/rotate",
       "flags": [
@@ -4174,8 +4174,8 @@
       "exposedInPhase3": false
     },
     {
-      "service": "webhook-out",
-      "operationId": "webhookOut.subscriptions.test",
+      "service": "atc-webhook-out",
+      "operationId": "atc-webhook-out.subscriptions.test",
       "method": "POST",
       "path": "/v1/subscriptions/{id}/test",
       "flags": [

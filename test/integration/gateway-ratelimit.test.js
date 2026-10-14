@@ -46,7 +46,7 @@ function ratelimitEnv(port) {
     DB_PATH: join(scratch, 'ratelimit.db'),
     // gateway's key can only ever hit /v1/check ("check" role); the harness key is readwrite so it
     // can also create and patch the policy directly, as an operator would.
-    RATELIMIT_API_KEYS: `gateway:${gatewayApiKeySecret}:check,harness:${harnessApiKeySecret}:readwrite`,
+    RATELIMIT_API_KEYS: `atc-gateway:${gatewayApiKeySecret}:check,harness:${harnessApiKeySecret}:readwrite`,
   };
 }
 
@@ -58,7 +58,7 @@ before(async () => {
   metricsToken = randomSecret();
 
   ratelimitPort = await freePort();
-  ratelimit = new ServiceProcess({ name: 'ratelimit', cwd: join(workspaceRoot, 'ratelimit'), entry: 'src/index.js', port: ratelimitPort, env: ratelimitEnv(ratelimitPort) });
+  ratelimit = new ServiceProcess({ name: 'atc-ratelimit', cwd: join(workspaceRoot, 'atc-ratelimit'), entry: 'src/index.js', port: ratelimitPort, env: ratelimitEnv(ratelimitPort) });
   await ratelimit.start();
 
   const policyRes = await fetch(`${ratelimit.baseUrl}/v1/policies`, {
@@ -91,7 +91,7 @@ before(async () => {
 
   const gatewayPort = await freePort();
   gateway = new ServiceProcess({
-    name: 'gateway', cwd: join(workspaceRoot, 'gateway'), entry: 'src/index.js', port: gatewayPort,
+    name: 'atc-gateway', cwd: join(workspaceRoot, 'atc-gateway'), entry: 'src/index.js', port: gatewayPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(gatewayPort), HOST: '127.0.0.1', LOG_LEVEL: 'info',
       ROUTES_FILE: routesPath, TRUST_PROXY: 'false', METRICS_TOKEN: metricsToken,
@@ -183,7 +183,7 @@ test('gateway + ratelimit, both real processes: policy enforcement, a genuine ra
   assert.equal(health.status, 200);
 
   // ---- Step 10: restart ratelimit for real, rebinding the exact same port gateway already has baked in.
-  ratelimit = new ServiceProcess({ name: 'ratelimit', cwd: join(workspaceRoot, 'ratelimit'), entry: 'src/index.js', port: ratelimitPort, env: ratelimitEnv(ratelimitPort) });
+  ratelimit = new ServiceProcess({ name: 'atc-ratelimit', cwd: join(workspaceRoot, 'atc-ratelimit'), entry: 'src/index.js', port: ratelimitPort, env: ratelimitEnv(ratelimitPort) });
   await ratelimit.start();
 
   // ---- Step 11: route A recovers automatically — no gateway restart, no reload, just the next request.

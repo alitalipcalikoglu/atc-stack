@@ -1,0 +1,201 @@
+/**
+ * GENERATED FILE -- do not edit by hand.
+ * Produced from <repo>/openapi.yaml by `node clients/typescript/generate.mjs`.
+ * Re-run generation instead of patching this file; see clients/typescript/README.md.
+ */
+
+import createFetchClient from 'openapi-fetch';
+import type { FetchOptions } from 'openapi-fetch';
+import type { paths, operations, components } from './types.gen.js';
+export type { paths, operations, components } from './types.gen.js';
+
+/**
+ * Caller-supplied configuration. Nothing is read from process.env, a stack config file,
+ * or any other implicit source -- baseUrl and credentials must always be passed explicitly.
+ */
+export interface ClientConfig {
+  /** Origin + path prefix the atc-console service is reachable at, e.g. "https://atc-console.internal:4000". */
+  baseUrl: string;
+  /** Headers merged into every request (e.g. { Authorization: "Bearer <key>" }). Per-call headers passed to an operation win over these. */
+  headers?: HeadersInit;
+  /** Override the fetch implementation (useful in tests, or for a non-global fetch runtime). Defaults to the ambient global fetch. */
+  fetch?: typeof fetch;
+  /** Passed straight to every underlying fetch() call's RequestInit.credentials -- set to "include" for cookie-based auth (console). */
+  credentials?: RequestCredentials;
+}
+
+/**
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (156 total).
+ * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
+ * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
+ * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
+ * via the per-call init if you need cancellation/timeout -- the client has no built-in timeout.
+ */
+export function createClient(config: ClientConfig) {
+  const client = createFetchClient<paths>({
+    baseUrl: config.baseUrl,
+    headers: config.headers,
+    fetch: config.fetch,
+    credentials: config.credentials,
+  });
+  return {
+    "atc-console.activity.list": (init: FetchOptions<operations["atc-console.activity.list"]>) => client.GET("/api/audit", init),
+    "atc-console.admins.create": (init: FetchOptions<operations["atc-console.admins.create"]>) => client.POST("/api/admins", init),
+    "atc-console.admins.delete": (init: FetchOptions<operations["atc-console.admins.delete"]>) => client.DELETE("/api/admins/{id}", init),
+    "atc-console.admins.list": (init: FetchOptions<operations["atc-console.admins.list"]>) => client.GET("/api/admins", init),
+    "atc-console.admins.resetPassword": (init: FetchOptions<operations["atc-console.admins.resetPassword"]>) => client.POST("/api/admins/{id}/password", init),
+    "atc-console.admins.unlock": (init: FetchOptions<operations["atc-console.admins.unlock"]>) => client.POST("/api/admins/{id}/unlock", init),
+    "atc-console.admins.update": (init: FetchOptions<operations["atc-console.admins.update"]>) => client.PATCH("/api/admins/{id}", init),
+    "atc-console.atc-audit.chain.head": (init: FetchOptions<operations["atc-console.atc-audit.chain.head"]>) => client.GET("/api/services/{sid}/atc-audit/chain/head", init),
+    "atc-console.atc-audit.chain.verify": (init: FetchOptions<operations["atc-console.atc-audit.chain.verify"]>) => client.GET("/api/services/{sid}/atc-audit/chain/verify", init),
+    "atc-console.atc-audit.events.export": (init: FetchOptions<operations["atc-console.atc-audit.events.export"]>) => client.GET("/api/services/{sid}/atc-audit/events/export", init),
+    "atc-console.atc-audit.events.get": (init: FetchOptions<operations["atc-console.atc-audit.events.get"]>) => client.GET("/api/services/{sid}/atc-audit/events/{id}", init),
+    "atc-console.atc-audit.events.list": (init: FetchOptions<operations["atc-console.atc-audit.events.list"]>) => client.GET("/api/services/{sid}/atc-audit/events", init),
+    "atc-console.atc-audit.stats.get": (init: FetchOptions<operations["atc-console.atc-audit.stats.get"]>) => client.GET("/api/services/{sid}/atc-audit/stats", init),
+    "atc-console.atc-auth.jwks.get": (init: FetchOptions<operations["atc-console.atc-auth.jwks.get"]>) => client.GET("/api/services/{sid}/atc-auth/jwks", init),
+    "atc-console.atc-auth.users.create": (init: FetchOptions<operations["atc-console.atc-auth.users.create"]>) => client.POST("/api/services/{sid}/atc-auth/users", init),
+    "atc-console.atc-auth.users.delete": (init: FetchOptions<operations["atc-console.atc-auth.users.delete"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}", init),
+    "atc-console.atc-auth.users.events": (init: FetchOptions<operations["atc-console.atc-auth.users.events"]>) => client.GET("/api/services/{sid}/atc-auth/users/{id}/events", init),
+    "atc-console.atc-auth.users.get": (init: FetchOptions<operations["atc-console.atc-auth.users.get"]>) => client.GET("/api/services/{sid}/atc-auth/users/{id}", init),
+    "atc-console.atc-auth.users.list": (init: FetchOptions<operations["atc-console.atc-auth.users.list"]>) => client.GET("/api/services/{sid}/atc-auth/users", init),
+    "atc-console.atc-auth.users.passwordResetEmail": (init: FetchOptions<operations["atc-console.atc-auth.users.passwordResetEmail"]>) => client.POST("/api/services/{sid}/atc-auth/users/{id}/password-reset-email", init),
+    "atc-console.atc-auth.users.resendVerification": (init: FetchOptions<operations["atc-console.atc-auth.users.resendVerification"]>) => client.POST("/api/services/{sid}/atc-auth/users/{id}/resend-verification", init),
+    "atc-console.atc-auth.users.revokeAllSessions": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeAllSessions"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions", init),
+    "atc-console.atc-auth.users.revokeSession": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeSession"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions/{sub}", init),
+    "atc-console.atc-auth.users.update": (init: FetchOptions<operations["atc-console.atc-auth.users.update"]>) => client.PATCH("/api/services/{sid}/atc-auth/users/{id}", init),
+    "atc-console.atc-flags.environments.list": (init: FetchOptions<operations["atc-console.atc-flags.environments.list"]>) => client.GET("/api/services/{sid}/atc-flags/environments", init),
+    "atc-console.atc-flags.envs.copy": (init: FetchOptions<operations["atc-console.atc-flags.envs.copy"]>) => client.POST("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}/copy", init),
+    "atc-console.atc-flags.envs.update": (init: FetchOptions<operations["atc-console.atc-flags.envs.update"]>) => client.PATCH("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}", init),
+    "atc-console.atc-flags.evaluate.post": (init: FetchOptions<operations["atc-console.atc-flags.evaluate.post"]>) => client.POST("/api/services/{sid}/atc-flags/evaluate", init),
+    "atc-console.atc-flags.flags.create": (init: FetchOptions<operations["atc-console.atc-flags.flags.create"]>) => client.POST("/api/services/{sid}/atc-flags/flags", init),
+    "atc-console.atc-flags.flags.delete": (init: FetchOptions<operations["atc-console.atc-flags.flags.delete"]>) => client.DELETE("/api/services/{sid}/atc-flags/flags/{id}", init),
+    "atc-console.atc-flags.flags.get": (init: FetchOptions<operations["atc-console.atc-flags.flags.get"]>) => client.GET("/api/services/{sid}/atc-flags/flags/{id}", init),
+    "atc-console.atc-flags.flags.history": (init: FetchOptions<operations["atc-console.atc-flags.flags.history"]>) => client.GET("/api/services/{sid}/atc-flags/flags/{id}/history", init),
+    "atc-console.atc-flags.flags.list": (init: FetchOptions<operations["atc-console.atc-flags.flags.list"]>) => client.GET("/api/services/{sid}/atc-flags/flags", init),
+    "atc-console.atc-flags.flags.update": (init: FetchOptions<operations["atc-console.atc-flags.flags.update"]>) => client.PATCH("/api/services/{sid}/atc-flags/flags/{id}", init),
+    "atc-console.atc-flags.history.list": (init: FetchOptions<operations["atc-console.atc-flags.history.list"]>) => client.GET("/api/services/{sid}/atc-flags/history", init),
+    "atc-console.atc-flags.stats.get": (init: FetchOptions<operations["atc-console.atc-flags.stats.get"]>) => client.GET("/api/services/{sid}/atc-flags/stats", init),
+    "atc-console.atc-geo.collections.clear": (init: FetchOptions<operations["atc-console.atc-geo.collections.clear"]>) => client.POST("/api/services/{sid}/atc-geo/collections/{id}/clear", init),
+    "atc-console.atc-geo.collections.create": (init: FetchOptions<operations["atc-console.atc-geo.collections.create"]>) => client.POST("/api/services/{sid}/atc-geo/collections", init),
+    "atc-console.atc-geo.collections.delete": (init: FetchOptions<operations["atc-console.atc-geo.collections.delete"]>) => client.DELETE("/api/services/{sid}/atc-geo/collections/{id}", init),
+    "atc-console.atc-geo.collections.get": (init: FetchOptions<operations["atc-console.atc-geo.collections.get"]>) => client.GET("/api/services/{sid}/atc-geo/collections/{id}", init),
+    "atc-console.atc-geo.collections.list": (init: FetchOptions<operations["atc-console.atc-geo.collections.list"]>) => client.GET("/api/services/{sid}/atc-geo/collections", init),
+    "atc-console.atc-geo.collections.nearby": (init: FetchOptions<operations["atc-console.atc-geo.collections.nearby"]>) => client.GET("/api/services/{sid}/atc-geo/collections/{id}/nearby", init),
+    "atc-console.atc-geo.collections.update": (init: FetchOptions<operations["atc-console.atc-geo.collections.update"]>) => client.PATCH("/api/services/{sid}/atc-geo/collections/{id}", init),
+    "atc-console.atc-geo.countries.get": (init: FetchOptions<operations["atc-console.atc-geo.countries.get"]>) => client.GET("/api/services/{sid}/atc-geo/countries/{id}", init),
+    "atc-console.atc-geo.countries.list": (init: FetchOptions<operations["atc-console.atc-geo.countries.list"]>) => client.GET("/api/services/{sid}/atc-geo/countries", init),
+    "atc-console.atc-geo.currencies.list": (init: FetchOptions<operations["atc-console.atc-geo.currencies.list"]>) => client.GET("/api/services/{sid}/atc-geo/currencies", init),
+    "atc-console.atc-geo.database.get": (init: FetchOptions<operations["atc-console.atc-geo.database.get"]>) => client.GET("/api/services/{sid}/atc-geo/database", init),
+    "atc-console.atc-geo.database.reload": (init: FetchOptions<operations["atc-console.atc-geo.database.reload"]>) => client.POST("/api/services/{sid}/atc-geo/database/reload", init),
+    "atc-console.atc-geo.distance.get": (init: FetchOptions<operations["atc-console.atc-geo.distance.get"]>) => client.GET("/api/services/{sid}/atc-geo/distance", init),
+    "atc-console.atc-geo.ip.batch": (init: FetchOptions<operations["atc-console.atc-geo.ip.batch"]>) => client.POST("/api/services/{sid}/atc-geo/ip/batch", init),
+    "atc-console.atc-geo.ip.lookup": (init: FetchOptions<operations["atc-console.atc-geo.ip.lookup"]>) => client.GET("/api/services/{sid}/atc-geo/ip", init),
+    "atc-console.atc-geo.phone.lookup": (init: FetchOptions<operations["atc-console.atc-geo.phone.lookup"]>) => client.GET("/api/services/{sid}/atc-geo/phone", init),
+    "atc-console.atc-geo.places.delete": (init: FetchOptions<operations["atc-console.atc-geo.places.delete"]>) => client.DELETE("/api/services/{sid}/atc-geo/collections/{id}/places/{sub}", init),
+    "atc-console.atc-geo.places.list": (init: FetchOptions<operations["atc-console.atc-geo.places.list"]>) => client.GET("/api/services/{sid}/atc-geo/collections/{id}/places", init),
+    "atc-console.atc-geo.places.upsert": (init: FetchOptions<operations["atc-console.atc-geo.places.upsert"]>) => client.PUT("/api/services/{sid}/atc-geo/collections/{id}/places", init),
+    "atc-console.atc-geo.stats.get": (init: FetchOptions<operations["atc-console.atc-geo.stats.get"]>) => client.GET("/api/services/{sid}/atc-geo/stats", init),
+    "atc-console.atc-geo.timezones.list": (init: FetchOptions<operations["atc-console.atc-geo.timezones.list"]>) => client.GET("/api/services/{sid}/atc-geo/timezones", init),
+    "atc-console.atc-media.files.bytes": (init: FetchOptions<operations["atc-console.atc-media.files.bytes"]>) => client.GET("/api/services/{sid}/atc-media/files/{id}/bytes/{sub}", init),
+    "atc-console.atc-media.files.delete": (init: FetchOptions<operations["atc-console.atc-media.files.delete"]>) => client.DELETE("/api/services/{sid}/atc-media/files/{id}", init),
+    "atc-console.atc-media.files.get": (init: FetchOptions<operations["atc-console.atc-media.files.get"]>) => client.GET("/api/services/{sid}/atc-media/files/{id}", init),
+    "atc-console.atc-media.files.list": (init: FetchOptions<operations["atc-console.atc-media.files.list"]>) => client.GET("/api/services/{sid}/atc-media/files", init),
+    "atc-console.atc-media.files.restore": (init: FetchOptions<operations["atc-console.atc-media.files.restore"]>) => client.POST("/api/services/{sid}/atc-media/files/{id}/restore", init),
+    "atc-console.atc-media.files.update": (init: FetchOptions<operations["atc-console.atc-media.files.update"]>) => client.PATCH("/api/services/{sid}/atc-media/files/{id}", init),
+    "atc-console.atc-media.files.uploadTicketed": (init: FetchOptions<operations["atc-console.atc-media.files.uploadTicketed"]>) => client.PUT("/api/services/{sid}/atc-media/files", init),
+    "atc-console.atc-media.files.urls": (init: FetchOptions<operations["atc-console.atc-media.files.urls"]>) => client.POST("/api/services/{sid}/atc-media/files/{id}/urls", init),
+    "atc-console.atc-media.tickets.create": (init: FetchOptions<operations["atc-console.atc-media.tickets.create"]>) => client.POST("/api/services/{sid}/atc-media/tickets", init),
+    "atc-console.atc-notify.messages.get": (init: FetchOptions<operations["atc-console.atc-notify.messages.get"]>) => client.GET("/api/services/{sid}/atc-notify/messages/{id}", init),
+    "atc-console.atc-notify.messages.list": (init: FetchOptions<operations["atc-console.atc-notify.messages.list"]>) => client.GET("/api/services/{sid}/atc-notify/messages", init),
+    "atc-console.atc-notify.messages.retry": (init: FetchOptions<operations["atc-console.atc-notify.messages.retry"]>) => client.POST("/api/services/{sid}/atc-notify/messages/{id}/retry", init),
+    "atc-console.atc-notify.messages.send": (init: FetchOptions<operations["atc-console.atc-notify.messages.send"]>) => client.POST("/api/services/{sid}/atc-notify/messages", init),
+    "atc-console.atc-notify.templates.list": (init: FetchOptions<operations["atc-console.atc-notify.templates.list"]>) => client.GET("/api/services/{sid}/atc-notify/templates", init),
+    "atc-console.atc-ratelimit.check.post": (init: FetchOptions<operations["atc-console.atc-ratelimit.check.post"]>) => client.POST("/api/services/{sid}/atc-ratelimit/check", init),
+    "atc-console.atc-ratelimit.overrides.delete": (init: FetchOptions<operations["atc-console.atc-ratelimit.overrides.delete"]>) => client.DELETE("/api/services/{sid}/atc-ratelimit/policies/{id}/overrides/{sub}", init),
+    "atc-console.atc-ratelimit.overrides.list": (init: FetchOptions<operations["atc-console.atc-ratelimit.overrides.list"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/overrides", init),
+    "atc-console.atc-ratelimit.overrides.set": (init: FetchOptions<operations["atc-console.atc-ratelimit.overrides.set"]>) => client.PUT("/api/services/{sid}/atc-ratelimit/policies/{id}/overrides/{sub}", init),
+    "atc-console.atc-ratelimit.policies.create": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.create"]>) => client.POST("/api/services/{sid}/atc-ratelimit/policies", init),
+    "atc-console.atc-ratelimit.policies.delete": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.delete"]>) => client.DELETE("/api/services/{sid}/atc-ratelimit/policies/{id}", init),
+    "atc-console.atc-ratelimit.policies.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}", init),
+    "atc-console.atc-ratelimit.policies.list": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.list"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies", init),
+    "atc-console.atc-ratelimit.policies.stats": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.stats"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/stats", init),
+    "atc-console.atc-ratelimit.policies.top": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.top"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/top", init),
+    "atc-console.atc-ratelimit.policies.update": (init: FetchOptions<operations["atc-console.atc-ratelimit.policies.update"]>) => client.PATCH("/api/services/{sid}/atc-ratelimit/policies/{id}", init),
+    "atc-console.atc-ratelimit.stats.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.stats.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/stats", init),
+    "atc-console.atc-ratelimit.subjects.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.subjects.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}", init),
+    "atc-console.atc-ratelimit.subjects.resetUsage": (init: FetchOptions<operations["atc-console.atc-ratelimit.subjects.resetUsage"]>) => client.DELETE("/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}/usage", init),
+    "atc-console.atc-scheduler.jobs.create": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.create"]>) => client.POST("/api/services/{sid}/atc-scheduler/jobs", init),
+    "atc-console.atc-scheduler.jobs.delete": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.delete"]>) => client.DELETE("/api/services/{sid}/atc-scheduler/jobs/{id}", init),
+    "atc-console.atc-scheduler.jobs.get": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.get"]>) => client.GET("/api/services/{sid}/atc-scheduler/jobs/{id}", init),
+    "atc-console.atc-scheduler.jobs.list": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.list"]>) => client.GET("/api/services/{sid}/atc-scheduler/jobs", init),
+    "atc-console.atc-scheduler.jobs.run": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.run"]>) => client.POST("/api/services/{sid}/atc-scheduler/jobs/{id}/run", init),
+    "atc-console.atc-scheduler.jobs.runs": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.runs"]>) => client.GET("/api/services/{sid}/atc-scheduler/jobs/{id}/runs", init),
+    "atc-console.atc-scheduler.jobs.update": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.update"]>) => client.PATCH("/api/services/{sid}/atc-scheduler/jobs/{id}", init),
+    "atc-console.atc-scheduler.preview.get": (init: FetchOptions<operations["atc-console.atc-scheduler.preview.get"]>) => client.GET("/api/services/{sid}/atc-scheduler/preview", init),
+    "atc-console.atc-scheduler.runs.cancel": (init: FetchOptions<operations["atc-console.atc-scheduler.runs.cancel"]>) => client.POST("/api/services/{sid}/atc-scheduler/runs/{id}/cancel", init),
+    "atc-console.atc-scheduler.runs.get": (init: FetchOptions<operations["atc-console.atc-scheduler.runs.get"]>) => client.GET("/api/services/{sid}/atc-scheduler/runs/{id}", init),
+    "atc-console.atc-scheduler.runs.list": (init: FetchOptions<operations["atc-console.atc-scheduler.runs.list"]>) => client.GET("/api/services/{sid}/atc-scheduler/runs", init),
+    "atc-console.atc-scheduler.stats.get": (init: FetchOptions<operations["atc-console.atc-scheduler.stats.get"]>) => client.GET("/api/services/{sid}/atc-scheduler/stats", init),
+    "atc-console.atc-scheduler.targetKeys.list": (init: FetchOptions<operations["atc-console.atc-scheduler.targetKeys.list"]>) => client.GET("/api/services/{sid}/atc-scheduler/target-keys", init),
+    "atc-console.atc-scheduler.timezones.list": (init: FetchOptions<operations["atc-console.atc-scheduler.timezones.list"]>) => client.GET("/api/services/{sid}/atc-scheduler/timezones", init),
+    "atc-console.atc-search.documents.browse": (init: FetchOptions<operations["atc-console.atc-search.documents.browse"]>) => client.GET("/api/services/{sid}/atc-search/indexes/{id}/documents", init),
+    "atc-console.atc-search.documents.delete": (init: FetchOptions<operations["atc-console.atc-search.documents.delete"]>) => client.DELETE("/api/services/{sid}/atc-search/indexes/{id}/documents/{sub}", init),
+    "atc-console.atc-search.documents.get": (init: FetchOptions<operations["atc-console.atc-search.documents.get"]>) => client.GET("/api/services/{sid}/atc-search/indexes/{id}/documents/{sub}", init),
+    "atc-console.atc-search.documents.upsert": (init: FetchOptions<operations["atc-console.atc-search.documents.upsert"]>) => client.PUT("/api/services/{sid}/atc-search/indexes/{id}/documents", init),
+    "atc-console.atc-search.indexes.clear": (init: FetchOptions<operations["atc-console.atc-search.indexes.clear"]>) => client.POST("/api/services/{sid}/atc-search/indexes/{id}/clear", init),
+    "atc-console.atc-search.indexes.create": (init: FetchOptions<operations["atc-console.atc-search.indexes.create"]>) => client.POST("/api/services/{sid}/atc-search/indexes", init),
+    "atc-console.atc-search.indexes.delete": (init: FetchOptions<operations["atc-console.atc-search.indexes.delete"]>) => client.DELETE("/api/services/{sid}/atc-search/indexes/{id}", init),
+    "atc-console.atc-search.indexes.get": (init: FetchOptions<operations["atc-console.atc-search.indexes.get"]>) => client.GET("/api/services/{sid}/atc-search/indexes/{id}", init),
+    "atc-console.atc-search.indexes.list": (init: FetchOptions<operations["atc-console.atc-search.indexes.list"]>) => client.GET("/api/services/{sid}/atc-search/indexes", init),
+    "atc-console.atc-search.indexes.search": (init: FetchOptions<operations["atc-console.atc-search.indexes.search"]>) => client.POST("/api/services/{sid}/atc-search/indexes/{id}/search", init),
+    "atc-console.atc-search.indexes.update": (init: FetchOptions<operations["atc-console.atc-search.indexes.update"]>) => client.PATCH("/api/services/{sid}/atc-search/indexes/{id}", init),
+    "atc-console.atc-search.stats.get": (init: FetchOptions<operations["atc-console.atc-search.stats.get"]>) => client.GET("/api/services/{sid}/atc-search/stats", init),
+    "atc-console.atc-shortlink.links.create": (init: FetchOptions<operations["atc-console.atc-shortlink.links.create"]>) => client.POST("/api/services/{sid}/atc-shortlink/links", init),
+    "atc-console.atc-shortlink.links.delete": (init: FetchOptions<operations["atc-console.atc-shortlink.links.delete"]>) => client.DELETE("/api/services/{sid}/atc-shortlink/links/{id}", init),
+    "atc-console.atc-shortlink.links.get": (init: FetchOptions<operations["atc-console.atc-shortlink.links.get"]>) => client.GET("/api/services/{sid}/atc-shortlink/links/{id}", init),
+    "atc-console.atc-shortlink.links.list": (init: FetchOptions<operations["atc-console.atc-shortlink.links.list"]>) => client.GET("/api/services/{sid}/atc-shortlink/links", init),
+    "atc-console.atc-shortlink.links.qr": (init: FetchOptions<operations["atc-console.atc-shortlink.links.qr"]>) => client.GET("/api/services/{sid}/atc-shortlink/links/{id}/qr.png", init),
+    "atc-console.atc-shortlink.links.stats": (init: FetchOptions<operations["atc-console.atc-shortlink.links.stats"]>) => client.GET("/api/services/{sid}/atc-shortlink/links/{id}/stats", init),
+    "atc-console.atc-shortlink.links.update": (init: FetchOptions<operations["atc-console.atc-shortlink.links.update"]>) => client.PATCH("/api/services/{sid}/atc-shortlink/links/{id}", init),
+    "atc-console.atc-shortlink.stats.get": (init: FetchOptions<operations["atc-console.atc-shortlink.stats.get"]>) => client.GET("/api/services/{sid}/atc-shortlink/stats", init),
+    "atc-console.atc-webhook-out.deliveries.cancel": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.cancel"]>) => client.POST("/api/services/{sid}/atc-webhook-out/deliveries/{id}/cancel", init),
+    "atc-console.atc-webhook-out.deliveries.get": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.get"]>) => client.GET("/api/services/{sid}/atc-webhook-out/deliveries/{id}", init),
+    "atc-console.atc-webhook-out.deliveries.list": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.list"]>) => client.GET("/api/services/{sid}/atc-webhook-out/deliveries", init),
+    "atc-console.atc-webhook-out.deliveries.redeliver": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.redeliver"]>) => client.POST("/api/services/{sid}/atc-webhook-out/deliveries/{id}/redeliver", init),
+    "atc-console.atc-webhook-out.events.get": (init: FetchOptions<operations["atc-console.atc-webhook-out.events.get"]>) => client.GET("/api/services/{sid}/atc-webhook-out/events/{id}", init),
+    "atc-console.atc-webhook-out.events.list": (init: FetchOptions<operations["atc-console.atc-webhook-out.events.list"]>) => client.GET("/api/services/{sid}/atc-webhook-out/events", init),
+    "atc-console.atc-webhook-out.eventTypes.list": (init: FetchOptions<operations["atc-console.atc-webhook-out.eventTypes.list"]>) => client.GET("/api/services/{sid}/atc-webhook-out/event-types", init),
+    "atc-console.atc-webhook-out.stats.get": (init: FetchOptions<operations["atc-console.atc-webhook-out.stats.get"]>) => client.GET("/api/services/{sid}/atc-webhook-out/stats", init),
+    "atc-console.atc-webhook-out.subscriptions.create": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.create"]>) => client.POST("/api/services/{sid}/atc-webhook-out/subscriptions", init),
+    "atc-console.atc-webhook-out.subscriptions.delete": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.delete"]>) => client.DELETE("/api/services/{sid}/atc-webhook-out/subscriptions/{id}", init),
+    "atc-console.atc-webhook-out.subscriptions.get": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.get"]>) => client.GET("/api/services/{sid}/atc-webhook-out/subscriptions/{id}", init),
+    "atc-console.atc-webhook-out.subscriptions.list": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.list"]>) => client.GET("/api/services/{sid}/atc-webhook-out/subscriptions", init),
+    "atc-console.atc-webhook-out.subscriptions.replay": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.replay"]>) => client.POST("/api/services/{sid}/atc-webhook-out/subscriptions/{id}/replay", init),
+    "atc-console.atc-webhook-out.subscriptions.rotate": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.rotate"]>) => client.POST("/api/services/{sid}/atc-webhook-out/subscriptions/{id}/rotate", init),
+    "atc-console.atc-webhook-out.subscriptions.test": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.test"]>) => client.POST("/api/services/{sid}/atc-webhook-out/subscriptions/{id}/test", init),
+    "atc-console.atc-webhook-out.subscriptions.update": (init: FetchOptions<operations["atc-console.atc-webhook-out.subscriptions.update"]>) => client.PATCH("/api/services/{sid}/atc-webhook-out/subscriptions/{id}", init),
+    "atc-console.docs.openapi.get": (init: FetchOptions<operations["atc-console.docs.openapi.get"]>) => client.GET("/api/docs/services/{sid}/openapi", init),
+    "atc-console.docs.services.list": (init: FetchOptions<operations["atc-console.docs.services.list"]>) => client.GET("/api/docs/services", init),
+    "atc-console.health.get": (init: FetchOptions<operations["atc-console.health.get"]>) => client.GET("/health", init),
+    "atc-console.info.get": (init: FetchOptions<operations["atc-console.info.get"]>) => client.GET("/v1/info", init),
+    "atc-console.me.password.change": (init: FetchOptions<operations["atc-console.me.password.change"]>) => client.POST("/api/me/password", init),
+    "atc-console.me.sessions.list": (init: FetchOptions<operations["atc-console.me.sessions.list"]>) => client.GET("/api/me/sessions", init),
+    "atc-console.me.sessions.logoutOthers": (init: FetchOptions<operations["atc-console.me.sessions.logoutOthers"]>) => client.POST("/api/me/sessions/logout-others", init),
+    "atc-console.me.totp.confirm": (init: FetchOptions<operations["atc-console.me.totp.confirm"]>) => client.POST("/api/me/totp/confirm", init),
+    "atc-console.me.totp.disable": (init: FetchOptions<operations["atc-console.me.totp.disable"]>) => client.POST("/api/me/totp/disable", init),
+    "atc-console.me.totp.start": (init: FetchOptions<operations["atc-console.me.totp.start"]>) => client.POST("/api/me/totp/start", init),
+    "atc-console.openapi": (init: FetchOptions<operations["atc-console.openapi"]>) => client.GET("/openapi.yaml", init),
+    "atc-console.ready.get": (init: FetchOptions<operations["atc-console.ready.get"]>) => client.GET("/ready", init),
+    "atc-console.services.about": (init: FetchOptions<operations["atc-console.services.about"]>) => client.GET("/api/services/about", init),
+    "atc-console.services.list": (init: FetchOptions<operations["atc-console.services.list"]>) => client.GET("/api/services", init),
+    "atc-console.services.overview": (init: FetchOptions<operations["atc-console.services.overview"]>) => client.GET("/api/services/overview", init),
+    "atc-console.services.status": (init: FetchOptions<operations["atc-console.services.status"]>) => client.GET("/api/services/{sid}/status", init),
+    "atc-console.services.updateSettings": (init: FetchOptions<operations["atc-console.services.updateSettings"]>) => client.PATCH("/api/services/{sid}/settings", init),
+    "atc-console.session.get": (init: FetchOptions<operations["atc-console.session.get"]>) => client.GET("/api/session", init),
+    "atc-console.session.login": (init: FetchOptions<operations["atc-console.session.login"]>) => client.POST("/api/session/login", init),
+    "atc-console.session.logout": (init: FetchOptions<operations["atc-console.session.logout"]>) => client.POST("/api/session/logout", init),
+    "atc-console.session.totp": (init: FetchOptions<operations["atc-console.session.totp"]>) => client.POST("/api/session/totp", init),
+  } as const;
+}
+
+export type AtcConsoleClient = ReturnType<typeof createClient>;

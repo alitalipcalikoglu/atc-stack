@@ -30,11 +30,11 @@ before(async () => {
   if (!shouldRun) return;
   const [auditPort, notifyPort] = await Promise.all([freePort(), freePort()]);
   audit = new ServiceProcess({
-    name: 'audit', cwd: join(workspaceRoot, 'audit'), entry: 'src/index.js', port: auditPort,
+    name: 'atc-audit', cwd: join(workspaceRoot, 'atc-audit'), entry: 'src/index.js', port: auditPort,
     env: { PATH: process.env.PATH ?? '', PORT: String(auditPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:', AUDIT_API_KEYS: `harness:${randomSecret()}` },
   });
   notify = new ServiceProcess({
-    name: 'notify', cwd: join(workspaceRoot, 'notify'), entry: 'src/index.js', port: notifyPort,
+    name: 'atc-notify', cwd: join(workspaceRoot, 'atc-notify'), entry: 'src/index.js', port: notifyPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(notifyPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
       NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>',
@@ -47,7 +47,7 @@ before(async () => {
   // Stack#matrix() iterates the whole manifest, so every id needs a readable .env — the 11 not
   // spawned here just point at the manifest's own (closed) port and read as plain unreachable
   // rows, exactly like any other down service; only audit/notify point at the real processes.
-  const realPort = /** @type {Record<string, number>} */ ({ audit: auditPort, notify: notifyPort });
+  const realPort = /** @type {Record<string, number>} */ ({ 'atc-audit': auditPort, 'atc-notify': notifyPort });
   for (const s of SERVICES) {
     mkdirSync(join(root, s.id), { recursive: true });
     writeFileSync(join(root, s.id, '.env'), `PORT=${realPort[s.id] ?? s.port}\nHOST=127.0.0.1\n`);
@@ -64,7 +64,7 @@ test('a real service\'s /v1/info matches the documented contract shape exactly',
   const res = await fetch(`${audit.baseUrl}/v1/info`);
   assert.equal(res.status, 200);
   const body = await res.json();
-  assert.equal(body.service, 'audit');
+  assert.equal(body.service, 'atc-audit');
   assert.equal(typeof body.version, 'string');
   assert.equal(body.apiVersion, 'v1');
   assert.deepEqual(body.capabilities, ['chain-verification', 'anchors', 'export']);
@@ -76,25 +76,25 @@ test('a real service\'s /v1/info matches the documented contract shape exactly',
 test('notify\'s real /v1/info reflects NOTIFY_WEBHOOK_CHANNEL=false at runtime: "webhook" is absent from capabilities', { skip }, async () => {
   const res = await fetch(`${notify.baseUrl}/v1/info`);
   const body = await res.json();
-  assert.equal(body.service, 'notify');
+  assert.equal(body.service, 'atc-notify');
   assert.deepEqual(body.capabilities, ['email', 'templates', 'idempotency'], 'webhook channel disabled: not advertised as a capability');
 });
 
 test('Stack#matrix(), pointed at these real running services (not a mock), parses their actual responses correctly', { skip }, async () => {
   /** @type {string[]} */ const logged = [];
   const rows = await new Stack({ root, log: (l) => logged.push(l) }).matrix();
-  const byId = /** @type {Record<string, any>} */ (Object.fromEntries(rows.filter((r) => r.id === 'audit' || r.id === 'notify').map((r) => [r.id, r])));
+  const byId = /** @type {Record<string, any>} */ (Object.fromEntries(rows.filter((r) => r.id === 'atc-audit' || r.id === 'atc-notify').map((r) => [r.id, r])));
 
-  assert.equal(byId.audit.ok, true);
-  assert.equal(byId.audit.infoOk, true);
-  assert.deepEqual(byId.audit.capabilities, ['chain-verification', 'anchors', 'export']);
+  assert.equal(byId['atc-audit'].ok, true);
+  assert.equal(byId['atc-audit'].infoOk, true);
+  assert.deepEqual(byId['atc-audit'].capabilities, ['chain-verification', 'anchors', 'export']);
 
-  assert.equal(byId.notify.ok, true);
-  assert.equal(byId.notify.infoOk, true);
-  assert.deepEqual(byId.notify.capabilities, ['email', 'templates', 'idempotency']);
+  assert.equal(byId['atc-notify'].ok, true);
+  assert.equal(byId['atc-notify'].infoOk, true);
+  assert.deepEqual(byId['atc-notify'].capabilities, ['email', 'templates', 'idempotency']);
 
   // The other 11 manifest entries point at closed ports and read as plain unreachable rows — the
   // command still completed and printed a full matrix rather than throwing over any of them.
-  assert.ok(logged.some((l) => l.startsWith('audit')));
-  assert.ok(logged.some((l) => l.startsWith('notify')));
+  assert.ok(logged.some((l) => l.startsWith('atc-audit')));
+  assert.ok(logged.some((l) => l.startsWith('atc-notify')));
 });

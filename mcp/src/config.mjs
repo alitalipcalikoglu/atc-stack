@@ -1,22 +1,22 @@
 // Explicit, deterministic MCP configuration. Nothing is auto-discovered: every base URL and
 // credential comes from an env var named exactly `STACK_MCP_<SERVICE>_...`. A service with no
 // base URL configured is simply not available -- tools that need it fail with a clear, specific
-// config error naming exactly what's missing; stack.status silently omits it from the aggregate
+// config error naming exactly what's missing; atc-stack.status silently omits it from the aggregate
 // (see server.mjs's per-service try/catch there). No value here is ever logged, echoed in an
 // error, or included in any tool output -- see redact() below and errors.mjs's translation layer.
 
 /** @typedef {{ timeoutMs: number, services: Record<string, { baseUrl: string|null, apiKey: string|null }> }} Config */
 
 export const SERVICES = [
-  'gateway', 'notify', 'auth', 'media', 'console', 'audit', 'shortlink',
-  'flags', 'scheduler', 'webhook-out', 'search', 'ratelimit', 'geo',
+  'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
+  'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo',
 ];
 
-/** Services this phase's explicit tools (beyond stack.status) actually call, and therefore need an API key for. */
-export const API_KEY_SERVICES = ['notify', 'media', 'flags', 'shortlink', 'ratelimit', 'search', 'geo'];
+/** Services this phase's explicit tools (beyond atc-stack.status) actually call, and therefore need an API key for. */
+export const API_KEY_SERVICES = ['atc-notify', 'atc-media', 'atc-flags', 'atc-shortlink', 'atc-ratelimit', 'atc-search', 'atc-geo'];
 
 /** @param {string} service */
-const envKey = (service) => service.toUpperCase().replace(/-/g, '_');
+const envKey = (service) => service.replace(/^atc-/, '').toUpperCase().replace(/-/g, '_');
 
 /** Default request timeout: matches gateway's own `UPSTREAM_TIMEOUT_MS` default (`gateway/src/config.js`) -- reused, not reinvented. */
 export const DEFAULT_TIMEOUT_MS = 30_000;

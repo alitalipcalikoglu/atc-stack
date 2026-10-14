@@ -58,8 +58,8 @@ function harness(f, overrides = {}) {
 
 test('canonical catalog contains exactly the 14 official sibling repositories and the release descriptor covers each once', () => {
   assert.deepEqual(REPOSITORIES.map((repository) => repository.id), [
-    'service-core', 'gateway', 'notify', 'auth', 'media', 'console', 'audit', 'shortlink',
-    'flags', 'scheduler', 'webhook-out', 'search', 'ratelimit', 'geo',
+    'atc-service-core', 'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
+    'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo',
   ]);
   for (const repository of REPOSITORIES) assert.equal(repository.remote, `https://github.com/alitalipcalikoglu/${repository.id}.git`);
   const release = Installer.releaseManifest();

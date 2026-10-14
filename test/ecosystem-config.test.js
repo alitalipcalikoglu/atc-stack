@@ -37,10 +37,10 @@ test('every real service ecosystem.config.cjs parses and has the shape stack its
 });
 
 test('runtime metadata selects adapter-node only for Console and preserves sibling entrypoints', () => {
-  const consoleService = SERVICES.find((s) => s.id === 'console');
+  const consoleService = SERVICES.find((s) => s.id === 'atc-console');
   assert.ok(consoleService);
   assert.equal(Stack.entry(consoleService), 'server.mjs');
-  for (const service of SERVICES.filter((s) => s.id !== 'console')) {
+  for (const service of SERVICES.filter((s) => s.id !== 'atc-console')) {
     assert.equal(Stack.entry(service), 'src/index.js', `${service.id}: sibling runtime must remain unchanged`);
   }
 });

@@ -9,7 +9,7 @@ import { parse as parseYaml } from 'yaml';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(HERE, '..', '..', '..');
-const SERVICES = ['gateway', 'notify', 'auth', 'media', 'console', 'audit', 'shortlink', 'flags', 'scheduler', 'webhook-out', 'search', 'ratelimit', 'geo'];
+const SERVICES = ['atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink', 'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo'];
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
 /** @typedef {{ service: string, operationId: string, method: string, path: string, flags: string[], exposedInPhase3: boolean }} CatalogEntry */
 /** @type {{ totalOperations: number, entries: CatalogEntry[] }} */
@@ -51,12 +51,12 @@ test('the catalog is a candidate universe, not the exposed tool list: far fewer 
   assert.ok(exposedCount > 0, 'reconcile.mjs has not been run, or found nothing');
   assert.ok(exposedCount < catalog.totalOperations, 'catalog exposure count must not equal the full catalog -- that would mean every operation became a tool');
   // exposedCount (operation-level) and TOOLS.length (tool-level) are deliberately different numbers
-  // -- stack.status alone accounts for 39 of the exposed operations under one tool.
+  // -- atc-stack.status alone accounts for 39 of the exposed operations under one tool.
   assert.notEqual(exposedCount, TOOLS.length, 'exposedCount and tool count coincidentally matching would be worth double-checking by hand');
 });
 
-test('no auth/console business operation is exposedInPhase3 -- only their operational probes (health/ready/info), via stack.status, are', () => {
-  const exposed = catalog.entries.filter((e) => e.exposedInPhase3 && (e.service === 'auth' || e.service === 'console'));
+test('no auth/console business operation is exposedInPhase3 -- only their operational probes (health/ready/info), via atc-stack.status, are', () => {
+  const exposed = catalog.entries.filter((e) => e.exposedInPhase3 && (e.service === 'atc-auth' || e.service === 'atc-console'));
   for (const e of exposed) {
     assert.deepEqual(e.flags, ['READ_SAFE', 'OPERATOR'], `${e.service}.${e.operationId} is exposed but is not a plain operational probe (flags: ${e.flags.join(',')})`);
   }

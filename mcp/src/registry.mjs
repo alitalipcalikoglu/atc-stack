@@ -59,7 +59,7 @@ export class ServiceRegistry {
   /**
    * A client usable for the always-public operational probes (health/ready/info) even when no API
    * key is configured for this service -- those three routes are unauthenticated on every service
-   * (confirmed in the Phase 0/1 audits), so stack.status only ever needs a base URL, never a key.
+   * (confirmed in the Phase 0/1 audits), so atc-stack.status only ever needs a base URL, never a key.
    * @param {string} service
    */
   async probeClient(service) {
