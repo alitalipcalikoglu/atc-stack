@@ -87,7 +87,8 @@ Boundaries:
 The public workflow is `stack install:all`, `stack setup`, `stack dev`, `stack up`, `stack down`
 and `stack status`. `install:all` installs the supported release; `--ref main` is the explicit
 moving development selection. GitHub supplies source and tags. There is no CI; release validation
-runs locally. Do not change the supported pointer, manifests or tags as a side effect of other work.
+runs locally through `release:prepare`, `release:verify` and `release:publish` (README,
+"Releasing"). Do not change the supported pointer, manifests or tags as a side effect of other work.
 
 ## Console architecture
 
@@ -108,12 +109,8 @@ downstream proxy, and extra controller/service/repository layering.
 
 ## Known debt
 
-1. **Range:** the media-byte path does not forward inbound `Range` downstream. Changing it needs an
-   explicit behavior and security decision.
-2. Media-byte and QR responses receive `Cache-Control: no-store` from the shared API response hook,
-   overriding route-local cache directives.
-3. **Swagger bundle size:** the local Swagger UI is a 1,425,215-byte lazy chunk, loaded only on
-   `/docs`.
+None open. Media byte ranges are forwarded (single range, 206/416), binary routes keep their
+private cache lifetimes, and the lazy Swagger chunk is bounded at 400 KB brotli by the M7 smoke.
 
 ## Operational constraints
 
