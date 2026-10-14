@@ -64,6 +64,11 @@ export class Compose {
       for (const [k, v] of Object.entries(s.env(c))) e.set(k, v);
       if (s.files) files.set(s.id, s.files(c));
     }
+    // IP databases: files an operator drops into atc-geo/mmdb (city.mmdb, optional asn.mmdb) are mounted read-only.
+    if (this.geoDatabases().length) {
+      c.env('atc-geo').set('MMDB_PATH', '/mmdb/city.mmdb');
+      if (this.geoDatabases().includes('asn.mmdb')) c.env('atc-geo').set('ASN_MMDB_PATH', '/mmdb/asn.mmdb');
+    }
     c.env('atc-audit').set('ANCHOR_PRIVATE_KEY_PATH', '/keys/anchor-private.pem');
     // The backup service reads every data volume, mounted under /sources/<id>.
     c.env('atc-backup').set('BACKUP_SOURCES', Object.entries(DATA_FILES).map(([id, file]) => `${id}=/sources/${id}/${file}`).join(','));
@@ -91,6 +96,13 @@ export class Compose {
     return m ? `/sources/${m[1]}/${m[2]}` : `/sources/${id}`;
   }
 
+  /** Database files present in `atc-geo/mmdb` (empty without a city database). */
+  geoDatabases() {
+    const dir = join(this.root, 'atc-geo', 'mmdb');
+    if (!existsSync(join(dir, 'city.mmdb'))) return [];
+    return ['city.mmdb', 'asn.mmdb'].filter((f) => existsSync(join(dir, f)));
+  }
+
   /** The compose document as plain data (paths relative to `compose/`). */
   document() {
     const rel = (/** @type {string} */ p) => relative(this.outDir, p) || '.';
@@ -103,6 +115,7 @@ export class Compose {
       const mounts = [];
       if (s.id in DATA_FILES || s.id === 'atc-backup') { mounts.push(`${s.id}-data:/data`); volumes[`${s.id}-data`] = {}; }
       if (s.id === 'atc-auth' || s.id === 'atc-audit') mounts.push(`${rel(join(this.root, s.id, 'keys'))}:/keys:ro`);
+      if (s.id === 'atc-geo' && this.geoDatabases().length) mounts.push(`${rel(join(this.root, 'atc-geo', 'mmdb'))}:/mmdb:ro`);
       if (s.id === 'atc-gateway' || s.id === 'atc-console') mounts.push(`./config/${s.id}:/config:ro`);
       // SQLite reads a WAL database through its -shm file, so the source volumes are mounted read-write.
       if (s.id === 'atc-backup') {

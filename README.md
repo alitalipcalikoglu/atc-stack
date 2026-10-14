@@ -326,3 +326,7 @@ npm run mcp:catalog                      # regenerate the tools and catalog afte
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+## IP databases for atc-geo
+
+Docker: put `city.mmdb` (and optionally `asn.mmdb`) into `atc-geo/mmdb/` before `npm run compose`; the directory is mounted read-only at `/mmdb` and `MMDB_PATH` / `ASN_MMDB_PATH` are set for you. Without a city file the container runs without IP geolocation. PM2: set `MMDB_PATH` (and `ASN_MMDB_PATH`) in `atc-geo/.env`; setup keeps your values. The service flags files older than `MMDB_MAX_AGE_DAYS` in `/ready`.

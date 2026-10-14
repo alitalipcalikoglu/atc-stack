@@ -79,3 +79,18 @@ test('load: fetch loops per route, percentiles, errors, 429s and other statuses 
   assert.deepEqual([LoadTest.percentile([], 50), LoadTest.percentile([1, 2, 3, 4], 50), LoadTest.percentile([1, 2, 3, 4], 95)], [null, 2, 4]);
   assert.throws(() => LoadTest.parseRoutes('/no-method'), /GET \/path/);
 });
+
+test('compose: IP databases in atc-geo/mmdb are mounted and wired only when present', () => {
+  const root = mkdtempSync(join(tmpdir(), 'atc-geo-root-'));
+  try {
+    const c = new Compose({ root, stackDir: root, portOffset: 0 });
+    assert.deepEqual(c.geoDatabases(), []);
+    mkdirSync(join(root, 'atc-geo', 'mmdb'), { recursive: true });
+    writeFileSync(join(root, 'atc-geo', 'mmdb', 'asn.mmdb'), '');
+    assert.deepEqual(c.geoDatabases(), [], 'an ASN file alone does not count');
+    writeFileSync(join(root, 'atc-geo', 'mmdb', 'city.mmdb'), '');
+    assert.deepEqual(c.geoDatabases(), ['city.mmdb', 'asn.mmdb']);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
