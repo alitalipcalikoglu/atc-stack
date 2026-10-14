@@ -9,7 +9,7 @@
     "atc-notify": { "repository": "https://github.com/alitalipcalikoglu/atc-notify.git", "tag": "v1.25.0", "commit": "1f134fe22f44e637ac714042588531bb1f07f52f" },
     "atc-auth": { "repository": "https://github.com/alitalipcalikoglu/atc-auth.git", "tag": "v1.25.0", "commit": "d9e074abdbe7984f941dec066a916f38b20f39c6" },
     "atc-media": { "repository": "https://github.com/alitalipcalikoglu/atc-media.git", "tag": "v1.25.0", "commit": "bab6cf6c56843be72df6573d70d04b7cbcfea115" },
-    "atc-console": { "repository": "https://github.com/alitalipcalikoglu/atc-console.git", "tag": "v1.25.0", "commit": "85d0684e38d97a24fe693429159b02084af1c8fc" },
+    "atc-console": { "repository": "https://github.com/alitalipcalikoglu/atc-console.git", "tag": "v1.25.0", "commit": "4d965d7dacd65f91d811869de0eb446a84c03873" },
     "atc-audit": { "repository": "https://github.com/alitalipcalikoglu/atc-audit.git", "tag": "v1.25.0", "commit": "b35ad9c208b33445df0a5bd71aa942f7eae7e78b" },
     "atc-shortlink": { "repository": "https://github.com/alitalipcalikoglu/atc-shortlink.git", "tag": "v1.25.0", "commit": "03a3236685439d61c6fb30c2014b1f641359a251" },
     "atc-flags": { "repository": "https://github.com/alitalipcalikoglu/atc-flags.git", "tag": "v1.25.0", "commit": "f0c254e6544009cea0f7a9ff6e41fdc2645a548a" },
