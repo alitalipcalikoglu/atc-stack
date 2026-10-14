@@ -174,7 +174,7 @@ npm run load -- --url http://127.0.0.1:3000 --duration 30 --concurrency 20
 npm run load -- --routes "GET /health,GET /status/summary.json" --json
 ```
 
-`--profile writes` instead drives the services that take a SQLite write on every request, directly and with the console's admin keys: `atc-ratelimit` checks, `atc-queue` enqueue and pull, and `atc-shortlink` clicks (it creates a `loadtest` policy, a `loadtest` queue and one short link first). Use it to watch p95/p99 and 5xx while the writers compete for each database's single write lock, and compare with the idle numbers before deciding that a service needs a different storage model.
+`--profile writes` instead drives the services that take a SQLite write on every request, directly and with the console's admin keys: `atc-ratelimit` checks, `atc-queue` enqueue and pull, and `atc-shortlink` clicks (it creates a `loadtest` policy, a `loadtest` queue and a `loadtest` short link first; delete them afterwards). Use it to watch p95/p99 and 5xx while the writers compete for each database's single write lock, and compare with the idle numbers before deciding that a service needs a different storage model.
 
 ```bash
 npm run load -- --profile writes --duration 20 --concurrency 20

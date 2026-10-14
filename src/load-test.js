@@ -63,8 +63,8 @@ export class LoadTest {
     };
     await call(rl, 'POST', '/v1/policies', { name: 'loadtest', description: 'stack load profile', limits: [{ window: 60, limit: 1_000_000_000 }] });
     await call(q, 'PUT', '/v1/queues/loadtest', { description: 'stack load profile', visibilitySec: 1 });
-    const link = await call(sl, 'POST', '/v1/links', { url: 'https://example.com/load', note: 'stack load profile' });
-    const code = link.link?.code ?? 'loadtest';
+    const link = await call(sl, 'POST', '/v1/links', { url: 'https://example.com/load', slug: 'loadtest', note: 'stack load profile' });
+    const code = link.link?.code ?? 'loadtest'; // a rerun answers 409: the link exists
     const publicBase = need(env('atc-shortlink'), 'PUBLIC_BASE_URL').replace(/\/+$/, '');
     /** @param {{ url: string, key: string }} svc */
     const auth = (svc) => ({ authorization: `Bearer ${svc.key}`, 'content-type': 'application/json' });
