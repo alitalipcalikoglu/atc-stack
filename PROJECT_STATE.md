@@ -1,6 +1,6 @@
 # ATC-WEB Project State
 
-Last source verification: 2026-10-14 (v1.18.0). A concise living handoff of the current state, not a
+Last source verification: 2026-10-14 (v1.19.0). A concise living handoff of the current state, not a
 history log; Git history and tags hold the past.
 
 ## Purpose and update rules
@@ -42,27 +42,27 @@ state update is necessarily newer.
 
 | Repository | Role | Verified development HEAD | Immutable current release | State / note |
 |---|---|---|---|---|
-| atc-audit | HTTP service: append-only audit log | `1691a9b145d47b75f10890aba334bfebdb916795` | `v1.18.0` → `1691a9b145d47b75f10890aba334bfebdb916795` | HEAD at release |
-| atc-auth | HTTP service: identity and tokens | `a86b9710b8e51a4fa23931c9ad81404a6b69298f` | `v1.18.0` → `a86b9710b8e51a4fa23931c9ad81404a6b69298f` | HEAD at release |
-| atc-console | HTTP service: administration UI/API | `87730e655472fd313439ed50f861753e298131fe` | `v1.18.0` → `87730e655472fd313439ed50f861753e298131fe` | SvelteKit 3; sidebar drawer below 900 px |
-| atc-flags | HTTP service: feature flags/settings | `8722c8f523c6c8b1bb8dda1b9132b6f4cde392c7` | `v1.18.0` → `8722c8f523c6c8b1bb8dda1b9132b6f4cde392c7` | HEAD at release |
-| atc-gateway | HTTP service: public edge | `49d374d72431aaef7cee216133bb2bf44346b4be` | `v1.18.0` → `49d374d72431aaef7cee216133bb2bf44346b4be` | HEAD at release |
-| atc-geo | HTTP service: geolocation/reference data | `fdc206f863384a070f8439b0eda7670a684fad00` | `v1.18.0` → `fdc206f863384a070f8439b0eda7670a684fad00` | HEAD at release |
-| atc-media | HTTP service: uploads and delivery | `01e5c66395aab9aa01f47b91e9fb479501c20c94` | `v1.18.0` → `01e5c66395aab9aa01f47b91e9fb479501c20c94` | HEAD at release |
-| atc-notify | HTTP service: queued notifications | `092e38cd0b8eebcb5e5320afa2d5ff9ec6274ec8` | `v1.18.0` → `092e38cd0b8eebcb5e5320afa2d5ff9ec6274ec8` | Email only |
-| atc-ratelimit | HTTP service: policies and quotas | `5b6b887f95498628e58e4158c08528adef9eb97d` | `v1.18.0` → `5b6b887f95498628e58e4158c08528adef9eb97d` | HEAD at release |
-| atc-scheduler | HTTP service: scheduled HTTP jobs | `9dc9956b7fac7f6fa5e7192ceaa4dc941c01dac1` | `v1.18.0` → `9dc9956b7fac7f6fa5e7192ceaa4dc941c01dac1` | HEAD at release |
-| atc-search | HTTP service: SQLite FTS search | `5702631e363ebfd0f8862d3bc807f0729d7a1f4f` | `v1.18.0` → `5702631e363ebfd0f8862d3bc807f0729d7a1f4f` | HEAD at release |
-| atc-service-core | Shared runtime package | `290881e85c080e5201a6ea110c474dd1bbd7f460` | `v1.18.0` → `290881e85c080e5201a6ea110c474dd1bbd7f460` | HEAD at release |
-| atc-shortlink | HTTP service: short links and QR | `50fe0fd032a68fefee644715d8a1c989b4256557` | `v1.18.0` → `50fe0fd032a68fefee644715d8a1c989b4256557` | HEAD at release |
-| atc-stack | Installer/orchestrator/release management | `473d32a25a025dfd5c84cc0bbc03854ac9d71e45` | `v1.18.0` → `473d32a25a025dfd5c84cc0bbc03854ac9d71e45` | v1.18.0 published and verified |
-| atc-webhook-out | HTTP service: durable outbound webhooks | `0eeb62dd0da1d0958c28f7c50d99591357f7ea0d` | `v1.18.0` → `0eeb62dd0da1d0958c28f7c50d99591357f7ea0d` | HEAD at release |
+| atc-audit | HTTP service: append-only audit log | `35d54dd2556dd9d0499b41c5675cbbf2b0e156a7` | `v1.19.0` → `35d54dd2556dd9d0499b41c5675cbbf2b0e156a7` | HEAD at release |
+| atc-auth | HTTP service: identity and tokens | `9dc78c30606814a11eede7d0f515990f91f8677d` | `v1.19.0` → `9dc78c30606814a11eede7d0f515990f91f8677d` | HEAD at release |
+| atc-console | HTTP service: administration UI/API | `d74a2ba5b0628d043bb66e56e11ad72bf7bb106e` | `v1.19.0` → `d74a2ba5b0628d043bb66e56e11ad72bf7bb106e` | SvelteKit 3; sidebar drawer below 900 px |
+| atc-flags | HTTP service: feature flags/settings | `1eff5257acd264dafe97cecc239b52a0d9b9b358` | `v1.19.0` → `1eff5257acd264dafe97cecc239b52a0d9b9b358` | HEAD at release |
+| atc-gateway | HTTP service: public edge | `7e53e66959c3172a0d826f69142e10718d5fe12b` | `v1.19.0` → `7e53e66959c3172a0d826f69142e10718d5fe12b` | HEAD at release |
+| atc-geo | HTTP service: geolocation/reference data | `2657c6bb836ac5ea10525b419853ecfadcd426f6` | `v1.19.0` → `2657c6bb836ac5ea10525b419853ecfadcd426f6` | HEAD at release |
+| atc-media | HTTP service: uploads and delivery | `914a3f43c4e3099db5c2dab8e41856fed0ba671e` | `v1.19.0` → `914a3f43c4e3099db5c2dab8e41856fed0ba671e` | HEAD at release |
+| atc-notify | HTTP service: queued notifications | `cb97fcd4380b4d8904dc1f7ad31e7671a98ced86` | `v1.19.0` → `cb97fcd4380b4d8904dc1f7ad31e7671a98ced86` | Email only |
+| atc-ratelimit | HTTP service: policies and quotas | `f973586bb9ba06481ab098685d7294c45edd6e8a` | `v1.19.0` → `f973586bb9ba06481ab098685d7294c45edd6e8a` | HEAD at release |
+| atc-scheduler | HTTP service: scheduled HTTP jobs | `bf0da5f60fb3be86112dda4e2fb758cd587be5e6` | `v1.19.0` → `bf0da5f60fb3be86112dda4e2fb758cd587be5e6` | HEAD at release |
+| atc-search | HTTP service: SQLite FTS search | `e57f214ba817fe9d7bbe4a87b7af613ec72fee93` | `v1.19.0` → `e57f214ba817fe9d7bbe4a87b7af613ec72fee93` | HEAD at release |
+| atc-service-core | Shared runtime package | `0fbd9da4b2ad3e3674cd2d17f0d6ba840d0aaf40` | `v1.19.0` → `0fbd9da4b2ad3e3674cd2d17f0d6ba840d0aaf40` | HEAD at release |
+| atc-shortlink | HTTP service: short links and QR | `bcaefd6bdcc5e2f2cb43373385ea1d4641b289a3` | `v1.19.0` → `bcaefd6bdcc5e2f2cb43373385ea1d4641b289a3` | HEAD at release |
+| atc-stack | Installer/orchestrator/release management | `76e25ac70f13d276f81e9adbbf8d95d46501ada8` | `v1.19.0` → `76e25ac70f13d276f81e9adbbf8d95d46501ada8` | v1.19.0 published and verified |
+| atc-webhook-out | HTTP service: durable outbound webhooks | `9dfb7cd928f50917d8a770cfc6b7f1edf665cb62` | `v1.19.0` → `9dfb7cd928f50917d8a770cfc6b7f1edf665cb62` | HEAD at release |
 
 ## Current release
 
-- Supported release: all 15 repositories at `v1.18.0`.
-- `atc-stack` `v1.18.0` peels to `473d32a25a025dfd5c84cc0bbc03854ac9d71e45`; `atc-service-core`
-  `v1.18.0` peels to `290881e85c080e5201a6ea110c474dd1bbd7f460`.
+- Supported release: all 15 repositories at `v1.19.0`.
+- `atc-stack` `v1.19.0` peels to `76e25ac70f13d276f81e9adbbf8d95d46501ada8`; `atc-service-core`
+  `v1.19.0` peels to `0fbd9da4b2ad3e3674cd2d17f0d6ba840d0aaf40`.
 - `installation-manifests/supported.json` selects the install matrix; `releases/` holds the current
   release notes and verification evidence. Tags are never moved.
 
