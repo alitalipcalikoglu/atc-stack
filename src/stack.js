@@ -23,6 +23,9 @@ import { Installer } from './installer.js';
  * `matrix()` variant (Stage 7: version/contract matrix from each service's own `/v1/info`).
  */
 export class Stack {
+  /** Column width for service ids in console output: the longest id plus one space. */
+  static ID_WIDTH = Math.max(...SERVICES.map((s) => s.id.length)) + 1;
+
   /** Canonical foreground entrypoint; only services that differ declare it in the manifest.
    * @param {import('./manifest.js').Service} service
    */
@@ -157,7 +160,7 @@ export class Stack {
       const dir = join(this.root, s.id);
       if (!existsSync(join(dir, '.env'))) throw new Error(`${s.id}: no .env; run setup first`);
       const child = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', `--env-file=${join(dir, '.env')}`, Stack.entry(s)], { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'] });
-      const tag = s.id.padEnd(11);
+      const tag = s.id.padEnd(Stack.ID_WIDTH);
       const pipe = (/** @type {import('node:stream').Readable|null} */ stream) => stream?.on('data', (d) => { for (const line of String(d).split('\n')) if (line) this.log(`${tag} ${Stack.pretty(line)}`); });
       pipe(child.stdout); pipe(child.stderr);
       child.on('exit', (code) => this.log(`${tag} exited (${code})`));
@@ -165,7 +168,7 @@ export class Stack {
     }
     const ready = await this.waitReady(20_000);
     this.log('');
-    for (const r of ready) this.log(`${r.id.padEnd(11)} ${r.ok ? 'ready' : 'NOT READY'}  ${r.url}`);
+    for (const r of ready) this.log(`${r.id.padEnd(Stack.ID_WIDTH)} ${r.ok ? 'ready' : 'NOT READY'}  ${r.url}`);
     this.log(`\nconsole: ${SetupContext.service('atc-console') && this.#url('atc-console')}`);
     await Promise.all(children.map((c) => new Promise((resolve) => c.on('exit', resolve))));
   }
@@ -179,7 +182,7 @@ export class Stack {
       const ready = await this.#probe(`${url}/ready`);
       rows.push({ id: s.id, url, health, ready, ok: health === 200 && ready === 200 });
     }
-    for (const r of rows) this.log(`${r.id.padEnd(11)} ${r.ok ? 'ok  ' : 'DOWN'}  health=${r.health ?? '-'} ready=${r.ready ?? '-'}  ${r.url}`);
+    for (const r of rows) this.log(`${r.id.padEnd(Stack.ID_WIDTH)} ${r.ok ? 'ok  ' : 'DOWN'}  health=${r.health ?? '-'} ready=${r.ready ?? '-'}  ${r.url}`);
     return rows;
   }
 
@@ -252,7 +255,7 @@ export class Stack {
   /** @param {MatrixRow[]} rows */
   #printMatrix(rows) {
     const col = (/** @type {string} */ s, /** @type {number} */ n) => (s.length > n ? `${s.slice(0, n - 1)}…` : s.padEnd(n));
-    this.log([col('SERVICE', 13), col('STATUS', 6), col('VERSION', 9), col('API', 5), col('SCHEMA', 7), col('SERVICE-CORE', 14), 'CAPABILITIES'].join(''));
+    this.log([col('SERVICE', Stack.ID_WIDTH + 1), col('STATUS', 7), col('VERSION', 9), col('API', 5), col('SCHEMA', 7), col('SERVICE-CORE', 14), 'CAPABILITIES'].join(''));
     for (const r of rows) {
       const status = r.ok ? 'ok' : 'DOWN';
       const version = r.infoOk ? (r.version ?? '-') : '?';
@@ -260,7 +263,7 @@ export class Stack {
       const schema = r.infoOk ? String(r.schemaVersion ?? '-') : '?';
       const core = r.infoOk ? (r.serviceCore ?? '-') : '?';
       const caps = r.infoOk ? (r.capabilities.length ? r.capabilities.join(',') : '-') : `(${r.infoError})`;
-      this.log([col(r.id, 13), col(status, 6), col(version, 9), col(api, 5), col(schema, 7), col(core, 14), caps].join(''));
+      this.log([col(r.id, Stack.ID_WIDTH + 1), col(status, 7), col(version, 9), col(api, 5), col(schema, 7), col(core, 14), caps].join(''));
     }
     /** @type {Map<string, string[]>} */
     const majors = new Map();
@@ -320,7 +323,7 @@ export class Stack {
 
     for (const id of ids) { this.log(`${id}: pm2 start`); await this.#run(this.root, ['pm2', 'start', id, '--silent']).catch(() => {}); }
     const ready = await this.waitReady(20_000, ids);
-    for (const r of ready) this.log(`${r.id.padEnd(11)} ${r.ok ? 'ready' : 'NOT READY'}  ${r.url}`);
+    for (const r of ready) this.log(`${r.id.padEnd(Stack.ID_WIDTH)} ${r.ok ? 'ready' : 'NOT READY'}  ${r.url}`);
 
     if (result.outcome === 'rolled_back') {
       throw new Error(`restore failed at ${result.failed?.service}/${result.failed?.path} (${result.failed?.phase}): ${result.failed?.error} — rolled back cleanly, every service restarted on its original data`);

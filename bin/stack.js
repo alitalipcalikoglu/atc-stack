@@ -55,13 +55,13 @@ export class Cli {
         console.log(`startup:      ${r.dryRun ? 'planned' : r.started ? (r.splitWorkers ? 'PM2 split workers' : 'PM2 combined') : 'skipped (--no-start)'}`);
         console.log(`ready:        ${r.started ? `${r.ready}/13` : 'not checked'}`);
         if (r.adminCreated) console.log('administrator: created (password not printed; use the value supplied with --admin-password, or reset it with the console admin CLI)');
-        if (r.dryRun) for (const [id, commit] of Object.entries(r.commits)) console.log(`  ${id.padEnd(13)} ${commit}`);
+        if (r.dryRun) for (const [id, commit] of Object.entries(r.commits)) console.log(`  ${id.padEnd(Math.max(...Object.keys(r.commits).map((k) => k.length)))} ${commit}`);
         return 0;
       }
       case 'setup': {
         const r = await stack.setup({ host: String(flags.host ?? '127.0.0.1'), local: !flags.public, install: flags.install === true, adminEmail: flags['admin-email'] === undefined ? undefined : String(flags['admin-email']), adminPassword: flags['admin-password'] === undefined ? undefined : String(flags['admin-password']) });
         console.log('\nservices:');
-        for (const s of r.services) console.log(`  ${s.id.padEnd(11)} ${s.url}`);
+        for (const s of r.services) console.log(`  ${s.id.padEnd(Stack.ID_WIDTH)} ${s.url}`);
         console.log(`\nconsole admin: ${r.admin.email}${r.admin.created ? `\npassword:      ${r.admin.password}   (shown once; change it after the first sign-in)` : '   (already existed, unchanged)'}`);
         console.log('\nnext: "npm run dev" (this terminal) or "npm run up" (PM2)');
         return 0;
