@@ -20,7 +20,7 @@ import { Stack } from '../src/stack.js';
  *   keys [list] | keys rotate <issuer> <holder>                     (who may call what, no secrets; replace one key's secret)
  *   mcp:config [--read-only | --full] [--print]                     (MCP keys + mcp.env + .mcp.json)
  *   compose  [--port-offset n] --root <dir>                         (writes compose/docker-compose.yml + env files)
- *   load     [--url http://127.0.0.1:3000] [--duration 10] [--concurrency 10] [--routes "GET /health,..."] [--json]
+ *   load     [--url http://127.0.0.1:3000] [--duration 10] [--concurrency 10] [--routes "GET /health,..."|--profile writes] [--json]
  *   release:prepare|release:verify|release:publish <version>        (see README, "Releasing")
  * `--root` defaults to the parent folder of this checkout (the workspace with one folder per service).
  */
@@ -141,7 +141,7 @@ export class Cli {
           baseUrl: String(flags.url ?? 'http://127.0.0.1:3000'),
           durationMs: num('duration', 10, 1, 3_600) * 1000,
           concurrency: num('concurrency', 10, 1, 1_000),
-          routes: flags.routes === undefined ? undefined : LoadTest.parseRoutes(String(flags.routes)),
+          routes: flags.profile === 'writes' ? await LoadTest.writeProfile(root) : flags.routes === undefined ? undefined : LoadTest.parseRoutes(String(flags.routes)),
         });
         const report = await lt.run();
         console.log(flags.json ? JSON.stringify(report, null, 2) : LoadTest.table(report));
@@ -157,7 +157,7 @@ export class Cli {
         return 0;
       }
       default:
-        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | mcp:config [--read-only|--full] [--print] | compose [--port-offset n] | load [--url u] [--duration s] [--concurrency n] [--routes "GET /p,..."] [--json] | release:prepare|release:verify|release:publish <version>');
+        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | mcp:config [--read-only|--full] [--print] | compose [--port-offset n] | load [--url u] [--duration s] [--concurrency n] [--routes "GET /p,..."|--profile writes] [--json] | release:prepare|release:verify|release:publish <version>');
         return 2;
     }
   }

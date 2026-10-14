@@ -1,3 +1,6 @@
+import { join } from 'node:path';
+import { EnvFile } from './env-file.js';
+
 /**
  * A small HTTP load generator on the standard library: `concurrency` fetch loops per route for
  * `durationMs`, against routes of the gateway. Reports per route requests, rate, latency
@@ -16,7 +19,8 @@ export class LoadTest {
   /**
    * @param {object} o
    * @param {string} o.baseUrl
-   * @param {readonly { name: string, method: string, path: string, body?: string, headers?: Record<string, string> }[]} [o.routes]
+   * @param {readonly { name: string, method: string, path: string, url?: string, body?: string, headers?: Record<string, string> }[]} [o.routes]
+   *   A route with `url` (absolute) bypasses the base URL, to hit a service directly.
    * @param {number} [o.durationMs]
    * @param {number} [o.concurrency]   Parallel loops per route.
    * @param {number} [o.timeoutMs]     Per request.
@@ -31,6 +35,45 @@ export class LoadTest {
     this.timeoutMs = timeoutMs;
     this.fetch = fetchImpl;
     this.now = now;
+  }
+
+  /**
+   * The write-heavy profile for the SQLite services that take a write per request: rate-limit
+   * checks, queue enqueue + pull, and short-link clicks. It talks to the services directly with
+   * the console's admin keys (read from the checkout's `.env` files) and creates the `loadtest`
+   * policy and queue first. Run it to see how the single write lock behaves under concurrency.
+   * @param {string} root  Workspace root.
+   * @param {typeof fetch} [fetchImpl]
+   */
+  static async writeProfile(root, fetchImpl = fetch) {
+    const env = (/** @type {string} */ id) => EnvFile.load(join(root, id, '.env'));
+    const need = (/** @type {EnvFile} */ f, /** @type {string} */ k) => {
+      const v = f.get(k);
+      if (!v) throw new Error(`${k} is missing; run "npm run setup" first`);
+      return v;
+    };
+    const consoleEnv = env('atc-console');
+    const rl = { url: `http://127.0.0.1:${need(env('atc-ratelimit'), 'PORT')}`, key: need(consoleEnv, 'RATELIMIT_API_KEY') };
+    const q = { url: `http://127.0.0.1:${need(env('atc-queue'), 'PORT')}`, key: need(consoleEnv, 'QUEUE_API_KEY') };
+    const sl = { url: `http://127.0.0.1:${need(env('atc-shortlink'), 'PORT')}`, key: need(consoleEnv, 'SHORTLINK_API_KEY') };
+    const call = async (/** @type {{ url: string, key: string }} */ svc, /** @type {string} */ method, /** @type {string} */ path, /** @type {object} */ body) => {
+      const res = await fetchImpl(`${svc.url}${path}`, { method, headers: { authorization: `Bearer ${svc.key}`, 'content-type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok && res.status !== 409) throw new Error(`${method} ${svc.url}${path} answered ${res.status}`);
+      return res.status === 204 ? {} : /** @type {any} */ (await res.json());
+    };
+    await call(rl, 'POST', '/v1/policies', { name: 'loadtest', description: 'stack load profile', limits: [{ window: 60, limit: 1_000_000_000 }] });
+    await call(q, 'PUT', '/v1/queues/loadtest', { description: 'stack load profile', visibilitySec: 1 });
+    const link = await call(sl, 'POST', '/v1/links', { url: 'https://example.com/load', note: 'stack load profile' });
+    const code = link.link?.code ?? 'loadtest';
+    const publicBase = need(env('atc-shortlink'), 'PUBLIC_BASE_URL').replace(/\/+$/, '');
+    /** @param {{ url: string, key: string }} svc */
+    const auth = (svc) => ({ authorization: `Bearer ${svc.key}`, 'content-type': 'application/json' });
+    return [
+      { name: 'ratelimit check', method: 'POST', path: '', url: `${rl.url}/v1/check`, headers: auth(rl), body: JSON.stringify({ policy: 'loadtest', subject: 'load' }) },
+      { name: 'queue enqueue', method: 'POST', path: '', url: `${q.url}/v1/queues/loadtest/messages`, headers: auth(q), body: JSON.stringify({ body: { n: 1 } }) },
+      { name: 'queue pull', method: 'POST', path: '', url: `${q.url}/v1/queues/loadtest/pull`, headers: auth(q), body: JSON.stringify({ max: 10 }) },
+      { name: 'shortlink click', method: 'GET', path: '', url: `${publicBase}/${code}` },
+    ];
   }
 
   /** Routes from `--routes "GET /health,GET /status"`. @param {string} spec */
@@ -60,7 +103,7 @@ export class LoadTest {
         while (this.now() < deadline) {
           const t0 = this.now();
           try {
-            const res = await this.fetch(`${this.baseUrl}${route.path}`, { method: route.method, headers: route.headers, body: route.body, redirect: 'manual', signal: AbortSignal.timeout(this.timeoutMs) });
+            const res = await this.fetch(route.url ?? `${this.baseUrl}${route.path}`, { method: route.method, headers: route.headers, body: route.body, redirect: 'manual', signal: AbortSignal.timeout(this.timeoutMs) });
             await res.arrayBuffer();
             statuses[res.status] = (statuses[res.status] ?? 0) + 1;
             if (res.status >= 500) counters.errors++;

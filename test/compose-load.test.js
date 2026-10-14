@@ -94,3 +94,27 @@ test('compose: IP databases in atc-geo/mmdb are mounted and wired only when pres
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('load: the writes profile prepares its policy, queue and link and builds direct routes', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'atc-load-root-'));
+  try {
+    const put = (/** @type {string} */ id, /** @type {string} */ text) => { mkdirSync(join(root, id), { recursive: true }); writeFileSync(join(root, id, '.env'), text); };
+    put('atc-console', 'RATELIMIT_API_KEY=rk\nQUEUE_API_KEY=qk\nSHORTLINK_API_KEY=sk\n');
+    put('atc-ratelimit', 'PORT=3011\n');
+    put('atc-queue', 'PORT=3016\n');
+    put('atc-shortlink', 'PORT=3006\nPUBLIC_BASE_URL=http://127.0.0.1:3006/\n');
+    /** @type {string[]} */ const calls = [];
+    const fake = /** @type {typeof fetch} */ (async (url, init) => {
+      calls.push(`${init?.method} ${url} ${new Headers(init?.headers).get('authorization')}`);
+      return new Response(JSON.stringify({ link: { code: 'abc' } }), { status: 201 });
+    });
+    const routes = await LoadTest.writeProfile(root, fake);
+    assert.deepEqual(calls, ['POST http://127.0.0.1:3011/v1/policies Bearer rk', 'PUT http://127.0.0.1:3016/v1/queues/loadtest Bearer qk', 'POST http://127.0.0.1:3006/v1/links Bearer sk']);
+    assert.deepEqual(routes.map((r) => r.url), ['http://127.0.0.1:3011/v1/check', 'http://127.0.0.1:3016/v1/queues/loadtest/messages', 'http://127.0.0.1:3016/v1/queues/loadtest/pull', 'http://127.0.0.1:3006/abc']);
+    rmSync(join(root, 'atc-console', '.env'));
+    put('atc-console', '');
+    await assert.rejects(() => LoadTest.writeProfile(root, fake), /RATELIMIT_API_KEY is missing/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
