@@ -161,6 +161,7 @@ export class SetupContext {
         { id: 'auth-public', pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('atc-auth')], methods: ['POST', 'OPTIONS'], injectApiKey: 'AUTH_API_KEY', cors: ['*'], rateLimit: 60, bodyLimit: 16384 },
         { id: 'media-user', pathPrefix: '/api/media/', stripPrefix: '/api/media', upstreams: [this.url('atc-media')], auth: 'user', injectApiKey: 'MEDIA_API_KEY', cors: ['*'], bodyLimit: 26214400, timeoutMs: 120000 },
         { id: 'media-files', pathPrefix: '/files/', upstreams: [this.url('atc-media')], methods: ['GET', 'HEAD', 'OPTIONS'], cors: ['*'], rateLimit: 1200, timeoutMs: 120000 },
+        { id: 'content-bundles', pathPrefix: '/api/content/v1/bundles/', stripPrefix: '/api/content', upstreams: [this.url('atc-content')], methods: ['GET', 'HEAD', 'OPTIONS'], injectApiKey: 'CONTENT_API_KEY', cors: ['*'], rateLimit: 600 },
         { id: 'jwks', pathPrefix: '/.well-known/jwks.json', upstreams: [this.url('atc-auth')], methods: ['GET', 'HEAD'] },
       ],
     };

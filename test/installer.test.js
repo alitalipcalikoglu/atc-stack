@@ -56,16 +56,20 @@ function harness(f, overrides = {}) {
   return { installer, calls, stack };
 }
 
-test('canonical catalog contains exactly the 14 official sibling repositories and the release descriptor covers each once', () => {
+// Repositories added to the catalog after the supported release; the next release manifest takes
+// them from the catalog (Release.manifest), after which this list is empty again.
+const UNRELEASED = ['atc-content'];
+
+test('canonical catalog contains exactly the 15 official sibling repositories and the release descriptor covers each released one once', () => {
   assert.deepEqual(REPOSITORIES.map((repository) => repository.id), [
     'atc-service-core', 'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
-    'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo',
+    'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content',
   ]);
   for (const repository of REPOSITORIES) assert.equal(repository.remote, `https://github.com/alitalipcalikoglu/${repository.id}.git`);
   const release = Installer.releaseManifest();
   assert.equal(release.release, JSON.parse(readFileSync(join(import.meta.dirname, '..', 'package.json'), 'utf8')).version);
-  assert.deepEqual(Object.keys(release.repositories).sort(), REPOSITORIES.map((repository) => repository.id).sort());
-  for (const repository of REPOSITORIES) assert.equal(release.repositories[repository.id].repository, repository.remote);
+  assert.deepEqual(Object.keys(release.repositories).sort(), REPOSITORIES.map((repository) => repository.id).filter((id) => !UNRELEASED.includes(id)).sort());
+  for (const repository of REPOSITORIES.filter((r) => !UNRELEASED.includes(r.id))) assert.equal(release.repositories[repository.id].repository, repository.remote);
 });
 
 test('a manifest repository identity cannot disagree with the official catalog', async () => {
@@ -102,6 +106,16 @@ test('development mode clones and resolves the official main head', async () => 
   const result = await installer.install({ ref: 'main', start: false });
   assert.equal(result.commits[f.id], f.commit);
   assert.equal(command(join(f.root, f.id), ['git', 'branch', '--show-current']).trim(), 'main');
+});
+
+test('development mode accepts a catalog repository the release descriptor does not list yet; release mode refuses it', async () => {
+  const f = fixture();
+  const { installer } = harness(f, { release: { schemaVersion: 1, channel: 'release', release: 'test', repositories: {} } });
+  const result = await installer.install({ ref: 'main', start: false });
+  assert.equal(result.commits[f.id], f.commit);
+  const g = fixture('beta');
+  const strict = harness(g, { release: { schemaVersion: 1, channel: 'release', release: 'test', repositories: {} } });
+  await assert.rejects(strict.installer.install({ start: false }), /\[PREFLIGHT\] beta: release descriptor entry is missing or invalid/);
 });
 
 test('correct clean existing repository is reused and clean main fast-forwards in development mode', async () => {

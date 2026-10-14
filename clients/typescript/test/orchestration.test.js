@@ -15,8 +15,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CLIENTS_ROOT = path.resolve(HERE, '..');
 const WORKSPACE_ROOT = path.resolve(CLIENTS_ROOT, '..', '..', '..');
 
-test('service list is non-empty and matches the 13 services with a canonical openapi.yaml', async () => {
-  assert.equal(SERVICES.length, 13);
+test('service list is non-empty and matches the 14 services with a canonical openapi.yaml', async () => {
+  assert.equal(SERVICES.length, 14);
   for (const service of SERVICES) {
     const specPath = path.join(WORKSPACE_ROOT, service, 'openapi.yaml');
     assert.ok(existsSync(specPath), `${service}: no openapi.yaml at ${specPath}`);

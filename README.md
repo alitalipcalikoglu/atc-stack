@@ -151,7 +151,7 @@ Options: `--root <dir>` (default: the parent of this checkout), `--admin-usernam
 
 | Service | Port | Repository | What it does | Calls |
 |---|---|---|---|---|
-| atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream |
+| atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream (auth, media, content) |
 | atc-notify | 3001 | [atc-notify](https://github.com/alitalipcalikoglu/atc-notify) | Queued e-mail with templates and retries. API/worker split-capable. | audit |
 | atc-auth | 3002 | [atc-auth](https://github.com/alitalipcalikoglu/atc-auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, audit |
 | atc-media | 3003 | [atc-media](https://github.com/alitalipcalikoglu/atc-media) | Uploads, deduplication, image variants, signed URLs, upload tickets | audit |
@@ -164,6 +164,7 @@ Options: `--root <dir>` (default: the parent of this checkout), `--admin-usernam
 | atc-search | 3010 | [atc-search](https://github.com/alitalipcalikoglu/atc-search) | Full-text search over your documents with facets and highlights (SQLite FTS5) | audit |
 | atc-ratelimit | 3011 | [atc-ratelimit](https://github.com/alitalipcalikoglu/atc-ratelimit) | Central rate limits and quotas: policies, sliding windows, overrides, blocks | audit |
 | atc-geo | 3012 | [atc-geo](https://github.com/alitalipcalikoglu/atc-geo) | IP geolocation (MMDB), countries, currencies, time zones, phone normalization, places | audit |
+| atc-content | 3013 | [atc-content](https://github.com/alitalipcalikoglu/atc-content) | Translations and content strings: namespaces, locale fallback chains, placeholder checks, numbered releases, ETag bundles (public through the gateway at `/api/content/v1/bundles/`) | audit |
 | atc-stack | – | [atc-stack](https://github.com/alitalipcalikoglu/atc-stack) | This installer and runner | – |
 
 Every service is its own repository and deployable alone; "Calls" lists the services it talks to over HTTP when configured (all optional except auth → notify for verification and reset mails). Browsers only ever reach the gateway and the console.
@@ -180,6 +181,7 @@ Every service is its own repository and deployable alone; "Calls" lists the serv
 | | | | atc-search | 3010 |
 | | | | atc-ratelimit | 3011 |
 | | | | atc-geo | 3012 |
+| | | | atc-content | 3013 |
 
 ## Adding a service
 
@@ -196,16 +198,16 @@ Every repository shares one version. A release runs locally in three resumable s
 kept in `.release/v<version>.json` (untracked), so a failed step can simply be run again.
 
 1. Write the release notes to `releases/v<version>.md`.
-2. `npm run release:prepare -- <version>`: checks that all 15 repositories are clean and in sync on
+2. `npm run release:prepare -- <version>`: checks that all 16 repositories are clean and in sync on
    `main`; bumps `atc-service-core`, runs its tests, tags and pushes it; bumps every service to that
    tag and runs `npm ci`, tests, typecheck and the production audit; then writes the candidate
    `installation-manifests/v<version>.json`, moves `supported.json`, removes the previous manifest
    and release files and pushes the candidate commit.
 3. `npm run release:verify -- <version>`: integration suite, contracts, client pilots, MCP E2E,
-   every Console smoke, all 13 Docker images (healthy as `node`, exit 0 on SIGTERM), and a fresh
+   every Console smoke, all 14 Docker images (healthy as `node`, exit 0 on SIGTERM), and a fresh
    `install:all --ref main` from GitHub whose commits must match the candidate manifest. Stop the
-   local stack first; the install uses ports 3000-3012.
-4. `npm run release:publish -- <version>`: tags the 13 services and stack at the manifest commits,
+   local stack first; the install uses ports 3000-3013.
+4. `npm run release:publish -- <version>`: tags the 14 services and stack at the manifest commits,
    checks the remote tags, runs a fresh default `install:all` (exact tags, three suites, reuse),
    writes `releases/v<version>.json`, updates `PROJECT_STATE.md` and pushes. Existing tags are never
    moved.

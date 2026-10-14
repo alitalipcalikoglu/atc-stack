@@ -102,11 +102,18 @@ export const SERVICES = [
     console: { type: 'atc-geo', label: 'Geo', keyEnv: 'GEO_API_KEY' },
   },
   {
+    id: 'atc-content', port: 3013, keysVar: 'CONTENT_API_KEYS',
+    // Bundles reach applications through the gateway route below; direct anonymous reads stay off unless the operator turns them on.
+    env: (c) => ({ ...auditEnv(c, 'atc-content'), CONTENT_PUBLIC_BUNDLES: c.keep('atc-content', 'CONTENT_PUBLIC_BUNDLES', 'false') }),
+    console: { type: 'atc-content', label: 'Content', keyEnv: 'CONTENT_API_KEY' },
+  },
+  {
     id: 'atc-gateway', port: 3000,
     env: (c) => ({
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
       // Routes may declare "policy" (central rate limits) and "atc-geo": true (X-Geo-* headers); the keys are issued here so routes.json can use them at once.
       RATELIMIT_URL: c.url('atc-ratelimit'), RATELIMIT_API_KEY: c.issue('atc-ratelimit', 'atc-gateway', 'check'), GEO_URL: c.url('atc-geo'), GEO_API_KEY: c.issue('atc-geo', 'atc-gateway', 'read'),
+      CONTENT_API_KEY: c.issue('atc-content', 'atc-gateway', 'read'), // injected on the public content-bundles route
     }),
     files: (c) => ({ 'routes.json': `${JSON.stringify(c.gatewayRoutes(), null, 2)}\n` }),
     console: { type: 'atc-gateway', label: 'Gateway', metricsTokenEnv: 'GATEWAY_METRICS_TOKEN' },

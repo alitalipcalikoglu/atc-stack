@@ -26,6 +26,7 @@ const TEMPLATES = /** @type {Record<string, string>} */ ({
   'atc-search': 'PORT=3010\nHOST=0.0.0.0\nSEARCH_API_KEYS=console:REPLACE_WITH_64_HEX_CHARS,shop-backend:REPLACE_WITH_64_HEX_CHARS:write:products\n',
   'atc-ratelimit': 'PORT=3011\nHOST=0.0.0.0\nRATELIMIT_API_KEYS=console:REPLACE_WITH_64_HEX_CHARS,gateway:REPLACE_WITH_64_HEX_CHARS:check\n',
   'atc-geo': 'PORT=3012\nHOST=0.0.0.0\nMMDB_PATH=\nASN_MMDB_PATH=\nGEO_API_KEYS=console:REPLACE_WITH_64_HEX_CHARS,shop-backend:REPLACE_WITH_64_HEX_CHARS:read\n',
+  'atc-content': 'PORT=3013\nHOST=0.0.0.0\nCONTENT_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS,web-frontend:REPLACE_WITH_64_HEX_CHARS:read\nCONTENT_PUBLIC_BUNDLES=false\n',
   'atc-gateway': 'PORT=3000\nHOST=0.0.0.0\nMETRICS_TOKEN=\nAUTH_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_AUTH_API_KEYS\nMEDIA_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_MEDIA_API_KEYS\nNOTIFY_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_NOTIFY_API_KEYS\n',
   'atc-console': 'PORT=3004\nHOST=0.0.0.0\nCOOKIE_SECURE=true\nNOTIFY_API_KEY=REPLACE_WITH_THE_CONSOLE_KEY_FROM_NOTIFY_API_KEYS\nAUTH_API_KEY=REPLACE_WITH\nMEDIA_API_KEY=REPLACE_WITH\nGATEWAY_METRICS_TOKEN=REPLACE_WITH\nAUDIT_API_KEY=REPLACE_WITH\nSHORTLINK_API_KEY=REPLACE_WITH\nFLAGS_API_KEY=REPLACE_WITH\nSCHEDULER_API_KEY=REPLACE_WITH\nWEBHOOK_OUT_API_KEY=REPLACE_WITH\nSEARCH_API_KEY=REPLACE_WITH\n',
 });
@@ -75,6 +76,8 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual([auditKeys['atc-console'].role, auditKeys['atc-flags'].role, env('atc-flags').AUDIT_API_KEY, env('atc-flags').AUDIT_URL.endsWith(':3005')], ['readwrite', 'write', auditKeys['atc-flags'].secret, true], 'every service gets a write key for audit; the console reads and writes');
   assert.deepEqual([keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-gateway'].role, keys('atc-geo', 'GEO_API_KEYS')['atc-gateway'].role, env('atc-gateway').RATELIMIT_API_KEY, env('atc-gateway').GEO_URL.endsWith(':3012')], ['check', 'read', keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-gateway'].secret, true]);
   assert.equal(env('atc-geo').MMDB_PATH, '', 'operator-owned value kept empty');
+  const contentKeys = keys('atc-content', 'CONTENT_API_KEYS');
+  assert.deepEqual([env('atc-console').CONTENT_API_KEY, contentKeys['atc-console'].role, contentKeys['atc-gateway'].role, env('atc-gateway').CONTENT_API_KEY, env('atc-content').CONTENT_PUBLIC_BUNDLES, auditKeys['atc-content'].role], [contentKeys['atc-console'].secret, '', 'read', contentKeys['atc-gateway'].secret, 'false', 'write'], 'console edits content, gateway only reads bundles');
   assert.deepEqual(Object.keys(keys('atc-search', 'SEARCH_API_KEYS')), ['atc-console'], 'template placeholders dropped');
   assert.equal(env('atc-console').GATEWAY_METRICS_TOKEN, env('atc-gateway').METRICS_TOKEN);
   assert.equal(env('atc-console').COOKIE_SECURE, 'false');
@@ -101,7 +104,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual(services.find((/** @type {any} */ s) => s.id === 'atc-notify').polling, { enabled: true, intervalSec: 30 });
   const routes = JSON.parse(written['atc-gateway/routes.json']);
   assert.equal(routes.jwt.jwksUrl, 'http://127.0.0.1:3002/.well-known/jwks.json');
-  assert.deepEqual(routes.routes.map((/** @type {any} */ r) => r.id), ['auth-public', 'media-user', 'media-files', 'jwks']);
+  assert.deepEqual(routes.routes.map((/** @type {any} */ r) => r.id), ['auth-public', 'media-user', 'media-files', 'content-bundles', 'jwks']);
   // stripPrefix removes only a literal substring of the caller's URL (gateway has no path-insert
   // capability); the caller must therefore include the target's real upstream path verbatim after
   // pathPrefix. Regression for the Stage 1.1 finding: a caller hitting the *short* form the route
@@ -113,10 +116,14 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   const mediaUser = routes.routes.find((/** @type {any} */ r) => r.id === 'media-user');
   assert.deepEqual([mediaUser.pathPrefix, mediaUser.stripPrefix], ['/api/media/', '/api/media']);
   assert.equal('/api/media/v1/files'.slice(mediaUser.stripPrefix.length), '/v1/files');
+  // Content bundles are public through the gateway with the gateway's read key; nothing but /v1/bundles/ is reachable.
+  const bundles = routes.routes.find((/** @type {any} */ r) => r.id === 'content-bundles');
+  assert.deepEqual([bundles.pathPrefix, bundles.stripPrefix, bundles.upstreams, bundles.methods, bundles.injectApiKey, bundles.auth], ['/api/content/v1/bundles/', '/api/content', ['http://127.0.0.1:3013'], ['GET', 'HEAD', 'OPTIONS'], 'CONTENT_API_KEY', undefined]);
+  assert.equal('/api/content/v1/bundles/web/tr-CY'.slice(bundles.stripPrefix.length), '/v1/bundles/web/tr-CY');
   // Stage 9: generated routes.json must parse cleanly under the gateway's own (real) validation —
   // in particular, none of these routes declares `policy`, so the new failOpen-required rule never
   // rejects the local-stack default. Proven against the actual gateway code, not a copy of its rules.
-  assert.doesNotThrow(() => RouteTable.parse(routes, { AUTH_API_KEY: 'a'.repeat(40), MEDIA_API_KEY: 'm'.repeat(40) }));
+  assert.doesNotThrow(() => RouteTable.parse(routes, { AUTH_API_KEY: 'a'.repeat(40), MEDIA_API_KEY: 'm'.repeat(40), CONTENT_API_KEY: 'c'.repeat(40) }));
 
   // Second run: nothing regenerated.
   const again = new SetupContext({ root, host: '127.0.0.1', local: true, run: async () => {} });

@@ -122,7 +122,7 @@ not generated output.
 
 ## Scope
 
-13/13 services have a generated client, one operationId-keyed method per operation, currently 376
+14/14 services have a generated client, one operationId-keyed method per operation, currently 418
 operations derived from the canonical specs. Explicit `any` count: 0. `unknown`/`Record<string, unknown>` is used only where the source
 OpenAPI spec itself has no real schema to offer (mainly console's pass-through proxy responses) —
 never as a shortcut around a real, knowable shape.

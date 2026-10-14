@@ -60,7 +60,7 @@ export class Installer {
     const mode = ref === undefined ? 'release' : 'development';
     if (ref !== undefined && ref !== 'main') throw new InstallError('PREFLIGHT', 'only the explicit development ref "main" is supported; omit --ref for the supported release');
     await this.#preflight({ start: start && !dryRun });
-    this.#validateCatalog();
+    this.#validateCatalog(mode);
 
     /** @type {string[]} */ const cloned = [];
     /** @type {string[]} */ const reused = [];
@@ -135,13 +135,20 @@ export class Installer {
     if (start) await this.#tool('pm2', ['--version'], 'PM2 is required for default startup; install it with "npm i -g pm2", or rerun with --no-start');
   }
 
-  #validateCatalog() {
+  /**
+   * The descriptor pins release installs only. Development installs (`--ref main`) follow each
+   * repository's main branch, so a repository added after the supported release is installable
+   * there before it has a release entry.
+   * @param {string} mode
+   */
+  #validateCatalog(mode) {
     const ids = this.repositories.map((repository) => repository.id);
     if (new Set(ids).size !== ids.length) throw new InstallError('PREFLIGHT', 'installer repository catalog contains duplicate ids');
     if (ids.some((id) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id))) throw new InstallError('PREFLIGHT', 'installer repository catalog contains an unsafe repository id');
     if (this.release.schemaVersion !== 1 || this.release.channel !== 'release') throw new InstallError('PREFLIGHT', 'unsupported installation manifest');
     for (const repository of this.repositories) {
       const entry = this.release.repositories[repository.id];
+      if (mode !== 'release' && !entry) continue;
       if (!entry || !/^v[^\s]+$/.test(entry.tag) || !/^[0-9a-f]{40}$/.test(entry.commit)) throw new InstallError('PREFLIGHT', 'release descriptor entry is missing or invalid', repository.id);
       if (entry.repository !== undefined && entry.repository !== repository.remote) throw new InstallError('PREFLIGHT', 'release descriptor repository does not match the official remote', repository.id);
     }

@@ -16,7 +16,7 @@ export class ReleaseError extends Error {}
  * The local release flow for the whole suite, in three resumable commands:
  *   prepare  bump every repository, tag service-core, write the candidate manifest
  *   verify   integration, contracts, Console smokes, Docker images, candidate install from `main`
- *   publish  tag the 14 repositories, verify the default install, record the evidence
+ *   publish  tag the 15 repositories, verify the default install, record the evidence
  * Progress is kept in `.release/v<version>.json` inside stack (untracked), so a failed run can be
  * repeated without redoing finished steps. Pure text transformations are static and unit-tested.
  */
@@ -190,17 +190,20 @@ export class Release {
   }
 
   /**
-   * The next installation manifest: previous shape, new release, tags and commits, one line per repository.
-   * @param {{ repositories: Record<string, { repository: string }> } & Record<string, unknown>} previous
+   * The next installation manifest: previous shape, new release, tags and commits, one line per
+   * repository. Entries come from the repository catalog, not the previous manifest, so a newly
+   * added repository enters the next release and a removed one leaves it.
+   * @param {Record<string, unknown>} previous
    * @param {string} version
    * @param {Record<string, string>} commits
+   * @param {readonly { id: string, remote: string }[]} [repositories]
    */
-  static manifest(previous, version, commits) {
-    const repositories = Object.fromEntries(Object.entries(previous.repositories).map(([id, entry]) => {
+  static manifest(previous, version, commits, repositories = REPOSITORIES) {
+    const entries = Object.fromEntries(repositories.map(({ id, remote }) => {
       if (!commits[id]) throw new ReleaseError(`no commit for ${id}`);
-      return [id, { repository: entry.repository, tag: `v${version}`, commit: commits[id] }];
+      return [id, { repository: remote, tag: `v${version}`, commit: commits[id] }];
     }));
-    const text = JSON.stringify({ ...previous, release: version, repositories }, null, 2);
+    const text = JSON.stringify({ ...previous, release: version, repositories: entries }, null, 2);
     return `${text.replace(/\{\n\s+"repository": ("[^"]+"),\n\s+"tag": ("[^"]+"),\n\s+"commit": ("[^"]+")\n\s+\}/g, (_, r, t, c) => `{ "repository": ${r}, "tag": ${t}, "commit": ${c} }`)}\n`;
   }
 

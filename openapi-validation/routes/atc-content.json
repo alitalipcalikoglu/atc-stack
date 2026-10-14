@@ -1,0 +1,30 @@
+{
+  "service": "atc-content",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/namespaces" },
+    { "method": "POST", "path": "/v1/namespaces" },
+    { "method": "GET", "path": "/v1/namespaces/{ns}" },
+    { "method": "PATCH", "path": "/v1/namespaces/{ns}" },
+    { "method": "DELETE", "path": "/v1/namespaces/{ns}" },
+    { "method": "PUT", "path": "/v1/namespaces/{ns}/locales/{locale}" },
+    { "method": "DELETE", "path": "/v1/namespaces/{ns}/locales/{locale}" },
+    { "method": "GET", "path": "/v1/namespaces/{ns}/keys" },
+    { "method": "GET", "path": "/v1/namespaces/{ns}/keys/{key}" },
+    { "method": "PUT", "path": "/v1/namespaces/{ns}/keys/{key}" },
+    { "method": "DELETE", "path": "/v1/namespaces/{ns}/keys/{key}" },
+    { "method": "POST", "path": "/v1/namespaces/{ns}/import" },
+    { "method": "GET", "path": "/v1/namespaces/{ns}/export/{locale}" },
+    { "method": "POST", "path": "/v1/namespaces/{ns}/publish" },
+    { "method": "POST", "path": "/v1/namespaces/{ns}/rollback" },
+    { "method": "GET", "path": "/v1/namespaces/{ns}/releases" },
+    { "method": "GET", "path": "/v1/namespaces/{ns}/releases/{number}" },
+    { "method": "GET", "path": "/v1/bundles/{ns}/{locale}" },
+    { "method": "GET", "path": "/v1/stats" }
+  ],
+  "exclusions": []
+}

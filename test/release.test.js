@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { Release, ReleaseError } from '../src/release.js';
+import { REPOSITORIES } from '../src/repository-catalog.js';
 
 const STACK = join(import.meta.dirname, '..');
 const supported = JSON.parse(readFileSync(join(STACK, 'installation-manifests', 'supported.json'), 'utf8')).release;
@@ -12,11 +13,22 @@ const manifest = JSON.parse(manifestText);
 
 test('manifest reproduces the committed descriptor byte for byte', () => {
   const commits = Object.fromEntries(Object.entries(manifest.repositories).map(([id, e]) => [id, /** @type {any} */ (e).commit]));
-  assert.equal(Release.manifest(manifest, supported, commits), manifestText);
-  const next = JSON.parse(Release.manifest(manifest, '9.9.9', commits));
+  const listed = Object.entries(manifest.repositories).map(([id, e]) => ({ id, remote: /** @type {any} */ (e).repository }));
+  assert.equal(Release.manifest(manifest, supported, commits, listed), manifestText);
+  const next = JSON.parse(Release.manifest(manifest, '9.9.9', commits, listed));
   assert.equal(next.release, '9.9.9');
   assert.ok(Object.values(next.repositories).every((e) => /** @type {any} */ (e).tag === 'v9.9.9'));
-  assert.throws(() => Release.manifest(manifest, '9.9.9', {}), ReleaseError);
+  assert.throws(() => Release.manifest(manifest, '9.9.9', {}, listed), ReleaseError);
+});
+
+test('manifest takes its entries from the repository catalog, so a new repository enters the next release', () => {
+  const commits = Object.fromEntries(REPOSITORIES.map((r, i) => [r.id, String(i).padStart(40, 'a')]));
+  const next = JSON.parse(Release.manifest(manifest, '9.9.9', commits));
+  assert.deepEqual(Object.keys(next.repositories), REPOSITORIES.map((r) => r.id));
+  const added = REPOSITORIES.find((r) => !(r.id in manifest.repositories));
+  if (added) assert.deepEqual(next.repositories[added.id], { repository: added.remote, tag: 'v9.9.9', commit: commits[added.id] });
+  assert.ok(REPOSITORIES.some((r) => r.id === 'atc-content'));
+  assert.throws(() => Release.manifest(manifest, '9.9.9', { ...commits, 'atc-content': '' }), /no commit for atc-content/);
 });
 
 test('bumpJson changes only the top-level version and keeps formatting', () => {
@@ -52,12 +64,12 @@ test('projectState rewrite is idempotent on the current file and moves every rel
 
 test('evidence carries the matrix, tests and install results', () => {
   const tags = { 'atc-stack': { tagObject: 'a', commit: 'b' }, 'atc-service-core': { tagObject: 'c', commit: 'd' } };
-  const state = { version: '9.9.9', previous: '9.9.8', tests: { 'atc-stack': 1 }, steps: { docker: 13, candidateInstall: { readiness: '13/13' }, defaultInstall: { readiness: '13/13' } } };
+  const state = { version: '9.9.9', previous: '9.9.8', tests: { 'atc-stack': 1 }, steps: { docker: 14, candidateInstall: { readiness: '14/14' }, defaultInstall: { readiness: '14/14' } } };
   const evidence = Release.evidence(state, tags, '2030-01-01');
   assert.deepEqual(evidence.releaseMatrix.map((e) => e.repo), ['atc-service-core', 'atc-stack']);
   assert.equal(evidence.publication.stackTagCommit, 'b');
   assert.equal(evidence.supersedes, '9.9.8');
-  assert.match(evidence.tests.docker, /^13\/13 /);
+  assert.match(evidence.tests.docker, /^14\/14 /);
 });
 
 test('prepare refuses to start without release notes or on a dirty workspace, and never pushes then', async () => {
