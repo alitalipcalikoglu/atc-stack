@@ -329,6 +329,7 @@ export class Release {
     state.tests[id] = Release.passed((await this.#run(dir, ['npm', 'test'])).out);
     await this.#run(dir, ['npm', 'run', '-s', 'typecheck']);
     if (audit) await this.#run(dir, ['npm', 'audit', '--omit=dev']);
+    this.#save(state);
     this.log(`  ${id}: ${state.tests[id]} tests passed`);
   }
 
