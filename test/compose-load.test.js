@@ -32,6 +32,8 @@ test('compose: every service from its Dockerfile, container URLs, image paths, p
       assert.equal(statSync(join(out, 'compose', 'env', `${s.id}.env`)).mode & 0o777, 0o600);
     }
     assert.equal(env('atc-backup').BACKUP_SOURCES.split(',')[0], 'atc-notify=/sources/atc-notify/notify.db');
+    assert.equal(env('atc-backup').BACKUP_TREES, 'atc-media-files=/sources/atc-media/files,atc-auth-keys=/sources/atc-auth-keys,atc-audit-keys=/sources/atc-audit-keys');
+    assert.match(yml, /atc-auth\/keys:\/sources\/atc-auth-keys:ro/);
     assert.equal(env('atc-status').MONITOR_SEEDS.split(',')[0], 'atc-notify=http://atc-notify:3001');
     assert.equal(env('atc-export').MEDIA_URL, 'http://atc-media:3003');
     assert.equal(env('atc-media').PUBLIC_BASE_URL, 'http://localhost:13003', 'the browser reaches media on the published port');

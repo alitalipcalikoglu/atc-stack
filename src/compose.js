@@ -1,6 +1,6 @@
 import { chmodSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { DATA_FILES, SERVICES } from './manifest.js';
+import { BACKUP_TREES, DATA_FILES, SERVICES } from './manifest.js';
 import { SetupContext } from './setup-context.js';
 
 /**
@@ -67,6 +67,8 @@ export class Compose {
     c.env('atc-audit').set('ANCHOR_PRIVATE_KEY_PATH', '/keys/anchor-private.pem');
     // The backup service reads every data volume, mounted under /sources/<id>.
     c.env('atc-backup').set('BACKUP_SOURCES', Object.entries(DATA_FILES).map(([id, file]) => `${id}=/sources/${id}/${file}`).join(','));
+    // Trees: the media blobs live in media's data volume, the key directories are mounted read-only from the checkout.
+    c.env('atc-backup').set('BACKUP_TREES', Object.entries(BACKUP_TREES).map(([id, path]) => `${id}=${Compose.treeMount(id, path)}`).join(','));
     mkdirSync(join(this.outDir, 'env'), { recursive: true, mode: 0o700 });
     for (const s of SERVICES) {
       const path = join(this.outDir, 'env', `${s.id}.env`);
@@ -83,6 +85,12 @@ export class Compose {
     return { file, services: SERVICES.length, published: Compose.PUBLISHED.map((id) => `${id} ${SetupContext.port(id) + this.portOffset}`) };
   }
 
+  /** Where a tree source is mounted inside the backup container. @param {string} id @param {string} path */
+  static treeMount(id, path) {
+    const m = /^(atc-[a-z-]+)\/data\/(.+)$/.exec(path);
+    return m ? `/sources/${m[1]}/${m[2]}` : `/sources/${id}`;
+  }
+
   /** The compose document as plain data (paths relative to `compose/`). */
   document() {
     const rel = (/** @type {string} */ p) => relative(this.outDir, p) || '.';
@@ -97,7 +105,10 @@ export class Compose {
       if (s.id === 'atc-auth' || s.id === 'atc-audit') mounts.push(`${rel(join(this.root, s.id, 'keys'))}:/keys:ro`);
       if (s.id === 'atc-gateway' || s.id === 'atc-console') mounts.push(`./config/${s.id}:/config:ro`);
       // SQLite reads a WAL database through its -shm file, so the source volumes are mounted read-write.
-      if (s.id === 'atc-backup') for (const id of Object.keys(DATA_FILES)) mounts.push(`${id}-data:/sources/${id}`);
+      if (s.id === 'atc-backup') {
+        for (const id of Object.keys(DATA_FILES)) mounts.push(`${id}-data:/sources/${id}`);
+        for (const [id, path] of Object.entries(BACKUP_TREES)) if (!path.includes('/data/')) mounts.push(`${rel(join(this.root, path))}:/sources/${id}:ro`);
+      }
       services[s.id] = {
         build: { context: rel(join(this.root, s.id)) },
         image: `atc-web/${s.id}:local`,

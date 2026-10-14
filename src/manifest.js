@@ -39,7 +39,12 @@ const eventsEnv = (c, id) => ({ WEBHOOK_OUT_URL: String(c.url('atc-webhook-out')
  * Media must accept export files and database backups: append those types to whatever the operator allows.
  * @param {string} list
  */
-const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3'])].join(',');
+const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.trim()).filter(Boolean), 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3', 'application/gzip', 'application/octet-stream'])].join(',');
+
+/** Files and directories atc-backup archives besides the databases: the media blobs and the signing keys (relative to the workspace). */
+export const BACKUP_TREES = Object.freeze({
+  'atc-media-files': 'atc-media/data/files', 'atc-auth-keys': 'atc-auth/keys', 'atc-audit-keys': 'atc-audit/keys',
+});
 
 /** Each service's SQLite file under its folder (its DB_PATH default); atc-backup reads them in place. */
 export const DATA_FILES = Object.freeze({
@@ -177,6 +182,9 @@ export const SERVICES = [
     env: (c) => ({
       ...auditEnv(c, 'atc-backup'), ...eventsEnv(c, 'atc-backup'),
       BACKUP_SOURCES: Object.entries(DATA_FILES).map(([id, file]) => `${id}=../${id}/data/${file}`).join(','),
+      BACKUP_TREES: Object.entries(BACKUP_TREES).map(([id, path]) => `${id}=../${path}`).join(','),
+      // Operator-owned: set 64 hex characters to encrypt backups at rest, and keep that key outside this host's backup volume.
+      BACKUP_ENCRYPTION_KEY: c.keep('atc-backup', 'BACKUP_ENCRYPTION_KEY', ''),
       // Off-host copies: every successful backup also goes to media as a private file.
       MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-backup'),
       ALLOW_LIVE_RESTORE: c.keep('atc-backup', 'ALLOW_LIVE_RESTORE', 'false'),
