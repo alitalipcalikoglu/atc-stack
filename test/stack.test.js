@@ -85,8 +85,8 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual([keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-gateway'].role, keys('atc-geo', 'GEO_API_KEYS')['atc-gateway'].role, env('atc-gateway').RATELIMIT_API_KEY, env('atc-gateway').GEO_URL.endsWith(':3012')], ['check', 'read', keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-gateway'].secret, true]);
   assert.equal(env('atc-geo').MMDB_PATH, '', 'operator-owned value kept empty');
   assert.deepEqual([env('atc-render').MEDIA_URL.endsWith(':3003'), env('atc-render').MEDIA_API_KEY, env('atc-console').RENDER_API_KEY, auditKeys['atc-render'].role], [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-render'].secret, keys('atc-render', 'RENDER_API_KEYS')['atc-console'].secret, 'write']);
-  assert.deepEqual(Object.keys(keys('atc-render', 'RENDER_API_KEYS')), ['atc-console'], 'template placeholders dropped');
-  assert.deepEqual([keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].role, env('atc-console').QUEUE_API_KEY, Object.keys(keys('atc-queue', 'QUEUE_API_KEYS'))], ['admin', keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].secret, ['atc-console']]);
+  assert.deepEqual(Object.keys(keys('atc-render', 'RENDER_API_KEYS')).sort(), ['atc-console', 'atc-scheduler'], 'template placeholders dropped; the scheduler may call render');
+  assert.deepEqual([keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].role, env('atc-console').QUEUE_API_KEY, Object.keys(keys('atc-queue', 'QUEUE_API_KEYS')).sort()], ['admin', keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].secret, ['atc-console', 'atc-export', 'atc-scheduler']]);
   assert.equal(env('atc-media').KEY_MAX_UPLOAD_BYTES, 'atc-backup:1073741824', 'database backups fit through media');
   const bk = env('atc-backup');
   assert.deepEqual([keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].role, env('atc-console').BACKUP_API_KEY, bk.MEDIA_API_KEY, bk.ALLOW_LIVE_RESTORE, auditKeys['atc-backup'].role], ['admin', keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].secret, keys('atc-media', 'MEDIA_API_KEYS')['atc-backup'].secret, 'false', 'write']);
@@ -95,11 +95,23 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   const stx = env('atc-status');
   assert.deepEqual([keys('atc-status', 'STATUS_API_KEYS')['atc-console'].role, env('atc-console').STATUS_API_KEY, stx.NOTIFY_API_KEY, stx.ALERT_EMAILS, auditKeys['atc-status'].role], ['admin', keys('atc-status', 'STATUS_API_KEYS')['atc-console'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-status'].secret, 'ops@example.com', 'write']);
   assert.deepEqual([stx.MONITOR_SEEDS.split(',').length, stx.MONITOR_SEEDS.split(',')[0], stx.MONITOR_SEEDS.includes('atc-status=')], [19, 'atc-notify=http://127.0.0.1:3001', false], 'every other service is monitored');
+  // Events: every producer publishes with a key that may only publish; webhook-out delivers ops.* to the status alert hub with a shared secret.
+  const wk = keys('atc-webhook-out', 'WEBHOOK_API_KEYS');
+  for (const id of ['atc-backup', 'atc-queue', 'atc-scheduler', 'atc-flags', 'atc-content', 'atc-auth', 'atc-status', 'atc-audit']) {
+    assert.deepEqual([env(id).WEBHOOK_OUT_API_KEY, wk[id]?.role, env(id).WEBHOOK_OUT_URL.endsWith(':3009')], [wk[id]?.secret, 'publish', true], `${id} publishes events`);
+  }
+  assert.equal(env('atc-webhook-out').SUBSCRIPTION_SEEDS, `alert-hub|http://127.0.0.1:3018/v1/hooks/webhook-out|ops.*|${env('atc-status').ALERT_HOOK_SECRET}`, 'ops.* events reach the alert hub');
+  assert.match(env('atc-status').ALERT_HOOK_SECRET, /^[0-9a-f]{64}$/);
+  // The scheduler can call the services a job typically needs, each with the least role; export reads more sources.
+  const tk = Object.fromEntries(env('atc-scheduler').TARGET_KEYS.split(',').map((e) => e.split(':')));
+  assert.deepEqual([tk['atc-backup'], keys('atc-backup', 'BACKUP_API_KEYS')['atc-scheduler'].role, keys('atc-queue', 'QUEUE_API_KEYS')['atc-scheduler'].role, keys('atc-payments', 'PAYMENTS_API_KEYS')['atc-scheduler'].role], [keys('atc-backup', 'BACKUP_API_KEYS')['atc-scheduler'].secret, 'admin', 'write', 'write']);
+  const exs = env('atc-export');
+  assert.deepEqual([exs.SOURCE_QUEUE_API_KEY, keys('atc-queue', 'QUEUE_API_KEYS')['atc-export'].role, exs.SOURCE_WEBHOOK_OUT_URL.endsWith(':3009'), keys('atc-scheduler', 'SCHEDULER_API_KEYS')['atc-export'].role], [keys('atc-queue', 'QUEUE_API_KEYS')['atc-export'].secret, 'read', true, 'read']);
   const px = env('atc-payments');
   assert.deepEqual([keys('atc-payments', 'PAYMENTS_API_KEYS')['atc-console'].role, env('atc-console').PAYMENTS_API_KEY, px.STRIPE_SECRET_KEY, px.STRIPE_WEBHOOK_SECRET, px.WEBHOOK_OUT_API_KEY, keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-payments'].role, auditKeys['atc-payments'].role],
     ['write', keys('atc-payments', 'PAYMENTS_API_KEYS')['atc-console'].secret, '', '', keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-payments'].secret, 'publish', 'write'], 'Stripe stays off until the operator sets keys');
   const ex = env('atc-export');
-  assert.deepEqual([ex.EXPORT_API_KEYS.startsWith('atc-console:'), ex.MEDIA_API_KEY, ex.NOTIFY_API_KEY, ex.SOURCE_AUDIT_API_KEY, auditKeys['atc-export-reader'].role, auditKeys['atc-export'].role, keys('atc-auth', 'AUTH_API_KEYS')['atc-export'].role, keys('atc-flags', 'FLAGS_API_KEYS')['atc-export'].role, keys('atc-content', 'CONTENT_API_KEYS')['atc-export'].role, ex.SOURCE_SHORTLINK_URL.endsWith(':3006')],
+  assert.deepEqual([ex.EXPORT_API_KEYS.includes('atc-console:'), ex.MEDIA_API_KEY, ex.NOTIFY_API_KEY, ex.SOURCE_AUDIT_API_KEY, auditKeys['atc-export-reader'].role, auditKeys['atc-export'].role, keys('atc-auth', 'AUTH_API_KEYS')['atc-export'].role, keys('atc-flags', 'FLAGS_API_KEYS')['atc-export'].role, keys('atc-content', 'CONTENT_API_KEYS')['atc-export'].role, ex.SOURCE_SHORTLINK_URL.endsWith(':3006')],
     [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-export'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export'].secret, auditKeys['atc-export-reader'].secret, 'read', 'write', 'read', 'read', 'read', true], 'export reads every source with read keys and writes files to media');
   assert.equal(env('atc-console').EXPORT_API_KEY, keys('atc-export', 'EXPORT_API_KEYS')['atc-console'].secret);
   assert.deepEqual(env('atc-media').ALLOWED_TYPES.split(','), ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'application/pdf', 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3'], 'media accepts export files and database backups');
@@ -117,7 +129,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   // Cross-service holders.
   assert.equal(env('atc-auth').NOTIFY_API_KEY, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-auth'].secret);
   assert.equal(env('atc-gateway').AUTH_API_KEY, keys('atc-auth', 'AUTH_API_KEYS')['atc-gateway'].secret);
-  assert.equal(env('atc-scheduler').TARGET_KEYS, `atc-flags:${keys('atc-flags', 'FLAGS_API_KEYS')['atc-scheduler'].secret},atc-notify:${keys('atc-notify', 'NOTIFY_API_KEYS')['atc-scheduler'].secret},atc-webhook-out:${keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-scheduler'].secret}`);
+  assert.equal(env('atc-scheduler').TARGET_KEYS, `atc-flags:${keys('atc-flags', 'FLAGS_API_KEYS')['atc-scheduler'].secret},atc-notify:${keys('atc-notify', 'NOTIFY_API_KEYS')['atc-scheduler'].secret},atc-webhook-out:${keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-scheduler'].secret}${['atc-export', 'atc-queue', 'atc-backup', 'atc-status', 'atc-render', 'atc-payments'].map((id) => `,${id}:${keys(id, ({ 'atc-export': 'EXPORT_API_KEYS', 'atc-queue': 'QUEUE_API_KEYS', 'atc-backup': 'BACKUP_API_KEYS', 'atc-status': 'STATUS_API_KEYS', 'atc-render': 'RENDER_API_KEYS', 'atc-payments': 'PAYMENTS_API_KEYS' })[id])['atc-scheduler'].secret}`).join('')}`);
   // Local URLs and lax outbound settings.
   assert.equal(env('atc-auth').NOTIFY_URL, 'http://127.0.0.1:3001');
   assert.equal(env('atc-auth').JWT_ISSUER, 'http://127.0.0.1:3000');
