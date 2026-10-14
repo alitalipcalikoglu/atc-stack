@@ -968,7 +968,7 @@ export interface paths {
          * Stream a file's bytes through the console.
          * @description Typed pass-through to the **media** service instance named by `sid` — console relays this to its `GET the signed variant URL`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Same-origin byte relay for the console UI. Hardened deliberately: only `image/jpeg`, `image/png`, `image/webp`, `image/gif` and `image/avif` keep their real content type and any `content-disposition` media sent; everything else (SVG, HTML, PDF, video, ...) is rewritten to `application/octet-stream` with `attachment; filename="{id}.bin"` so nothing can execute or render in console's origin. Every response also carries `content-security-policy: default-src 'none'; sandbox` and `cache-control: private, max-age=300`. `{sub}` is the variant name.
+         *     Same-origin byte relay for the console UI. Hardened deliberately: only `image/jpeg`, `image/png`, `image/webp`, `image/gif` and `image/avif` keep their real content type and any `content-disposition` media sent; everything else (SVG, HTML, PDF, video, ...) is rewritten to `application/octet-stream` with `attachment; filename="{id}.bin"` so nothing can execute or render in console's origin. Every response also carries `content-security-policy: default-src 'none'; sandbox` and `cache-control: private, max-age=300`. `{sub}` is the variant name. A single `bytes=` range is forwarded to media so the browser can seek; media answers `206` with `Content-Range`, or `416` when the range is unsatisfiable. Multi-range and other units are not forwarded and the whole body is served.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -5311,7 +5311,10 @@ export interface operations {
     "atc-console.atc-media.files.bytes": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description One byte range (`bytes=start-end`, `bytes=start-` or `bytes=-suffix`). */
+                Range?: string;
+            };
             path: {
                 /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
                 sid: components["parameters"]["SidParam"];
@@ -5332,6 +5335,19 @@ export interface operations {
                     "Content-Security-Policy"?: string;
                     /** @description Relayed when the downstream response had one. */
                     ETag?: string;
+                    /** @description Relayed from media (`bytes`). */
+                    "Accept-Ranges"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description The requested byte range, with the same content-type rules as `200`. */
+            206: {
+                headers: {
+                    /** @description The range served, e.g. `bytes 0-1023/4096`. */
+                    "Content-Range"?: string;
                     [name: string]: unknown;
                 };
                 content: {
@@ -5341,6 +5357,15 @@ export interface operations {
             400: components["responses"]["ValidationFailed"];
             401: components["responses"]["Unauthenticated"];
             404: components["responses"]["ProxyNotFound"];
+            /** @description The range is outside the file. No body. */
+            416: {
+                headers: {
+                    /** @description The file size, e.g. `bytes *\/4096`. */
+                    "Content-Range"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             502: components["responses"]["Unreachable"];
             default: components["responses"]["DownstreamDefault"];
         };
