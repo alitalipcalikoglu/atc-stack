@@ -146,6 +146,8 @@ By default the stack is **local**: `HOST=127.0.0.1`, plain HTTP everywhere, `COO
 
 `npm run setup -- --public --host 10.0.0.5` keeps every security default from the templates (HTTPS-only outbound, secure cookies, allowlists empty until you fill them), uses the given host for service-to-service URLs, keeps `PUBLIC_BASE_URL`s you set, and does not rewrite an existing `atc-gateway/routes.json`. Put a TLS-terminating proxy in front and set `TRUST_PROXY=true` per service.
 
+In `--public` mode three services reach other hosts on your behalf, and each refuses private and loopback targets until you allow them in its own `.env`: `atc-scheduler` (job targets), `atc-webhook-out` (subscriber URLs) and `atc-status` (monitor targets, including the seeded checks of the other services, and heartbeat/TLS/TCP monitors). Set `TARGET_ALLOWED_HOSTS` there to the exact hosts they may call (the stack's own service hosts for status, your receivers for webhook-out) and keep `TARGET_ALLOW_HTTP=false` unless a target really is plain HTTP; an empty list with `TARGET_ALLOW_PRIVATE=true` is refused at start. The stack deliberately does not guess these lists: they are the SSRF boundary.
+
 Options: `--root <dir>` (default: the parent of this checkout), `--admin-username <name>` (default `admin`), `--admin-password <password>` (otherwise generated), `--install`.
 
 ## Docker Compose
@@ -161,9 +163,20 @@ docker compose -f compose/docker-compose.yml exec atc-console node --disable-war
 
 - Generated next to it: one env file per service (`compose/env/<id>.env`, mode 0600, the same secrets as the local `.env` files; relative host paths are dropped so the images' own `/data`, `/config` and `/keys` apply), the gateway's `routes.json` and the console's `services.json` under `compose/config/`. Everything in `compose/` is untracked. The compose file itself holds no secrets.
 - Services call each other by container name (`http://atc-media:3003`); scheduler and webhook-out may reach those names. Only the gateway (3000), the console (3004) and media (3003, for signed file URLs; `PUBLIC_BASE_URL` points at the published port) are published, on 127.0.0.1. `--port-offset N` adds `N` to those host ports.
-- One named volume per service (`<id>-data` at `/data`); atc-auth's keys are mounted read-only from `atc-auth/keys`. atc-backup mounts every data volume at `/sources/<id>` and backs them all up.
+- One named volume per service (`<id>-data` at `/data`); atc-auth's keys are mounted read-only from `atc-auth/keys`. atc-backup mounts every data volume at `/sources/<id>` and backs them all up. Those mounts are **read-write on purpose**: SQLite reads a WAL database through its `-shm` file, so a read-only mount makes the online backup fail. The backup service only reads them; the isolation is the container boundary, not the mount flag. Restores never write into a live volume unless `ALLOW_LIVE_RESTORE=true` is set.
 - Start order: the gateway waits for auth; backup and status wait until every other service is healthy, so their first backups and checks find everything up. `stop_grace_period` is 35 s, matching PM2's `kill_timeout`.
 - Stripe stays off until `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` are set in `atc-payments/.env` and `npm run compose` runs again.
+
+## Scaling model
+
+Every service is **one process on one SQLite database**; the stack scales up, not out. The suite is built for a small team's single host: one machine runs all 20 services, and an unreachable machine means downtime until you restore. What that means in practice:
+
+- **Capacity** comes from the machine (CPU for render and media variants, disk and memory for everything else) and from the per-service limits in each `.env` (`RATE_LIMIT_MAX`, quotas, worker pools). `npm run load` and `npm run load -- --profile writes` measure where it bends.
+- **Recovery point** is the backup interval of `atc-backup` (default 6 hours, `BACKUP_INTERVAL_MIN`) plus the off-site copy in `atc-media`; recovery time is a restore plus a start. There is no replica to fail over to.
+- **Second instances are not supported** for a stateful service: two processes on one database file would fight over the write lock and workers. The per-service READMEs ("Scaling model") say which parts could be split (gateway and render are stateless candidates) and `docs/READINESS.md` classifies each service.
+- **Splitting workers** from API processes (`--split-workers`) is supported where a service has a background worker, and is the supported way to isolate heavy work.
+
+If you need more than this, the next step is per-service: move that one service's storage to a server database. The HTTP contracts do not change.
 
 ## Load test
 
@@ -331,10 +344,10 @@ npm run mcp:catalog                      # regenerate the tools and catalog afte
 - [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) — what `stack status --matrix` reports and the compatibility semantics around it (major/minor `serviceCore` mismatch, API vs. schema compatibility, mixed-version rollout coverage).
 - [test/integration/](test/integration/) — cross-service integration tests that spawn real service processes (`STACK_INTEGRATION=1 npm test`; plain `npm test` stays fast and spawns nothing).
 
-## License
-
-MIT, see [LICENSE](LICENSE).
-
 ## IP databases for atc-geo
 
 Docker: put `city.mmdb` (and optionally `asn.mmdb`) into `atc-geo/mmdb/` before `npm run compose`; the directory is mounted read-only at `/mmdb` and `MMDB_PATH` / `ASN_MMDB_PATH` are set for you. Without a city file the container runs without IP geolocation. PM2: set `MMDB_PATH` (and `ASN_MMDB_PATH`) in `atc-geo/.env`; setup keeps your values. The service flags files older than `MMDB_MAX_AGE_DAYS` in `/ready`.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
