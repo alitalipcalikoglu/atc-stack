@@ -16,7 +16,7 @@ Per service (`atc-stack/src/snapshot.js:44-97`, `EXTRA_PATHS`, `DB_SERVICES`, `A
 
 | Service | What's captured | How |
 |---|---|---|
-| Every stateful service (notify, auth, media, audit, shortlink, flags, scheduler, webhook-out, search, ratelimit, geo, console) | its SQLite database at `DB_PATH` | `PRAGMA user_version` read, then `VACUUM INTO` a fresh file — a consistent read snapshot, safe against a live WAL writer, no service is stopped (`Snapshot.#backupDb`, `snapshot.js:435-446`) |
+| Every stateful service (every entry of `SERVICES` except the gateway: notify, auth, media, audit, shortlink, flags, scheduler, webhook-out, search, ratelimit, geo, content, export, render, queue, backup, status, payments, console) | its SQLite database at `DB_PATH` | `PRAGMA user_version` read, then `VACUUM INTO` a fresh file — a consistent read snapshot, safe against a live WAL writer, no service is stopped (`Snapshot.#backupDb`, `snapshot.js:435-446`) |
 | `atc-media` | `objects/` and `variants/` under `DATA_DIR` (content-addressed blob storage) | recursive directory copy |
 | `atc-auth` | `keys/` (the JWT signing key pair) | recursive directory copy |
 | `atc-gateway` | `routes.json` (its only state — no database) | file copy |

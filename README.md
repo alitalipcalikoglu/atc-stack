@@ -34,7 +34,7 @@ stack install:all --admin-password '<choose-a-strong-password>'
 directory. It validates prerequisites before mutation, clones missing official repositories,
 validates and reuses safe existing checkouts, runs `npm ci` from every sibling lockfile, delegates
 configuration to the existing `setup` implementation, starts through the existing PM2 `up` path,
-and waits (bounded) for all 13 HTTP services to report ready.
+and waits (bounded) for all 20 HTTP services to report ready.
 
 The default is the current supported **production release** (`1.20.0`): every sibling is checked
 against the immutable tag and exact commit recorded in

@@ -15,8 +15,8 @@ not replace source, tests, OpenAPI, installation manifests or tags.
 
 ## Workspace topology
 
-The workspace root is local-only and is not a Git repository. It holds 15 independent repositories,
-all named `atc-<name>`: 13 independently deployable HTTP services (atc-notify delivers email only; outbound webhooks are atc-webhook-out), `atc-service-core` (shared runtime
+The workspace root is local-only and is not a Git repository. It holds 22 independent repositories,
+all named `atc-<name>`: 20 independently deployable HTTP services (atc-notify delivers email only; outbound webhooks are atc-webhook-out), `atc-service-core` (shared runtime
 package) and `atc-stack` (installer, orchestrator and release management). Every repository,
 folder, package (`@atc-web/atc-<name>`), service id, PM2 name, operationId prefix and audit action
 prefix uses the `atc-` name. Environment variable names, database file names, error codes, metric
@@ -60,7 +60,7 @@ state update is necessarily newer.
 
 ## Current release
 
-- Supported release: all 15 repositories at `v1.20.0`.
+- Supported release: all 22 repositories at `v1.20.0`.
 - `atc-stack` `v1.20.0` peels to `49e21e1a5079c2fbf8d5e58bdb88b6503aba9b67`; `atc-service-core`
   `v1.20.0` peels to `da4983cc02a7a8fddbfec49ec3265169a9035d0d`.
 - `installation-manifests/supported.json` selects the install matrix; `releases/` holds the current
@@ -125,7 +125,7 @@ None. Future work is ordinary product maintenance.
 
 ## Update checklist
 
-1. Verify all 15 repositories: branch, remote, HEAD, clean tree.
+1. Verify all 22 repositories: branch, remote, HEAD, clean tree.
 2. Update the repository table, the current release and the contract counts from source.
 3. Record decisions and debt; remove debt only with validated evidence.
 4. Validate affected repositories locally, inspect the diff, then commit focused changes.
