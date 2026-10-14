@@ -10,11 +10,11 @@ running instance without guessing from a version number.
 ```json
 {
   "service": "atc-notify",
-  "version": "1.17.0",
+  "version": "1.17.1",
   "apiVersion": "v1",
   "capabilities": ["email", "templates", "idempotency"],
   "schemaVersion": 3,
-  "serviceCore": "1.17.0"
+  "serviceCore": "1.17.1"
 }
 ```
 
@@ -54,8 +54,8 @@ shape by hand, with `schemaVersion: null` and `serviceCore: null`.
 
 ```
 SERVICE          STATUS VERSION  API  SCHEMA SERVICE-CORE  CAPABILITIES
-atc-notify       ok     1.17.0   v1   3      1.17.0        email,templates,idempotency
-atc-gateway      ok     1.17.0   v1   -      -             jwt-auth,rate-limit-policy,...
+atc-notify       ok     1.17.1   v1   3      1.17.1        email,templates,idempotency
+atc-gateway      ok     1.17.1   v1   -      -             jwt-auth,rate-limit-policy,...
 atc-shortlink    DOWN   ?        ?    ?      ?             (unreachable: connect ECONNREFUSED)
 ```
 
