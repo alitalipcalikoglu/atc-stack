@@ -38,16 +38,16 @@ test('passed reads node:test summaries and rejects failures', () => {
 
 test('projectState rewrite is idempotent on the current file and moves every release reference', () => {
   const text = readFileSync(join(STACK, 'PROJECT_STATE.md'), 'utf8');
-  const date = /Last source verification: (\d{4}-\d{2}-\d{2})/.exec(text)?.[1] ?? '';
+  const [, date = '', recorded = ''] = /Last source verification: (\d{4}-\d{2}-\d{2}) \(v([\d.]+)\)/.exec(text) ?? [];
   /** @type {Record<string, { commit: string }>} */
   const tags = {};
   for (const [, id, commit] of text.matchAll(/^\| (atc-[a-z-]+) \| [^|]+ \| `[0-9a-f]{40}` \| `v[\d.]+` → `([0-9a-f]{40})` \|/gm)) tags[id] = { commit };
   assert.equal(Object.keys(tags).length, 15);
-  assert.equal(Release.projectState(text, supported, tags, date), text);
+  assert.equal(Release.projectState(text, recorded, tags, date), text);
   const moved = Release.projectState(text, '9.9.9', tags, '2030-01-01');
   assert.equal((moved.match(/`v9\.9\.9`/g) ?? []).length, 15 + 3);
   assert.match(moved, /Last source verification: 2030-01-01 \(v9\.9\.9\)\./);
-  assert.doesNotMatch(moved, new RegExp(`v${supported.replaceAll('.', '\\.')}`));
+  assert.doesNotMatch(moved, new RegExp(`v${recorded.replaceAll('.', '\\.')}`));
 });
 
 test('evidence carries the matrix, tests and install results', () => {

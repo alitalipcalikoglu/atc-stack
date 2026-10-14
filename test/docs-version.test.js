@@ -7,7 +7,8 @@ const ROOT = join(import.meta.dirname, '..');
 const { version } = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 // Every repository shares one version since 1.13.0; older numbers in docs are illustrative examples.
 const UNIFIED = [1, 13, 0];
-const SKIP = new Set(['node_modules', '.git', 'releases', 'data', 'keys']);
+// PROJECT_STATE.md describes the last verified release until release:publish rewrites it.
+const SKIP = new Set(['node_modules', '.git', 'releases', 'data', 'keys', 'PROJECT_STATE.md']);
 
 /** @param {string} dir @returns {string[]} */
 const markdown = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
