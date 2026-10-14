@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 546,
+  "totalOperations": 568,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -1881,6 +1881,91 @@
       "operationId": "atc-console.atc-notify.templates.list",
       "method": "GET",
       "path": "/api/services/{sid}/atc-notify/templates",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.events.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-payments/provider-events",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.payments.cancel",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/payments/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.payments.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-payments/payments/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.payments.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-payments/payments",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.payments.refund",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/payments/{id}/refunds",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.payments.sync",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/payments/{id}/sync",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-payments/stats",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -4474,6 +4559,161 @@
       "path": "/v1/templates",
       "flags": [
         "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.events.list",
+      "method": "GET",
+      "path": "/v1/provider-events",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.ledger.list",
+      "method": "GET",
+      "path": "/v1/ledger",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.payments.cancel",
+      "method": "POST",
+      "path": "/v1/payments/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.payments.create",
+      "method": "POST",
+      "path": "/v1/payments",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.payments.get",
+      "method": "GET",
+      "path": "/v1/payments/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.payments.list",
+      "method": "GET",
+      "path": "/v1/payments",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.payments.sync",
+      "method": "POST",
+      "path": "/v1/payments/{id}/sync",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.refunds.create",
+      "method": "POST",
+      "path": "/v1/payments/{id}/refunds",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.webhooks.stripe",
+      "method": "POST",
+      "path": "/v1/webhooks/stripe",
+      "flags": [
+        "MUTATION"
       ],
       "exposedInPhase3": false
     },

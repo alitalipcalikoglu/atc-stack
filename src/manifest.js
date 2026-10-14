@@ -42,7 +42,7 @@ const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.tri
 const DATA_FILES = {
   'atc-notify': 'notify.db', 'atc-auth': 'auth.db', 'atc-media': 'media.db', 'atc-audit': 'audit.db', 'atc-shortlink': 'shortlink.db', 'atc-flags': 'flags.db',
   'atc-scheduler': 'scheduler.db', 'atc-webhook-out': 'webhook-out.db', 'atc-search': 'search.db', 'atc-ratelimit': 'ratelimit.db', 'atc-geo': 'geo.db',
-  'atc-content': 'content.db', 'atc-export': 'export.db', 'atc-render': 'render.db', 'atc-queue': 'queue.db', 'atc-status': 'status.db', 'atc-console': 'console.db',
+  'atc-content': 'content.db', 'atc-export': 'export.db', 'atc-render': 'render.db', 'atc-queue': 'queue.db', 'atc-status': 'status.db', 'atc-payments': 'payments.db', 'atc-console': 'console.db',
 };
 
 /** @type {Service[]} */
@@ -174,6 +174,18 @@ export const SERVICES = [
     console: { type: 'atc-status', label: 'Status', keyEnv: 'STATUS_API_KEY' },
   },
   {
+    id: 'atc-payments', port: 3019, keysVar: 'PAYMENTS_API_KEYS',
+    env: (c) => ({
+      ...auditEnv(c, 'atc-payments'),
+      // Operator-owned: empty = provider (and webhook endpoint) disabled; /ready reports it.
+      STRIPE_SECRET_KEY: c.keep('atc-payments', 'STRIPE_SECRET_KEY', ''),
+      STRIPE_WEBHOOK_SECRET: c.keep('atc-payments', 'STRIPE_WEBHOOK_SECRET', ''),
+      STRIPE_API_URL: c.keep('atc-payments', 'STRIPE_API_URL', 'https://api.stripe.com'),
+      WEBHOOK_OUT_URL: c.url('atc-webhook-out'), WEBHOOK_OUT_API_KEY: c.issue('atc-webhook-out', 'atc-payments', 'publish'),
+    }),
+    console: { type: 'atc-payments', label: 'Payments', keyEnv: 'PAYMENTS_API_KEY' },
+  },
+  {
     id: 'atc-gateway', port: 3000,
     env: (c) => ({
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
@@ -207,4 +219,5 @@ export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({
   'atc-queue': 'admin', // manages queues, purges and redrives dead letters
   'atc-backup': 'admin', // runs, downloads, verifies, restores and deletes backups
   'atc-status': 'admin', // creates, changes, checks and deletes monitors
+  'atc-payments': 'write', // creates, cancels, syncs and refunds payments
 });

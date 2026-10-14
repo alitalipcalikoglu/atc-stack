@@ -1,0 +1,20 @@
+{
+  "service": "atc-payments",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "POST", "path": "/v1/webhooks/stripe" },
+    { "method": "POST", "path": "/v1/payments" },
+    { "method": "GET", "path": "/v1/payments" },
+    { "method": "GET", "path": "/v1/payments/{id}" },
+    { "method": "POST", "path": "/v1/payments/{id}/cancel" },
+    { "method": "POST", "path": "/v1/payments/{id}/sync" },
+    { "method": "POST", "path": "/v1/payments/{id}/refunds" },
+    { "method": "GET", "path": "/v1/ledger" },
+    { "method": "GET", "path": "/v1/provider-events" },
+    { "method": "GET", "path": "/v1/stats" }
+  ]
+}

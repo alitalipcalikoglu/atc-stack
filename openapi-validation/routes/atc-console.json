@@ -221,7 +221,14 @@
     { "method": "DELETE", "path": "/api/services/{sid}/atc-status/monitors/{id}" },
     { "method": "POST", "path": "/api/services/{sid}/atc-status/monitors/{id}/check" },
     { "method": "GET", "path": "/api/services/{sid}/atc-status/monitors/{id}/checks" },
-    { "method": "GET", "path": "/api/services/{sid}/atc-status/incidents" }
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/incidents" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-payments/stats" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-payments/payments" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-payments/payments/{id}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-payments/payments/{id}/cancel" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-payments/payments/{id}/sync" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-payments/payments/{id}/refunds" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-payments/provider-events" }
   ],
   "exclusions": [
     "GET /* (static asset serving via @fastify/static, wildcard over PUBLIC_DIR) and the SPA fallback in setNotFoundHandler: not an API contract, serves the built Svelte app (index.html) for unmatched non-API GET/HEAD paths."

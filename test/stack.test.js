@@ -32,6 +32,7 @@ const TEMPLATES = /** @type {Record<string, string>} */ ({
   'atc-queue': 'PORT=3016\nHOST=0.0.0.0\nQUEUE_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS:admin,mailer:REPLACE_WITH_64_HEX_CHARS:write:emails\n',
   'atc-backup': 'PORT=3017\nHOST=0.0.0.0\nBACKUP_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS:admin\nBACKUP_SOURCES=\nALLOW_LIVE_RESTORE=false\n',
   'atc-status': 'PORT=3018\nHOST=0.0.0.0\nSTATUS_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS:admin\nMONITOR_SEEDS=\nALERT_EMAILS=\n',
+  'atc-payments': 'PORT=3019\nHOST=0.0.0.0\nPAYMENTS_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS:write\nSTRIPE_SECRET_KEY=\nSTRIPE_WEBHOOK_SECRET=\n',
   'atc-gateway': 'PORT=3000\nHOST=0.0.0.0\nMETRICS_TOKEN=\nAUTH_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_AUTH_API_KEYS\nMEDIA_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_MEDIA_API_KEYS\nNOTIFY_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_NOTIFY_API_KEYS\n',
   'atc-console': 'PORT=3004\nHOST=0.0.0.0\nCOOKIE_SECURE=true\nNOTIFY_API_KEY=REPLACE_WITH_THE_CONSOLE_KEY_FROM_NOTIFY_API_KEYS\nAUTH_API_KEY=REPLACE_WITH\nMEDIA_API_KEY=REPLACE_WITH\nGATEWAY_METRICS_TOKEN=REPLACE_WITH\nAUDIT_API_KEY=REPLACE_WITH\nSHORTLINK_API_KEY=REPLACE_WITH\nFLAGS_API_KEY=REPLACE_WITH\nSCHEDULER_API_KEY=REPLACE_WITH\nWEBHOOK_OUT_API_KEY=REPLACE_WITH\nSEARCH_API_KEY=REPLACE_WITH\n',
 });
@@ -87,10 +88,13 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   const bk = env('atc-backup');
   assert.deepEqual([keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].role, env('atc-console').BACKUP_API_KEY, bk.MEDIA_API_KEY, bk.ALLOW_LIVE_RESTORE, auditKeys['atc-backup'].role], ['admin', keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].secret, keys('atc-media', 'MEDIA_API_KEYS')['atc-backup'].secret, 'false', 'write']);
   assert.deepEqual(bk.BACKUP_SOURCES.split(',').slice(0, 2), ['atc-notify=../atc-notify/data/notify.db', 'atc-auth=../atc-auth/data/auth.db']);
-  assert.equal(bk.BACKUP_SOURCES.split(',').length, 17, 'every service with a database, console included');
+  assert.equal(bk.BACKUP_SOURCES.split(',').length, 18, 'every service with a database, console included');
   const stx = env('atc-status');
   assert.deepEqual([keys('atc-status', 'STATUS_API_KEYS')['atc-console'].role, env('atc-console').STATUS_API_KEY, stx.NOTIFY_API_KEY, stx.ALERT_EMAILS, auditKeys['atc-status'].role], ['admin', keys('atc-status', 'STATUS_API_KEYS')['atc-console'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-status'].secret, 'ops@example.com', 'write']);
-  assert.deepEqual([stx.MONITOR_SEEDS.split(',').length, stx.MONITOR_SEEDS.split(',')[0], stx.MONITOR_SEEDS.includes('atc-status=')], [18, 'atc-notify=http://127.0.0.1:3001', false], 'every other service is monitored');
+  assert.deepEqual([stx.MONITOR_SEEDS.split(',').length, stx.MONITOR_SEEDS.split(',')[0], stx.MONITOR_SEEDS.includes('atc-status=')], [19, 'atc-notify=http://127.0.0.1:3001', false], 'every other service is monitored');
+  const px = env('atc-payments');
+  assert.deepEqual([keys('atc-payments', 'PAYMENTS_API_KEYS')['atc-console'].role, env('atc-console').PAYMENTS_API_KEY, px.STRIPE_SECRET_KEY, px.STRIPE_WEBHOOK_SECRET, px.WEBHOOK_OUT_API_KEY, keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-payments'].role, auditKeys['atc-payments'].role],
+    ['write', keys('atc-payments', 'PAYMENTS_API_KEYS')['atc-console'].secret, '', '', keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-payments'].secret, 'publish', 'write'], 'Stripe stays off until the operator sets keys');
   const ex = env('atc-export');
   assert.deepEqual([ex.EXPORT_API_KEYS.startsWith('atc-console:'), ex.MEDIA_API_KEY, ex.NOTIFY_API_KEY, ex.SOURCE_AUDIT_API_KEY, auditKeys['atc-export-reader'].role, auditKeys['atc-export'].role, keys('atc-auth', 'AUTH_API_KEYS')['atc-export'].role, keys('atc-flags', 'FLAGS_API_KEYS')['atc-export'].role, keys('atc-content', 'CONTENT_API_KEYS')['atc-export'].role, ex.SOURCE_SHORTLINK_URL.endsWith(':3006')],
     [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-export'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export'].secret, auditKeys['atc-export-reader'].secret, 'read', 'write', 'read', 'read', 'read', true], 'export reads every source with read keys and writes files to media');
@@ -125,7 +129,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual(services.find((/** @type {any} */ s) => s.id === 'atc-notify').polling, { enabled: true, intervalSec: 30 });
   const routes = JSON.parse(written['atc-gateway/routes.json']);
   assert.equal(routes.jwt.jwksUrl, 'http://127.0.0.1:3002/.well-known/jwks.json');
-  assert.deepEqual(routes.routes.map((/** @type {any} */ r) => r.id), ['auth-public', 'media-user', 'media-files', 'content-bundles', 'jwks', 'status-page']);
+  assert.deepEqual(routes.routes.map((/** @type {any} */ r) => r.id), ['auth-public', 'media-user', 'media-files', 'content-bundles', 'jwks', 'status-page', 'payments-webhooks']);
   // stripPrefix removes only a literal substring of the caller's URL (gateway has no path-insert
   // capability); the caller must therefore include the target's real upstream path verbatim after
   // pathPrefix. Regression for the Stage 1.1 finding: a caller hitting the *short* form the route

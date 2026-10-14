@@ -78,7 +78,7 @@ export interface paths {
         };
         /**
          * Service identity and capabilities.
-         * @description The one operational route console takes from the shared `registerInfo` helper, so its shape is identical across all 19 services.
+         * @description The one operational route console takes from the shared `registerInfo` helper, so its shape is identical across all 20 services.
          */
         get: operations["atc-console.info.get"];
         put?: never;
@@ -4275,6 +4275,166 @@ export interface paths {
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
         get: operations["atc-console.atc-status.incidents.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Payments by status, volume, balances and outbox.
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `GET /v1/stats`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-payments.stats.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Payments, newest first.
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `GET /v1/payments`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-payments.payments.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One payment with refunds and ledger entries.
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `GET /v1/payments/{id}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-payments.payments.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/payments/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a pending payment.
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `POST /v1/payments/{id}/cancel`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-payments.payments.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/payments/{id}/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply the payment's current Stripe state.
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `POST /v1/payments/{id}/sync`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-payments.payments.sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/payments/{id}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refund a payment (idempotencyKey in the body becomes the Idempotency-Key header).
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `POST /v1/payments/{id}/refunds`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-payments.payments.refund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-payments/provider-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recent Stripe webhook events.
+         * @description Typed pass-through to the **payments** service instance named by `sid` — console relays this to its `GET /v1/provider-events`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-payments.events.list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -12729,6 +12889,237 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Pass-through of the status service's own `GET /v1/incidents` response body, relayed unchanged. See the status service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.stats.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the payments service's own `GET /v1/stats` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.payments.list": {
+        parameters: {
+            query?: {
+                status?: "pending" | "processing" | "succeeded" | "canceled" | "partially_refunded" | "refunded";
+                limit?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the payments service's own `GET /v1/payments` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.payments.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the payments service's own `GET /v1/payments/{id}` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.payments.cancel": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the payments service's own `POST /v1/payments/{id}/cancel` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.payments.sync": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the payments service's own `POST /v1/payments/{id}/sync` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.payments.refund": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount?: number;
+                    /** @enum {string} */
+                    reason?: "duplicate" | "fraudulent" | "requested_by_customer";
+                    idempotencyKey: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the payments service's own `POST /v1/payments/{id}/refunds` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-payments.events.list": {
+        parameters: {
+            query?: {
+                limit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the payments service's own `GET /v1/provider-events` response body, relayed unchanged. See the payments service's own OpenAPI document for the authoritative body. */
             200: {
                 headers: {
                     [name: string]: unknown;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Generates mcp/tool-catalog.json: the full, classified inventory of all canonical operations
-// across the 19 services' openapi.yaml. This is the *candidate universe* -- it is NOT the MCP
+// across the 20 services' openapi.yaml. This is the *candidate universe* -- it is NOT the MCP
 // server's exposed tool list (see mcp/src/tools/index.mjs for the actual, explicit, small
 // allowlist). Re-run whenever a service's openapi.yaml changes: `node mcp/tool-catalog.generate.mjs`.
 // Not wired into any CI/workflow.
@@ -13,7 +13,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(HERE, '..', '..');
 const SERVICES = [
   'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
-  'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue', 'atc-backup', 'atc-status',
+  'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue', 'atc-backup', 'atc-status', 'atc-payments',
 ];
 const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'];
 

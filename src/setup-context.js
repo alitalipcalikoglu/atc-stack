@@ -164,6 +164,8 @@ export class SetupContext {
         { id: 'content-bundles', pathPrefix: '/api/content/v1/bundles/', stripPrefix: '/api/content', upstreams: [this.url('atc-content')], methods: ['GET', 'HEAD', 'OPTIONS'], injectApiKey: 'CONTENT_API_KEY', cors: ['*'], rateLimit: 600 },
         { id: 'jwks', pathPrefix: '/.well-known/jwks.json', upstreams: [this.url('atc-auth')], methods: ['GET', 'HEAD'] },
         { id: 'status-page', pathPrefix: '/status', upstreams: [this.url('atc-status')], methods: ['GET', 'HEAD'], rateLimit: 600 },
+        // Stripe calls this; the Stripe signature authenticates it, so no key is injected.
+        { id: 'payments-webhooks', pathPrefix: '/api/payments/v1/webhooks/', stripPrefix: '/api/payments', upstreams: [this.url('atc-payments')], methods: ['POST'], bodyLimit: 262144, rateLimit: 600 },
       ],
     };
   }
