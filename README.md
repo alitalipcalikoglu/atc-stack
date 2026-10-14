@@ -36,9 +36,9 @@ validates and reuses safe existing checkouts, runs `npm ci` from every sibling l
 configuration to the existing `setup` implementation, starts through the existing PM2 `up` path,
 and waits (bounded) for all 13 HTTP services to report ready.
 
-The default is the current supported **production release** (`1.14.1`): every sibling is checked
+The default is the current supported **production release** (`1.14.2`): every sibling is checked
 against the immutable tag and exact commit recorded in
-[`installation-manifests/v1.14.1.json`](installation-manifests/v1.14.1.json), selected by the explicit
+[`installation-manifests/v1.14.2.json`](installation-manifests/v1.14.2.json), selected by the explicit
 [`installation-manifests/supported.json`](installation-manifests/supported.json) pointer.
 Every repository shares one version, and every repository, folder and service id carries the
 `atc-` prefix (`atc-notify`, `atc-service-core`, …). The installation manifest is the source of
@@ -53,7 +53,7 @@ stack install:all --ref main --admin-password '<choose-a-strong-password>'
 ```
 
 Use that explicit development mode only when intentionally following moving `main` heads. The
-supported `v1.14.1` release and current development mode both require Console's canonical
+supported `v1.14.2` release and current development mode both require Console's canonical
 `server.mjs` plus adapter-node build; historical manifests remain unchanged and retain their own
 matching runtime snapshots.
 
