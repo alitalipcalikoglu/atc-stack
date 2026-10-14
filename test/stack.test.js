@@ -15,7 +15,7 @@ after(() => rmSync(root, { recursive: true, force: true }));
 
 /** Templates mirroring the real .env.example files: only the variables the manifest touches. */
 const TEMPLATES = /** @type {Record<string, string>} */ ({
-  'atc-notify': '# notify\nPORT=3001\nHOST=0.0.0.0\nNOTIFY_API_KEYS=shop:REPLACE_WITH_64_HEX_CHARS,blog:REPLACE_WITH_64_HEX_CHARS\nSMTP_URL=smtps://user:password@smtp.example.com:465\nSMTP_FROM="Example App <no-reply@example.com>"\nWEBHOOK_SIGNING_SECRET=REPLACE_WITH_64_HEX_CHARS\nWEBHOOK_ALLOW_HTTP=false\n',
+  'atc-notify': '# notify\nPORT=3001\nHOST=0.0.0.0\nNOTIFY_API_KEYS=shop:REPLACE_WITH_64_HEX_CHARS,blog:REPLACE_WITH_64_HEX_CHARS\nSMTP_URL=smtps://user:password@smtp.example.com:465\nSMTP_FROM="Example App <no-reply@example.com>"\n',
   'atc-auth': 'PORT=3002\nHOST=0.0.0.0\nAUTH_API_KEYS=shop-backend:REPLACE_WITH_64_HEX_CHARS\nJWT_ISSUER=https://auth.example.com\nJWT_AUDIENCE=shop\nNOTIFY_URL=https://notify.internal:3001\nNOTIFY_API_KEY=REPLACE_WITH_NOTIFY_KEY_FOR_AUTH\nAPP_NAME=Shop\nVERIFY_URL_TEMPLATE=https://shop.example.com/verify-email?token={token}\nRESET_URL_TEMPLATE=https://shop.example.com/reset-password?token={token}\n',
   'atc-media': 'PORT=3003\nHOST=0.0.0.0\nPUBLIC_BASE_URL=https://media.example.com\nMEDIA_API_KEYS=shop-backend:REPLACE_WITH_64_HEX_CHARS\nSIGNING_SECRET=REPLACE_WITH_64_HEX_CHARS\nCORS_ORIGINS=https://shop.example.com\n',
   'atc-audit': 'PORT=3005\nHOST=0.0.0.0\nAUDIT_API_KEYS=auth:REPLACE_WITH_64_HEX_CHARS:write,console:REPLACE_WITH_64_HEX_CHARS:read\n',

@@ -81,7 +81,7 @@ before(async () => {
     name: 'atc-notify', cwd: join(workspaceRoot, 'atc-notify'), entry: 'src/index.js', port: notifyPort,
     env: {
       PATH: process.env.PATH ?? '', PORT: String(notifyPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-      NOTIFY_API_KEYS: `atc-auth:${authToNotifySecret}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
+      NOTIFY_API_KEYS: `atc-auth:${authToNotifySecret}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>',
     },
   });
   await Promise.all([audit.start(), notify.start()]);

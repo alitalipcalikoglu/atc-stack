@@ -155,10 +155,8 @@ succeeded 100/100 times with zero corruption and zero duplicate migration effect
 Every other service in the manifest has no `splitWorkers` flag and only ever runs one process per
 service, so this scenario does not apply to it — one process, one `Database` instance, nothing to
 race. Every consumer (all 11 other backend services plus `atc-console`) is now pinned to
-`@atc-web/atc-service-core` v1.11.1, well past the v1.10.1 that first shipped this guarantee — updated
-post-production Phase 5, which needed the newer tag anyway for its own centralized trace-context
-work (see `atc-service-core/VERSIONING.md` on why a pin bump is each service's own deliberate act, and
-`atc-stack/docs/OBSERVABILITY.md` for what Phase 5 actually changed). None of these 12 services run in
+`@atc-web/atc-service-core` release that includes this guarantee (it first shipped in v1.10.1; see
+`atc-service-core/VERSIONING.md` on why a pin bump is each service's own deliberate act). None of these 12 services run in
 split mode, so this guarantee is not exercised for their own startup today, but nothing blocks a
 future adoption if one of them ever gains a `splitWorkers` template.
 

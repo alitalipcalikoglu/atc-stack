@@ -46,7 +46,7 @@ before(async () => {
         PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'warn',
         DB_PATH: join(scratch, 'notify.db'),
         NOTIFY_API_KEYS: `mcp:${SENTINEL_NOTIFY_KEY}`, // notify's keys are id:secret only, no role suffix (confirmed same as media)
-        SMTP_URL: 'json:', SMTP_FROM: 'noreply@example.test', WEBHOOK_SIGNING_SECRET: randomSecret(32),
+        SMTP_URL: 'json:', SMTP_FROM: 'noreply@example.test',
       },
     });
     await proc.start();
@@ -260,7 +260,7 @@ test('authenticated read: atc-flags.evaluate', { skip }, async () => {
 test('async submit -> status read: atc-notify.messages.create then atc-notify.messages.get', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const created = await callTool(client, 'atc-notify.messages.create', { channel: 'webhook', url: 'https://example.test/hook', event: 'mcp.e2e.test', data: { hello: 'world' } });
+    const created = await callTool(client, 'atc-notify.messages.create', { template: 'generic', to: ['someone@example.test'], data: { appName: 'MCP', subject: 'E2E', title: 'Hello', paragraphs: ['From the MCP E2E test.'] } });
     assert.equal(created.isError, undefined, JSON.stringify(created));
     assert.equal(created.structuredContent.status, 202);
     const id = created.structuredContent.data.id;

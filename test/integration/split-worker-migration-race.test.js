@@ -136,7 +136,7 @@ test('notify: split api+worker simultaneous first start against a pending migrat
     serviceId: 'atc-notify',
     env: ({ dbPath, apiPort }) => ({
       PATH: process.env.PATH ?? '', PORT: String(apiPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: dbPath,
-      NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
+      NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>',
     }),
   });
 });

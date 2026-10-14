@@ -187,33 +187,26 @@ export const TOOLS = [
 
   // ---------------------------------------------------------------------------------------------
   // atc-notify.messages.create -- async submit (safe mutation). atc-notify/openapi.yaml operationId
-  // atc-notify.messages.create, body oneOf(MessageCreateEmail, MessageCreateWebhook) discriminated on
-  // `channel`. Per-template email `data` shape is intentionally NOT re-derived here (server-side
+  // atc-notify.messages.create, body MessageCreateEmail (`channel` is always `email`, set by the
+  // handler). Per-template `data` shape is intentionally NOT re-derived here (server-side
   // Ajv is the real validator for that) -- this schema only re-derives the OUTER contract shape.
   // ---------------------------------------------------------------------------------------------
   {
     name: 'atc-notify.messages.create',
     description:
-      'Queues an email or webhook message for delivery. Returns immediately (202 new / 200 replay ' +
+      'Queues an email for delivery. Returns immediately (202 new / 200 replay ' +
       'of an idempotencyKey) -- this does NOT mean delivery has happened, only that it was accepted. ' +
       'Use atc-notify.messages.get with the returned id to check real delivery status later.',
     inputSchema: {
-      channel: z.enum(['email', 'webhook']),
-      // email branch
-      template: z.enum(['email-verification', 'password-reset', 'generic']).optional(),
-      to: z.array(z.string().email()).min(1).max(10).optional(),
-      data: z.record(z.string(), z.unknown()).optional().describe('email: validated server-side against the named template\'s schema. webhook: free-form, sent verbatim.'),
-      // webhook branch
-      url: z.string().url().max(2048).optional(),
-      event: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_.:-]+$/).optional(),
+      template: z.enum(['email-verification', 'password-reset', 'generic']),
+      to: z.array(z.string().email()).min(1).max(10),
+      data: z.record(z.string(), z.unknown()).describe('Validated server-side against the named template\'s schema.'),
       idempotencyKey: z.string().min(1).max(128).optional(),
     },
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     async handler(args, registry) {
       const client = await registry.client('atc-notify');
-      const body = args.channel === 'email'
-        ? { channel: 'email', template: args.template, to: args.to, data: args.data ?? {}, idempotencyKey: args.idempotencyKey }
-        : { channel: 'webhook', url: args.url, event: args.event, data: args.data ?? {}, idempotencyKey: args.idempotencyKey };
+      const body = { channel: /** @type {const} */ ('email'), template: args.template, to: args.to, data: args.data, idempotencyKey: args.idempotencyKey };
       const res = await client['atc-notify.messages.create']({ body });
       if (res.error) throw res;
       return toolResult({ ...summarize(res), data: res.data, summary: `message ${res.data?.id} queued, status ${res.response.status}` });

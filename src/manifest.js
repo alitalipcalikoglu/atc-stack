@@ -36,7 +36,7 @@ const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_
 export const SERVICES = [
   {
     id: 'atc-notify', port: 3001, keysVar: 'NOTIFY_API_KEYS', splitWorkers: true,
-    env: (c) => ({ ...auditEnv(c, 'atc-notify'), SMTP_URL: c.keep('atc-notify', 'SMTP_URL', 'json:'), SMTP_FROM: c.keep('atc-notify', 'SMTP_FROM', '"atc-web <no-reply@localhost>"'), WEBHOOK_SIGNING_SECRET: c.secret('atc-notify', 'WEBHOOK_SIGNING_SECRET'), WEBHOOK_ALLOW_HTTP: c.local ? 'true' : c.keep('atc-notify', 'WEBHOOK_ALLOW_HTTP', 'false') }),
+    env: (c) => ({ ...auditEnv(c, 'atc-notify'), SMTP_URL: c.keep('atc-notify', 'SMTP_URL', 'json:'), SMTP_FROM: c.keep('atc-notify', 'SMTP_FROM', '"atc-web <no-reply@localhost>"') }),
     console: { type: 'atc-notify', label: 'Notify', keyEnv: 'NOTIFY_API_KEY', polling: { enabled: true, intervalSec: 30 } },
   },
   {

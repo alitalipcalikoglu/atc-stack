@@ -109,7 +109,7 @@ authorization logic, which remains completely separate and unaffected.
 **External/operator-configured HTTP targets do not receive platform trace context automatically.**
 `@atc-web/atc-service-core/http`'s `HttpCaller` — the transport every genuinely external, operator-
 configured call goes through (scheduler's job targets, webhook-out's subscriber endpoints, audit's
-anchor webhook; notify's webhook channel has its own pre-existing, unrelated transport) — was not
+anchor webhook) — was not
 touched by this: it has no notion of trust and injects nothing implicitly, and none of those three
 wrapper classes build a trace header into what they send. Proven as a security regression, not just
 asserted: each has a test capturing the real outbound HTTP headers to a real local receiver and

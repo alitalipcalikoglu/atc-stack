@@ -38,7 +38,6 @@ before(async () => {
     env: {
       PATH: process.env.PATH ?? '', PORT: String(notifyPort), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
       NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>',
-      WEBHOOK_SIGNING_SECRET: randomSecret(), NOTIFY_WEBHOOK_CHANNEL: 'false',
     },
   });
   await Promise.all([audit.start(), notify.start()]);
@@ -73,11 +72,11 @@ test('a real service\'s /v1/info matches the documented contract shape exactly',
   assert.equal(typeof body.serviceCore, 'string');
 });
 
-test('notify\'s real /v1/info reflects NOTIFY_WEBHOOK_CHANNEL=false at runtime: "webhook" is absent from capabilities', { skip }, async () => {
+test('notify\'s real /v1/info advertises exactly its email channel, templates and idempotency', { skip }, async () => {
   const res = await fetch(`${notify.baseUrl}/v1/info`);
   const body = await res.json();
   assert.equal(body.service, 'atc-notify');
-  assert.deepEqual(body.capabilities, ['email', 'templates', 'idempotency'], 'webhook channel disabled: not advertised as a capability');
+  assert.deepEqual(body.capabilities, ['email', 'templates', 'idempotency']);
 });
 
 test('Stack#matrix(), pointed at these real running services (not a mock), parses their actual responses correctly', { skip }, async () => {

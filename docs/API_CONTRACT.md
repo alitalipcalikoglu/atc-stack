@@ -10,11 +10,11 @@ running instance without guessing from a version number.
 ```json
 {
   "service": "atc-notify",
-  "version": "1.0.0",
+  "version": "1.14.1",
   "apiVersion": "v1",
-  "capabilities": ["email", "webhook", "templates", "idempotency"],
+  "capabilities": ["email", "templates", "idempotency"],
   "schemaVersion": 3,
-  "serviceCore": "1.11.1"
+  "serviceCore": "1.14.1"
 }
 ```
 
@@ -23,7 +23,7 @@ running instance without guessing from a version number.
 | `service` | The manifest id (`atc-stack/src/manifest.js`), e.g. `"atc-notify"` — not a display label. |
 | `version` | The service's own package semver. A release number, unrelated to the API contract below. |
 | `apiVersion` | The `/v1` HTTP contract this instance serves. Independent of `version`: a service ships many package releases (`1.4.0`, `1.9.0`, …) while `apiVersion` stays `"v1"` throughout, and only changes when the `/v1` contract itself is replaced wholesale (there is no `/v2` as of this stage). |
-| `capabilities` | Real, public, currently-supported behaviors only — deterministic (the same running configuration always reports the same list), lowercase, stable identifiers, each documented in that service's own README. Never a planned or future feature, and never a behavior that is actually disabled in this instance's configuration (e.g. notify omits `"webhook"` when `NOTIFY_WEBHOOK_CHANNEL=false`). |
+| `capabilities` | Real, public, currently-supported behaviors only — deterministic (the same running configuration always reports the same list), lowercase, stable identifiers, each documented in that service's own README. Never a planned or future feature, and never a behavior that is actually disabled in this instance's configuration. |
 | `schemaVersion` | For a stateful service: its real, currently-open database schema version, read live from `Database#schemaVersion` (`PRAGMA user_version`) — never hand-maintained, never hardcoded. For a service with no database (today, only `atc-gateway`): always `null`. This is the one, consistent stateless contract — every stateless service reports `null`, not an omitted field, so a consumer never has to branch on whether the key exists. |
 | `serviceCore` | The version of `@atc-web/atc-service-core` actually installed and running in this process, read from that package's own `package.json` at import time (`readServiceVersion`/`SERVICE_CORE_VERSION` in `@atc-web/atc-service-core/fastify`) — it can never say something different from what is truly running. `null` for the one service with no dependency on service-core at all (`atc-gateway`, a deliberate, pre-existing design choice, not new to this stage). |
 
@@ -53,10 +53,10 @@ shape by hand, with `schemaVersion: null` and `serviceCore: null`.
 ## `stack status --matrix`
 
 ```
-SERVICE      STATUS VERSION  API  SCHEMA SERVICE-CORE  CAPABILITIES
-notify       ok     1.0.0    v1   3      1.11.1        email,webhook,templates,idempotency
-gateway      ok     1.0.0    v1   -      -             jwt-auth,rate-limit-policy,...
-shortlink    DOWN   ?        ?    ?      ?              (unreachable: connect ECONNREFUSED)
+SERVICE          STATUS VERSION  API  SCHEMA SERVICE-CORE  CAPABILITIES
+atc-notify       ok     1.14.1   v1   3      1.14.1        email,templates,idempotency
+atc-gateway      ok     1.14.1   v1   -      -             jwt-auth,rate-limit-policy,...
+atc-shortlink    DOWN   ?        ?    ?      ?             (unreachable: connect ECONNREFUSED)
 ```
 
 Reads `/health`, `/ready` and `/v1/info` per service, entirely independently and entirely

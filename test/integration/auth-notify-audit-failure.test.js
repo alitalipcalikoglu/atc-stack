@@ -68,7 +68,7 @@ function jwtKeyPath(tag) {
 function notifyEnv({ port, apiKey }) {
   return {
     PATH: process.env.PATH ?? '', PORT: String(port), HOST: '127.0.0.1', LOG_LEVEL: 'info', DB_PATH: ':memory:',
-    NOTIFY_API_KEYS: `atc-auth:${apiKey}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
+    NOTIFY_API_KEYS: `atc-auth:${apiKey}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>',
   };
 }
 

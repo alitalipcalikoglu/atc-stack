@@ -214,7 +214,7 @@ test('notify: real old-schema (v2) fixture with an existing queued message migra
       return sentinelId;
     },
     env: () => ({
-      NOTIFY_API_KEYS: `harness:${apiKey}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret(),
+      NOTIFY_API_KEYS: `harness:${apiKey}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>',
     }),
     verify: async ({ proc, dbPath, seeded }) => {
       const res = await fetch(`${proc.baseUrl}/v1/messages/${seeded}`, { headers: { authorization: `Bearer ${apiKey}` } });
@@ -414,7 +414,7 @@ test('notify: a real process refuses to start against a database one schema vers
         VALUES (?, 'harness', NULL, 'email', ?, 'sent', 1, 5, ?, ?, ?)
       `).run(sentinelId, JSON.stringify({ to: 'user@example.test' }), now, now, now);
     },
-    env: () => ({ NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>', WEBHOOK_SIGNING_SECRET: randomSecret() }),
+    env: () => ({ NOTIFY_API_KEYS: `harness:${randomSecret()}`, SMTP_URL: 'json:', SMTP_FROM: 'Harness <harness@example.test>' }),
     assertSentinelUnchanged: (raw) => {
       const row = /** @type {any} */ (raw.prepare('SELECT status FROM messages WHERE id = ?').get(sentinelId));
       assert.equal(row?.status, 'sent', 'the sentinel row must be completely untouched by the refused startup attempt');

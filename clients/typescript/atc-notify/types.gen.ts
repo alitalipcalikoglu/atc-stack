@@ -78,7 +78,7 @@ export interface paths {
         };
         /**
          * Service identity and capabilities
-         * @description Public, unauthenticated, uncached. `capabilities` is computed live from the channels actually wired into this instance: it drops `"webhook"` when `NOTIFY_WEBHOOK_CHANNEL=false` (Stage 7), so it always reflects real, currently-enabled behavior rather than a static list.
+         * @description Public, unauthenticated, uncached. `capabilities` lists the channels wired into this instance plus `templates` and `idempotency`.
          */
         get: operations["atc-notify.info.get"];
         put?: never;
@@ -124,7 +124,7 @@ export interface paths {
         put?: never;
         /**
          * Queue a message for delivery
-         * @description Inserts the message and returns immediately (`202` for a newly-created message, `200` when the request replays an existing `idempotencyKey`); actual delivery happens later, out of band, via the worker process. Body is polymorphic on `channel` (`email` or `webhook`); an `email` body's `data` is additionally validated, at request time, against the named template's own JSON Schema (`GET /v1/templates` lists the templates this instance ships with, each with its schema).
+         * @description Inserts the message and returns immediately (`202` for a newly-created message, `200` when the request replays an existing `idempotencyKey`); actual delivery happens later, out of band, via the worker process. `channel` is always `email`; the body's `data` is additionally validated, at request time, against the named template's own JSON Schema (`GET /v1/templates` lists the templates this instance ships with, each with its schema).
          *     **Idempotency**: `idempotencyKey`, when given, scopes one logical send per API key. Reusing a key with the identical channel and payload replays the original row (`200`); reusing it with a different channel or payload is a conflict (`409 IDEMPOTENCY_CONFLICT`) — the key is not a slot to overwrite.
          *     **State machine**: `queued -> processing -> sent | failed`. A `failed` message is retryable exactly once per call via `POST /v1/messages/{id}/retry` (full attempt-budget reset, not automatic); there is no cancel/abort endpoint. Automatic retries use exponential backoff with jitter (`BACKOFF_BASE_MS`, default 5000ms; `BACKOFF_CAP_MS`, default 3600000ms) up to `MAX_ATTEMPTS` attempts (default 8) before a message is settled as `failed`.
          */
@@ -243,10 +243,9 @@ export interface components {
             /** @constant */
             apiVersion: "v1";
             /**
-             * @description Real, currently-enabled behaviors only. Always includes `templates` and `idempotency`; includes `email` when the email channel is configured, and `webhook` unless `NOTIFY_WEBHOOK_CHANNEL=false`.
+             * @description Real, currently-enabled behaviors: `email`, `templates` and `idempotency`.
              * @example [
              *       "email",
-             *       "webhook",
              *       "templates",
              *       "idempotency"
              *     ]
@@ -264,16 +263,12 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            channel: "email" | "webhook";
+            channel: "email";
             status: components["schemas"]["MessageStatus"];
-            /** @description Template name. Populated for `channel: email` only; `null` for `webhook`. */
-            template: string | null;
-            /** @description Event name. Populated for `channel: webhook` only; `null` for `email`. */
-            event: string | null;
-            /** @description Recipient addresses. Populated for `channel: email` only; `null` for `webhook`. */
-            to: string[] | null;
-            /** @description Target URL. Populated for `channel: webhook` only; `null` for `email`. */
-            url: string | null;
+            /** @description Template name. */
+            template: string;
+            /** @description Recipient addresses. */
+            to: string[];
             /** @description Delivery attempts made so far. */
             attempts: number;
             /** @description Attempt budget this message was created with (`MAX_ATTEMPTS`, default 8). */
@@ -285,7 +280,7 @@ export interface components {
             nextAttemptAt: string | null;
             /** @description Error from the most recent failed attempt, truncated to 2000 characters. */
             lastError: string | null;
-            /** @description Provider reference from the successful attempt (SMTP message id, or `http <status>` for a webhook), once `status` is `sent`. */
+            /** @description Provider reference from the successful attempt (SMTP message id), once `status` is `sent`. */
             providerId: string | null;
             /** Format: date-time */
             createdAt: string;
@@ -315,33 +310,7 @@ export interface components {
             /** @description Validated server-side against the named template's own JSON Schema (see the `if`/`then` branches below, one per template, and `GET /v1/templates` for the same schemas at runtime). `locale` defaults to `tr` when omitted on every template. */
             data: Record<string, never>;
             idempotencyKey?: components["schemas"]["IdempotencyKey"];
-        } & (unknown & unknown & unknown & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            channel: "email";
-        });
-        MessageCreateWebhook: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            channel: "webhook";
-            /**
-             * Format: uri
-             * @description HTTP(S) target. Resolved through an SSRF guard at delivery time; redirects are not followed.
-             */
-            url: string;
-            event: string;
-            /** @description Free-form JSON, opaque to notify — sent verbatim as the delivered payload's `data` field. No further schema is enforced (unlike the `email` channel's per-template `data`). */
-            data: Record<string, never>;
-            /** @description Extra outbound request headers. Only `X-*` and `Authorization` names are allowed; values must be single-line printable ASCII (no CR/LF). */
-            headers?: {
-                [key: string]: string;
-            };
-            idempotencyKey?: components["schemas"]["IdempotencyKey"];
-        };
+        } & (unknown & unknown & unknown);
         EmailList: string[];
         /** @description Scopes one logical send per API key. Reusing it with an identical channel+payload replays the original message; reusing it with a different one is a `409 IDEMPOTENCY_CONFLICT`. */
         IdempotencyKey: string;
@@ -580,7 +549,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MessageCreateEmail"] | components["schemas"]["MessageCreateWebhook"];
+                "application/json": components["schemas"]["MessageCreateEmail"];
             };
         };
         responses: {
@@ -610,7 +579,7 @@ export interface operations {
                     "application/json": components["schemas"]["Message"];
                 };
             };
-            /** @description `VALIDATION_FAILED` — the body failed JSON Schema validation (unknown/missing field, wrong `channel` discriminator, malformed email/URL/event name, disallowed webhook header name, etc.), or an `email` message's `data` failed the named template's own schema (`details[].path` is prefixed `/data`). */
+            /** @description `VALIDATION_FAILED` — the body failed JSON Schema validation (unknown/missing field, a `channel` other than `email`, malformed address, etc.), or `data` failed the named template's own schema (`details[].path` is prefixed `/data`). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -620,15 +589,6 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
-            /** @description `WEBHOOK_CHANNEL_DISABLED` — `channel: "webhook"` was submitted while this instance runs with `NOTIFY_WEBHOOK_CHANNEL=false`. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
             /** @description `IDEMPOTENCY_CONFLICT` — `idempotencyKey` was already used by this API key with a different channel or payload. */
             409: {
                 headers: {
