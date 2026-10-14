@@ -136,7 +136,7 @@ function buildRoutes() {
   };
   return {
     jwt: { ...generated.jwt, jwksUrl: rebind(generated.jwt.jwksUrl) },
-    routes: generated.routes.filter((/** @type {any} */ r) => r.upstreams.every(isLive)).map((/** @type {any} */ r) => ({ ...r, upstreams: r.upstreams.map(rebind) })),
+    routes: generated.routes.filter((/** @type {any} */ r) => r.upstreams.every(isLive)).map((/** @type {any} */ { policy: _policy, ...r }) => ({ ...r, upstreams: r.upstreams.map(rebind) })), // no ratelimit service in this scenario
   };
 }
 

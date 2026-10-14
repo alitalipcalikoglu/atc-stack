@@ -267,7 +267,7 @@ export class Release {
       return commit ? `| ${id} | ${role} | \`${commit}\` | \`v${version}\` → \`${commit}\` |` : row;
     });
     next = next.replace(/\| v[\d.]+ published and verified \|/, `| v${version} published and verified |`);
-    next = next.replace(/- Supported release: all 15 repositories at `v[\d.]+`\./, `- Supported release: all 15 repositories at \`v${version}\`.`);
+    next = next.replace(/- Supported release: all (\d+) repositories at `v[\d.]+`\./, (_m, n) => `- Supported release: all ${n} repositories at \`v${version}\`.`);
     next = next.replace(/- `atc-stack` `v[\d.]+` peels to `[0-9a-f]+`; `atc-service-core`\n  `v[\d.]+` peels to `[0-9a-f]+`\./,
       `- \`atc-stack\` \`v${version}\` peels to \`${tags['atc-stack'].commit}\`; \`atc-service-core\`\n  \`v${version}\` peels to \`${tags['atc-service-core'].commit}\`.`);
     return next;
