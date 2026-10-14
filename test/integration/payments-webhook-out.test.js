@@ -68,7 +68,7 @@ test('a payment created through atc-payments is delivered by atc-webhook-out', {
   const body = await res.json();
   assert.equal(res.status, 201, JSON.stringify(body));
 
-  const hit = await waitUntil(() => received.find((r) => JSON.stringify(r.body).includes('payment.created')), { timeoutMs: 15_000, message: 'payment.created at the subscriber' });
+  const hit = /** @type {NonNullable<(typeof received)[number]>} */ (await waitUntil(() => received.find((r) => JSON.stringify(r.body).includes('payment.created')), { timeoutMs: 15_000, message: 'payment.created at the subscriber' }));
   assert.ok(JSON.stringify(hit.body).includes(body.payment.id), 'the delivery carries the payment id');
   assert.ok(Object.keys(hit.headers).some((h) => h.startsWith('x-webhook')), 'the delivery is signed by atc-webhook-out');
 });
