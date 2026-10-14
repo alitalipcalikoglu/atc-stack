@@ -129,7 +129,7 @@ export class Installer {
     }
     if (!existsSync(join(this.stackDir, '.git')) || !existsSync(join(this.stackDir, 'package.json'))) throw new InstallError('PREFLIGHT', `stack CLI is not running from a valid stack checkout: ${this.stackDir}`);
     const [major, minor] = process.versions.node.split('.').map(Number);
-    if (major < 22 || (major === 22 && minor < 13)) throw new InstallError('PREFLIGHT', `Node 22.13+ is required; found ${process.versions.node}`);
+    if (major < 22 || (major === 22 && minor < 17)) throw new InstallError('PREFLIGHT', `Node 22.17+ is required; found ${process.versions.node}`);
     await this.#tool('git', ['--version']);
     await this.#tool('npm', ['--version']);
     if (start) await this.#tool('pm2', ['--version'], 'PM2 is required for default startup; install it with "npm i -g pm2", or rerun with --no-start');
