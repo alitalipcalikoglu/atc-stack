@@ -38,6 +38,7 @@ const TEMPLATES = /** @type {Record<string, string>} */ ({
 });
 for (const [id, text] of Object.entries(TEMPLATES)) { mkdirSync(join(root, id), { recursive: true }); writeFileSync(join(root, id, '.env.example'), text); }
 mkdirSync(join(root, 'atc-auth', 'keys'), { recursive: true }); writeFileSync(join(root, 'atc-auth', 'keys', 'jwt-private.pem'), 'x');
+mkdirSync(join(root, 'atc-audit', 'keys'), { recursive: true }); writeFileSync(join(root, 'atc-audit', 'keys', 'anchor-private.pem'), 'x');
 writeFileSync(join(root, 'atc-console', 'server.mjs'), '// canonical adapter-node wrapper\n');
 mkdirSync(join(root, 'atc-console', 'build'), { recursive: true }); writeFileSync(join(root, 'atc-console', 'build', 'handler.js'), '// adapter-node handler\n');
 
@@ -67,6 +68,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.equal(env('atc-console').FLAGS_API_KEY, keys('atc-flags', 'FLAGS_API_KEYS')['atc-console'].secret);
   assert.equal(keys('atc-audit', 'AUDIT_API_KEYS')['atc-console'].role, 'readwrite');
   assert.equal(env('atc-console').AUDIT_API_KEY, keys('atc-audit', 'AUDIT_API_KEYS')['atc-console'].secret);
+  assert.equal(env('atc-audit').ANCHOR_PRIVATE_KEY_PATH, './keys/anchor-private.pem', 'chain anchors are on by default');
   assert.equal(env('atc-console').WEBHOOK_OUT_API_KEY, keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-console'].secret);
   assert.equal(env('atc-console').SEARCH_API_KEY, keys('atc-search', 'SEARCH_API_KEYS')['atc-console'].secret);
   assert.equal(env('atc-console').RATELIMIT_API_KEY, keys('atc-ratelimit', 'RATELIMIT_API_KEYS')['atc-console'].secret);
@@ -168,11 +170,12 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
 
 test('setup prepares missing JWT keys and always refreshes the console build', async () => {
   rmSync(join(root, 'atc-auth', 'keys'), { recursive: true });
+  rmSync(join(root, 'atc-audit', 'keys'), { recursive: true });
   rmSync(join(root, 'atc-console', 'build'), { recursive: true });
   /** @type {string[]} */ const ran = [];
   const ctx = new SetupContext({ root, host: '127.0.0.1', local: true, run: async (id, argv) => { ran.push(`${id} ${argv.join(' ')}`); } });
   await ctx.compute();
-  assert.deepEqual(ran, ['atc-auth npm run keygen', 'atc-console npm run build']);
+  assert.deepEqual(ran, ['atc-auth npm run keygen', 'atc-audit npm run anchor-keygen -- keys/anchor', 'atc-console npm run build']);
 });
 
 test('setup rejects an obsolete Console checkout without the canonical adapter-node wrapper', async () => {

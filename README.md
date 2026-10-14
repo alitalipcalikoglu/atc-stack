@@ -130,7 +130,7 @@ directory — no HTTP route, no new auth system; see [atc-media/README.md](../at
 ## What `setup` does
 
 1. **Dependencies**: `npm ci` in every folder that has no `node_modules` (or all with `--install`).
-2. **Preparation**: `npm run keygen` in `atc-auth` when `keys/jwt-private.pem` is missing; `npm run build` in `atc-console` when `public/` is missing.
+2. **Preparation**: `npm run keygen` in `atc-auth` when `keys/jwt-private.pem` is missing, `npm run anchor-keygen -- keys/anchor` in `atc-audit` when `keys/anchor-private.pem` is missing (signed chain anchors are on by default); `npm run build` in `atc-console` when `public/` is missing.
 3. **Env files**: each service's `.env` is loaded (or started from its `.env.example`), then the stack sets `PORT`, `HOST`, every secret that is empty or still a `REPLACE_WITH…` placeholder, the URLs services use to reach each other, and the API keys:
    - every service that issues keys (`*_API_KEYS`) gets an entry per holder: `atc-console` (role `read` for audit, default elsewhere), `atc-gateway` (auth, media, notify), `atc-auth` (notify), `atc-scheduler` (flags `write`, notify, webhook-out `publish`);
    - holders receive the same secret: console `*_API_KEY` variables and `GATEWAY_METRICS_TOKEN`, gateway `AUTH_API_KEY`/`MEDIA_API_KEY`/`NOTIFY_API_KEY`, auth `NOTIFY_API_KEY`, scheduler `TARGET_KEYS`.

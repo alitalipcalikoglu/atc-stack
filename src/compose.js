@@ -64,6 +64,7 @@ export class Compose {
       for (const [k, v] of Object.entries(s.env(c))) e.set(k, v);
       if (s.files) files.set(s.id, s.files(c));
     }
+    c.env('atc-audit').set('ANCHOR_PRIVATE_KEY_PATH', '/keys/anchor-private.pem');
     // The backup service reads every data volume, mounted under /sources/<id>.
     c.env('atc-backup').set('BACKUP_SOURCES', Object.entries(DATA_FILES).map(([id, file]) => `${id}=/sources/${id}/${file}`).join(','));
     mkdirSync(join(this.outDir, 'env'), { recursive: true, mode: 0o700 });
@@ -93,7 +94,7 @@ export class Compose {
       /** @type {string[]} */
       const mounts = [];
       if (s.id in DATA_FILES || s.id === 'atc-backup') { mounts.push(`${s.id}-data:/data`); volumes[`${s.id}-data`] = {}; }
-      if (s.id === 'atc-auth') mounts.push(`${rel(join(this.root, 'atc-auth', 'keys'))}:/keys:ro`);
+      if (s.id === 'atc-auth' || s.id === 'atc-audit') mounts.push(`${rel(join(this.root, s.id, 'keys'))}:/keys:ro`);
       if (s.id === 'atc-gateway' || s.id === 'atc-console') mounts.push(`./config/${s.id}:/config:ro`);
       // SQLite reads a WAL database through its -shm file, so the source volumes are mounted read-write.
       if (s.id === 'atc-backup') for (const id of Object.keys(DATA_FILES)) mounts.push(`${id}-data:/sources/${id}`);

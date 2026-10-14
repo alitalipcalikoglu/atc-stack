@@ -73,7 +73,9 @@ export const SERVICES = [
   },
   {
     id: 'atc-audit', port: 3005, keysVar: 'AUDIT_API_KEYS',
-    env: () => ({}),
+    // Signed chain anchors: without them the hash chain alone cannot prove the log was not rewritten by whoever can write the database.
+    prepare: async (c) => { if (!c.exists('atc-audit', 'keys/anchor-private.pem')) await c.run('atc-audit', ['npm', 'run', 'anchor-keygen', '--', 'keys/anchor']); },
+    env: (c) => ({ ANCHOR_PRIVATE_KEY_PATH: c.keep('atc-audit', 'ANCHOR_PRIVATE_KEY_PATH', './keys/anchor-private.pem') }),
     console: { type: 'atc-audit', label: 'Audit', keyEnv: 'AUDIT_API_KEY', polling: { enabled: true, intervalSec: 60 } },
   },
   {
