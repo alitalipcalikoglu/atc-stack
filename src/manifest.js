@@ -42,7 +42,7 @@ const withDataTypes = (list) => [...new Set([...list.split(',').map((t) => t.tri
 const DATA_FILES = {
   'atc-notify': 'notify.db', 'atc-auth': 'auth.db', 'atc-media': 'media.db', 'atc-audit': 'audit.db', 'atc-shortlink': 'shortlink.db', 'atc-flags': 'flags.db',
   'atc-scheduler': 'scheduler.db', 'atc-webhook-out': 'webhook-out.db', 'atc-search': 'search.db', 'atc-ratelimit': 'ratelimit.db', 'atc-geo': 'geo.db',
-  'atc-content': 'content.db', 'atc-export': 'export.db', 'atc-render': 'render.db', 'atc-queue': 'queue.db', 'atc-console': 'console.db',
+  'atc-content': 'content.db', 'atc-export': 'export.db', 'atc-render': 'render.db', 'atc-queue': 'queue.db', 'atc-status': 'status.db', 'atc-console': 'console.db',
 };
 
 /** @type {Service[]} */
@@ -163,6 +163,17 @@ export const SERVICES = [
     console: { type: 'atc-backup', label: 'Backups', keyEnv: 'BACKUP_API_KEY' },
   },
   {
+    id: 'atc-status', port: 3018, keysVar: 'STATUS_API_KEYS',
+    env: (c) => ({
+      ...auditEnv(c, 'atc-status'),
+      // /health and /ready of every other service, as public monitors on the status page.
+      MONITOR_SEEDS: SERVICES.filter((s) => s.id !== 'atc-status').map((s) => `${s.id}=${c.url(s.id)}`).join(','),
+      NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-status'),
+      ALERT_EMAILS: c.keep('atc-status', 'ALERT_EMAILS', 'ops@example.com'),
+    }),
+    console: { type: 'atc-status', label: 'Status', keyEnv: 'STATUS_API_KEY' },
+  },
+  {
     id: 'atc-gateway', port: 3000,
     env: (c) => ({
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
@@ -195,4 +206,5 @@ export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({
   'atc-audit': 'readwrite', // reads events and forwards its own log
   'atc-queue': 'admin', // manages queues, purges and redrives dead letters
   'atc-backup': 'admin', // runs, downloads, verifies, restores and deletes backups
+  'atc-status': 'admin', // creates, changes, checks and deletes monitors
 });

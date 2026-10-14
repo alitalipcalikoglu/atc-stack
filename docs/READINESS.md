@@ -22,6 +22,7 @@ section of any service before relying on it for something that matters.
 
 | Service | Ready means | Scaling | Process boundary |
 |---|---|---|---|
+| [status](../../atc-status/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; one check loop, one open incident per monitor (partial unique index) | single process (`instances: 1` pinned) |
 | [backup](../../atc-backup/docs/READINESS.md) | `db.ping()` + writable `BACKUP_DIR`, cached 10s | **B — single-node stateful**; one backup or restore at a time, reads the sources in place on their host | single process (`instances: 1` pinned) |
 | [queue](../../atc-queue/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; claims in `BEGIN IMMEDIATE`, lease tokens fence ack/nack/extend, a reaper reclaims expired leases | single process (`instances: 1` pinned) |
 | [gateway](../../atc-gateway/docs/READINESS.md) | every route has at least one upstream passing its own `/health` probe (2s timeout, 15s cache) | **A — stateless, horizontally scalable**; per-instance state not shared: local per-IP limiter, per-instance circuit breaker, geo cache | single process only |
@@ -48,4 +49,4 @@ real `src/api-main.js` + `src/worker-main.js` split (confirmed on disk) and `spl
 `Stack#generateSplitEcosystem`, `src/stack.js`). Every other service only ever runs its single
 combined app.
 
-No gaps found: all 18 services that run as their own process have a `docs/READINESS.md`.
+No gaps found: all 19 services that run as their own process have a `docs/READINESS.md`.

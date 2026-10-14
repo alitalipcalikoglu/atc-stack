@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (213 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (221 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -215,6 +215,14 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-shortlink.links.stats": (init: FetchOptions<operations["atc-console.atc-shortlink.links.stats"]>) => client.GET("/api/services/{sid}/atc-shortlink/links/{id}/stats", init),
     "atc-console.atc-shortlink.links.update": (init: FetchOptions<operations["atc-console.atc-shortlink.links.update"]>) => client.PATCH("/api/services/{sid}/atc-shortlink/links/{id}", init),
     "atc-console.atc-shortlink.stats.get": (init: FetchOptions<operations["atc-console.atc-shortlink.stats.get"]>) => client.GET("/api/services/{sid}/atc-shortlink/stats", init),
+    "atc-console.atc-status.incidents.list": (init: FetchOptions<operations["atc-console.atc-status.incidents.list"]>) => client.GET("/api/services/{sid}/atc-status/incidents", init),
+    "atc-console.atc-status.monitors.check": (init: FetchOptions<operations["atc-console.atc-status.monitors.check"]>) => client.POST("/api/services/{sid}/atc-status/monitors/{id}/check", init),
+    "atc-console.atc-status.monitors.checks": (init: FetchOptions<operations["atc-console.atc-status.monitors.checks"]>) => client.GET("/api/services/{sid}/atc-status/monitors/{id}/checks", init),
+    "atc-console.atc-status.monitors.delete": (init: FetchOptions<operations["atc-console.atc-status.monitors.delete"]>) => client.DELETE("/api/services/{sid}/atc-status/monitors/{id}", init),
+    "atc-console.atc-status.monitors.get": (init: FetchOptions<operations["atc-console.atc-status.monitors.get"]>) => client.GET("/api/services/{sid}/atc-status/monitors/{id}", init),
+    "atc-console.atc-status.monitors.list": (init: FetchOptions<operations["atc-console.atc-status.monitors.list"]>) => client.GET("/api/services/{sid}/atc-status/monitors", init),
+    "atc-console.atc-status.monitors.upsert": (init: FetchOptions<operations["atc-console.atc-status.monitors.upsert"]>) => client.PUT("/api/services/{sid}/atc-status/monitors/{id}", init),
+    "atc-console.atc-status.stats.get": (init: FetchOptions<operations["atc-console.atc-status.stats.get"]>) => client.GET("/api/services/{sid}/atc-status/stats", init),
     "atc-console.atc-webhook-out.deliveries.cancel": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.cancel"]>) => client.POST("/api/services/{sid}/atc-webhook-out/deliveries/{id}/cancel", init),
     "atc-console.atc-webhook-out.deliveries.get": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.get"]>) => client.GET("/api/services/{sid}/atc-webhook-out/deliveries/{id}", init),
     "atc-console.atc-webhook-out.deliveries.list": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.list"]>) => client.GET("/api/services/{sid}/atc-webhook-out/deliveries", init),

@@ -22,5 +22,6 @@ export const REPOSITORIES = Object.freeze([
   'atc-render',
   'atc-queue',
   'atc-backup',
+  'atc-status',
 ].map((id) => Object.freeze({ id, remote: `https://github.com/alitalipcalikoglu/${id}.git` })));
 

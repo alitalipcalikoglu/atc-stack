@@ -68,10 +68,10 @@ state update is necessarily newer.
 
 ## Current suite contract
 
-- 18 canonical `openapi.yaml` files, all OpenAPI 3.1.0. Console: 163 paths, 213 operations. Suite:
-  522 operations (repositories added on `main` after the supported release enter the next release manifest).
-- Generated TypeScript clients: 18/18, 522/522 operations, no regeneration drift.
-- MCP: 522-operation candidate catalog, 10 explicitly exposed tools, STDIO transport only.
+- 19 canonical `openapi.yaml` files, all OpenAPI 3.1.0. Console: 169 paths, 221 operations. Suite:
+  546 operations (repositories added on `main` after the supported release enter the next release manifest).
+- Generated TypeScript clients: 19/19, 546/546 operations, no regeneration drift.
+- MCP: 546-operation candidate catalog, 10 explicitly exposed tools, STDIO transport only.
 
 Boundaries:
 

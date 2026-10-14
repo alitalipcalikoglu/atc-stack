@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 522,
+  "totalOperations": 546,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -2701,6 +2701,102 @@
       "operationId": "atc-console.atc-shortlink.stats.get",
       "method": "GET",
       "path": "/api/services/{sid}/atc-shortlink/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.incidents.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/incidents",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.monitors.check",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-status/monitors/{id}/check",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.monitors.checks",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/monitors/{id}/checks",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.monitors.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-status/monitors/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.monitors.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/monitors/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.monitors.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/monitors",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.monitors.upsert",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-status/monitors/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/stats",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -5532,6 +5628,170 @@
     {
       "service": "atc-shortlink",
       "operationId": "atc-shortlink.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.incidents.get",
+      "method": "GET",
+      "path": "/v1/incidents/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.incidents.list",
+      "method": "GET",
+      "path": "/v1/incidents",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.monitors.check",
+      "method": "POST",
+      "path": "/v1/monitors/{id}/check",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.monitors.checks",
+      "method": "GET",
+      "path": "/v1/monitors/{id}/checks",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.monitors.delete",
+      "method": "DELETE",
+      "path": "/v1/monitors/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.monitors.get",
+      "method": "GET",
+      "path": "/v1/monitors/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.monitors.list",
+      "method": "GET",
+      "path": "/v1/monitors",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.monitors.upsert",
+      "method": "PUT",
+      "path": "/v1/monitors/{id}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.page.get",
+      "method": "GET",
+      "path": "/status",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.page.summary",
+      "method": "GET",
+      "path": "/status/summary.json",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.stats.get",
       "method": "GET",
       "path": "/v1/stats",
       "flags": [

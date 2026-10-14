@@ -1,0 +1,21 @@
+{
+  "service": "atc-status",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/status" },
+    { "method": "GET", "path": "/status/summary.json" },
+    { "method": "GET", "path": "/v1/monitors" },
+    { "method": "PUT", "path": "/v1/monitors/{id}" },
+    { "method": "GET", "path": "/v1/monitors/{id}" },
+    { "method": "DELETE", "path": "/v1/monitors/{id}" },
+    { "method": "POST", "path": "/v1/monitors/{id}/check" },
+    { "method": "GET", "path": "/v1/monitors/{id}/checks" },
+    { "method": "GET", "path": "/v1/incidents" },
+    { "method": "GET", "path": "/v1/incidents/{id}" },
+    { "method": "GET", "path": "/v1/stats" }
+  ]
+}

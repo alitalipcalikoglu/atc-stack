@@ -213,7 +213,15 @@
     { "method": "DELETE", "path": "/api/services/{sid}/atc-backup/backups/{id}" },
     { "method": "POST", "path": "/api/services/{sid}/atc-backup/backups/{id}/verify" },
     { "method": "POST", "path": "/api/services/{sid}/atc-backup/backups/{id}/restore" },
-    { "method": "GET", "path": "/api/services/{sid}/atc-backup/backups/{id}/file" }
+    { "method": "GET", "path": "/api/services/{sid}/atc-backup/backups/{id}/file" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/stats" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/monitors" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/monitors/{id}" },
+    { "method": "PUT", "path": "/api/services/{sid}/atc-status/monitors/{id}" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-status/monitors/{id}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-status/monitors/{id}/check" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/monitors/{id}/checks" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/incidents" }
   ],
   "exclusions": [
     "GET /* (static asset serving via @fastify/static, wildcard over PUBLIC_DIR) and the SPA fallback in setNotFoundHandler: not an API contract, serves the built Svelte app (index.html) for unmatched non-API GET/HEAD paths."
