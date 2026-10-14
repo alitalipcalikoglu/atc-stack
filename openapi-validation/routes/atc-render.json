@@ -1,0 +1,21 @@
+{
+  "service": "atc-render",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/templates" },
+    { "method": "POST", "path": "/v1/templates" },
+    { "method": "GET", "path": "/v1/templates/{name}" },
+    { "method": "PATCH", "path": "/v1/templates/{name}" },
+    { "method": "DELETE", "path": "/v1/templates/{name}" },
+    { "method": "POST", "path": "/v1/templates/{name}/versions" },
+    { "method": "GET", "path": "/v1/templates/{name}/versions/{version}" },
+    { "method": "POST", "path": "/v1/render" },
+    { "method": "POST", "path": "/v1/render/preview" },
+    { "method": "GET", "path": "/v1/stats" }
+  ],
+  "exclusions": []
+}

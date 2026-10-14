@@ -184,6 +184,15 @@
     { "method": "POST", "path": "/api/services/{sid}/atc-export/exports/{id}/retry" },
     { "method": "GET", "path": "/api/services/{sid}/atc-export/exports/{id}/file" },
     { "method": "GET", "path": "/api/services/{sid}/atc-export/exports/{id}/download" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/stats" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/templates" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-render/templates" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/templates/{id}" },
+    { "method": "PATCH", "path": "/api/services/{sid}/atc-render/templates/{id}" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-render/templates/{id}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-render/templates/{id}/versions" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/templates/{id}/versions/{sub}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-render/preview" },
     { "method": "PUT", "path": "/api/services/{sid}/atc-media/files" }
   ],
   "exclusions": [

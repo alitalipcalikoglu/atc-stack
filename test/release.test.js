@@ -27,7 +27,7 @@ test('manifest takes its entries from the repository catalog, so a new repositor
   assert.deepEqual(Object.keys(next.repositories), REPOSITORIES.map((r) => r.id));
   const added = REPOSITORIES.find((r) => !(r.id in manifest.repositories));
   if (added) assert.deepEqual(next.repositories[added.id], { repository: added.remote, tag: 'v9.9.9', commit: commits[added.id] });
-  assert.ok(REPOSITORIES.some((r) => r.id === 'atc-content') && REPOSITORIES.some((r) => r.id === 'atc-export'));
+  assert.ok(REPOSITORIES.some((r) => r.id === 'atc-content') && REPOSITORIES.some((r) => r.id === 'atc-export') && REPOSITORIES.some((r) => r.id === 'atc-render'));
   assert.throws(() => Release.manifest(manifest, '9.9.9', { ...commits, 'atc-content': '' }), /no commit for atc-content/);
 });
 
@@ -64,12 +64,12 @@ test('projectState rewrite is idempotent on the current file and moves every rel
 
 test('evidence carries the matrix, tests and install results', () => {
   const tags = { 'atc-stack': { tagObject: 'a', commit: 'b' }, 'atc-service-core': { tagObject: 'c', commit: 'd' } };
-  const state = { version: '9.9.9', previous: '9.9.8', tests: { 'atc-stack': 1 }, steps: { docker: 15, candidateInstall: { readiness: '15/15' }, defaultInstall: { readiness: '15/15' } } };
+  const state = { version: '9.9.9', previous: '9.9.8', tests: { 'atc-stack': 1 }, steps: { docker: 16, candidateInstall: { readiness: '16/16' }, defaultInstall: { readiness: '16/16' } } };
   const evidence = Release.evidence(state, tags, '2030-01-01');
   assert.deepEqual(evidence.releaseMatrix.map((e) => e.repo), ['atc-service-core', 'atc-stack']);
   assert.equal(evidence.publication.stackTagCommit, 'b');
   assert.equal(evidence.supersedes, '9.9.8');
-  assert.match(evidence.tests.docker, /^15\/15 /);
+  assert.match(evidence.tests.docker, /^16\/16 /);
 });
 
 test('prepare refuses to start without release notes or on a dirty workspace, and never pushes then', async () => {

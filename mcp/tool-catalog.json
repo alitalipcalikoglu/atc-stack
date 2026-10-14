@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 442,
+  "totalOperations": 466,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -1792,6 +1792,114 @@
         "OPERATOR",
         "POOR_MCP_FIT",
         "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.preview",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-render/preview",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.templates.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-render/templates",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.templates.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-render/templates/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.templates.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/templates/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.templates.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/templates",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.templates.update",
+      "method": "PATCH",
+      "path": "/api/services/{sid}/atc-render/templates/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.versions.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-render/templates/{id}/versions",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.versions.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/templates/{id}/versions/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
       ],
       "exposedInPhase3": false
     },
@@ -4093,6 +4201,160 @@
       "flags": [
         "DESTRUCTIVE",
         "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.render.create",
+      "method": "POST",
+      "path": "/v1/render",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.render.preview",
+      "method": "POST",
+      "path": "/v1/render/preview",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.templates.create",
+      "method": "POST",
+      "path": "/v1/templates",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.templates.delete",
+      "method": "DELETE",
+      "path": "/v1/templates/{name}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.templates.get",
+      "method": "GET",
+      "path": "/v1/templates/{name}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.templates.list",
+      "method": "GET",
+      "path": "/v1/templates",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.templates.update",
+      "method": "PATCH",
+      "path": "/v1/templates/{name}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.versions.create",
+      "method": "POST",
+      "path": "/v1/templates/{name}/versions",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.versions.get",
+      "method": "GET",
+      "path": "/v1/templates/{name}/versions/{version}",
+      "flags": [
+        "READ_SAFE"
       ],
       "exposedInPhase3": false
     },

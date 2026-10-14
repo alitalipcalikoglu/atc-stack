@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (184 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (193 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -152,6 +152,15 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-ratelimit.stats.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.stats.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/stats", init),
     "atc-console.atc-ratelimit.subjects.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.subjects.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}", init),
     "atc-console.atc-ratelimit.subjects.resetUsage": (init: FetchOptions<operations["atc-console.atc-ratelimit.subjects.resetUsage"]>) => client.DELETE("/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}/usage", init),
+    "atc-console.atc-render.preview": (init: FetchOptions<operations["atc-console.atc-render.preview"]>) => client.POST("/api/services/{sid}/atc-render/preview", init),
+    "atc-console.atc-render.stats.get": (init: FetchOptions<operations["atc-console.atc-render.stats.get"]>) => client.GET("/api/services/{sid}/atc-render/stats", init),
+    "atc-console.atc-render.templates.create": (init: FetchOptions<operations["atc-console.atc-render.templates.create"]>) => client.POST("/api/services/{sid}/atc-render/templates", init),
+    "atc-console.atc-render.templates.delete": (init: FetchOptions<operations["atc-console.atc-render.templates.delete"]>) => client.DELETE("/api/services/{sid}/atc-render/templates/{id}", init),
+    "atc-console.atc-render.templates.get": (init: FetchOptions<operations["atc-console.atc-render.templates.get"]>) => client.GET("/api/services/{sid}/atc-render/templates/{id}", init),
+    "atc-console.atc-render.templates.list": (init: FetchOptions<operations["atc-console.atc-render.templates.list"]>) => client.GET("/api/services/{sid}/atc-render/templates", init),
+    "atc-console.atc-render.templates.update": (init: FetchOptions<operations["atc-console.atc-render.templates.update"]>) => client.PATCH("/api/services/{sid}/atc-render/templates/{id}", init),
+    "atc-console.atc-render.versions.create": (init: FetchOptions<operations["atc-console.atc-render.versions.create"]>) => client.POST("/api/services/{sid}/atc-render/templates/{id}/versions", init),
+    "atc-console.atc-render.versions.get": (init: FetchOptions<operations["atc-console.atc-render.versions.get"]>) => client.GET("/api/services/{sid}/atc-render/templates/{id}/versions/{sub}", init),
     "atc-console.atc-scheduler.jobs.create": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.create"]>) => client.POST("/api/services/{sid}/atc-scheduler/jobs", init),
     "atc-console.atc-scheduler.jobs.delete": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.delete"]>) => client.DELETE("/api/services/{sid}/atc-scheduler/jobs/{id}", init),
     "atc-console.atc-scheduler.jobs.get": (init: FetchOptions<operations["atc-console.atc-scheduler.jobs.get"]>) => client.GET("/api/services/{sid}/atc-scheduler/jobs/{id}", init),

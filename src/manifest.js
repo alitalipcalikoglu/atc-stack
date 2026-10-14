@@ -133,6 +133,12 @@ export const SERVICES = [
     console: { type: 'atc-export', label: 'Exports', keyEnv: 'EXPORT_API_KEY' },
   },
   {
+    id: 'atc-render', port: 3015, keysVar: 'RENDER_API_KEYS',
+    // Media is its only network peer: image blocks by file id and stored renders.
+    env: (c) => ({ ...auditEnv(c, 'atc-render'), MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-render') }),
+    console: { type: 'atc-render', label: 'Render', keyEnv: 'RENDER_API_KEY' },
+  },
+  {
     id: 'atc-gateway', port: 3000,
     env: (c) => ({
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),

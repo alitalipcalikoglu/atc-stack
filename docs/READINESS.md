@@ -35,6 +35,7 @@ section of any service before relying on it for something that matters.
 | [search](../../atc-search/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; every write path transactional, but its own search counters are process-local and would diverge across instances | single process (`instances: 1` pinned) |
 | [ratelimit](../../atc-ratelimit/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; the check/consume path is safe under two processes sharing one file (whole read-decide-write sequence in one transaction), but this service isn't run that way today | single process (`instances: 1` pinned) |
 | [geo](../../atc-geo/docs/READINESS.md) | `db.ping()` and, when `MMDB_PATH` is set, that the IP database actually loaded | **A for in-memory lookups/reference data, B for place collections**; classified **B** overall because one process owns both | single process |
+| [render](../../atc-render/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; templates and render log in SQLite, CPU-bound rendering bounded by `RENDER_CONCURRENCY` (429 beyond) | single process (`instances: 1` pinned) |
 | [export](../../atc-export/docs/READINESS.md) | `db.ping()`, cached 10s; reports `worker: "running"` or `"stopped"` | **B — single-node stateful**; worker in-process, claims transactional and fenced on an owner token, heartbeat-renewed leases | single process (`instances: 1` pinned) |
 | [content](../../atc-content/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; bundle cache is keyed by release number (always correct), bundle request counters are per process | single process (`instances: 1` pinned) |
 
@@ -45,4 +46,4 @@ real `src/api-main.js` + `src/worker-main.js` split (confirmed on disk) and `spl
 `Stack#generateSplitEcosystem`, `src/stack.js`). Every other service only ever runs its single
 combined app.
 
-No gaps found: all 15 services that run as their own process have a `docs/READINESS.md`.
+No gaps found: all 16 services that run as their own process have a `docs/READINESS.md`.
