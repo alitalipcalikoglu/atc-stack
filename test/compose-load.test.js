@@ -118,3 +118,29 @@ test('load: the writes profile prepares its policy, queue and link and builds di
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('deps: audit and outdated are read per service, high findings fail, the SBOM is written per service', async () => {
+  const { Deps } = await import('../src/deps.js');
+  const calls = [];
+  const exec = async (/** @type {string} */ cwd, /** @type {string[]} */ argv) => {
+    calls.push(`${cwd.split('/').pop()} ${argv[1]}`);
+    if (argv[1] === 'audit') return { code: cwd.endsWith('atc-queue') ? 1 : 0, out: `npm warn something\n${JSON.stringify({ metadata: { vulnerabilities: { low: 1, high: cwd.endsWith('atc-queue') ? 2 : 0 } } })}` };
+    if (argv[1] === 'outdated') return { code: 1, out: JSON.stringify({ fastify: { current: '4.1.0', latest: '5.0.0' }, pino: { current: '9.1.0', latest: '9.2.0' } }) };
+    return { code: 0, out: JSON.stringify({ bomFormat: 'CycloneDX', components: [] }) };
+  };
+  const deps = new Deps({ root: '/ws', exec });
+  const report = await deps.check();
+  assert.equal(report.results.length, SERVICES.length);
+  assert.deepEqual([report.results[0].outdated, report.results[0].majorBehind], [2, 1]);
+  assert.equal(report.failed, true);
+  assert.equal(report.results.find((r) => r.id === 'atc-queue')?.vulnerabilities.high, 2);
+  assert.match(Deps.table(report), /service\s+critical\s+high/);
+  const out = mkdtempSync(join(tmpdir(), 'atc-sbom-'));
+  try {
+    const r = await deps.sbom(out);
+    assert.equal(r.written.length, SERVICES.length);
+    assert.equal(JSON.parse(readFileSync(r.written[0], 'utf8')).bomFormat, 'CycloneDX');
+  } finally {
+    rmSync(out, { recursive: true, force: true });
+  }
+});

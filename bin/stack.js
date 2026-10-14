@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import './../src/quiet.js';
-import { dirname, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SERVICES } from '../src/manifest.js';
 import { Compose } from '../src/compose.js';
+import { Deps } from '../src/deps.js';
 import { LoadTest } from '../src/load-test.js';
 import { Release } from '../src/release.js';
 import { REPOSITORIES } from '../src/repository-catalog.js';
@@ -16,6 +17,8 @@ import { Stack } from '../src/stack.js';
  *   up [--split-workers] | down [--split-workers] | status [--matrix] | dev   --root <dir>
  *   backup   --root <dir> --dir <snapshot dir>                     (default dir: <root>/backups/<timestamp>)
  *   restore  <snapshot dir> --root <dir> --service <id>             (default: every service the snapshot covers)
+ *   deps:check [--json]                                              (npm audit + outdated for every service; fails on high/critical)
+ *   sbom [--dir dir]                                                 (CycloneDX bill of materials per service, default <stack>/sbom)
  *   maintenance <service>   --root <dir>                            (one-shot; today: media only)
  *   keys [list] | keys rotate <issuer> <holder>                     (who may call what, no secrets; replace one key's secret)
  *   mcp:config [--read-only | --full] [--print]                     (MCP keys + mcp.env + .mcp.json)
@@ -94,6 +97,16 @@ export class Cli {
         console.log(`\nrestored: ${r.restored.join(', ') || 'none'}`);
         if (r.skipped.length) console.log(`skipped (not in snapshot): ${r.skipped.join(', ')}`);
         return 0;
+      }
+      case 'deps:check': {
+        const report = await new Deps({ root, exec: Stack.exec }).check();
+        console.log(flags.json ? JSON.stringify(report, null, 2) : Deps.table(report));
+        return report.failed ? 1 : 0;
+      }
+      case 'sbom': {
+        const r = await new Deps({ root, exec: Stack.exec, log: (l) => console.error(l) }).sbom(String(flags.dir ?? join(stackDir, 'sbom')));
+        console.log(`wrote ${r.written.length} SBOM files (CycloneDX)${r.failed.length ? `; failed: ${r.failed.join(', ')}` : ''}`);
+        return r.failed.length ? 1 : 0;
       }
       case 'maintenance': {
         if (!positional[0]) { console.error('usage: atc-stack maintenance <service> [--root dir]'); return 2; }

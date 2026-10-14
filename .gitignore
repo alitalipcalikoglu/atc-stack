@@ -5,3 +5,4 @@ node_modules/
 compose/
 mcp.env
 .mcp.json
+sbom/

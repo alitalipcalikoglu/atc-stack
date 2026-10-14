@@ -28,6 +28,8 @@
     "mcp:config": "node bin/stack.js mcp:config",
     "keys": "node bin/stack.js keys",
     "load": "node bin/stack.js load",
+    "deps:check": "node bin/stack.js deps:check",
+    "sbom": "node bin/stack.js sbom",
     "release:prepare": "node bin/stack.js release:prepare",
     "release:verify": "node bin/stack.js release:verify",
     "release:publish": "node bin/stack.js release:publish",

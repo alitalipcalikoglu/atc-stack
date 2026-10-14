@@ -265,6 +265,10 @@ A new service is part of the stack from its first release. In the same delivery:
 3. Add the port to the table above and a template line to `test/stack.test.js` so the wiring test covers it.
 4. Run `npm run setup` and `npm run dev`; every service, old and new, must report `ready`.
 
+## Dependencies and SBOM
+
+`npm run deps:check` runs `npm audit --omit=dev` and `npm outdated` in every service and prints one table (vulnerabilities by severity, packages behind, packages a major version behind); it exits non-zero on any high or critical finding, or when audit could not run (`--json` for scripts). It changes nothing: updating a dependency stays a deliberate, tested act per service. `npm run sbom` writes a CycloneDX bill of materials of the production dependencies of every service (from its `package-lock.json`) to `sbom/<service>.cdx.json` (git-ignored; `--dir` to choose another folder), for audits or a supply-chain scanner. Run both before a release.
+
 ## Releasing
 
 Every repository shares one version. A release runs locally in three resumable steps; progress is
