@@ -189,23 +189,23 @@ Default routes are public and change nothing: `/health`, `/.well-known/jwks.json
 |---|---|---|---|---|
 | atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream (auth, media, content, status, payments webhooks) |
 | atc-notify | 3001 | [atc-notify](https://github.com/alitalipcalikoglu/atc-notify) | Queued e-mail with templates and retries. API/worker split-capable. | audit |
-| atc-auth | 3002 | [atc-auth](https://github.com/alitalipcalikoglu/atc-auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, audit |
+| atc-auth | 3002 | [atc-auth](https://github.com/alitalipcalikoglu/atc-auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, webhook-out, audit |
 | atc-media | 3003 | [atc-media](https://github.com/alitalipcalikoglu/atc-media) | Uploads, deduplication, image variants, signed URLs, upload tickets | audit |
 | atc-console | 3004 | [atc-console](https://github.com/alitalipcalikoglu/atc-console) | Admin web app for every service: own admins, 2FA, console log | every service, audit |
-| atc-audit | 3005 | [atc-audit](https://github.com/alitalipcalikoglu/atc-audit) | Append-only event log with a hash chain, filters, export, retention | – |
+| atc-audit | 3005 | [atc-audit](https://github.com/alitalipcalikoglu/atc-audit) | Append-only event log with a hash chain, filters, export, retention | webhook-out |
 | atc-shortlink | 3006 | [atc-shortlink](https://github.com/alitalipcalikoglu/atc-shortlink) | Short links, click statistics, QR codes | audit |
-| atc-flags | 3007 | [atc-flags](https://github.com/alitalipcalikoglu/atc-flags) | Feature flags and typed settings per environment, rollouts, targeting rules | audit |
-| atc-scheduler | 3008 | [atc-scheduler](https://github.com/alitalipcalikoglu/atc-scheduler) | Cron and one-shot jobs calling HTTP targets with signatures and retries. API/worker split-capable. | flags, notify, webhook-out (targets), audit |
-| atc-webhook-out | 3009 | [atc-webhook-out](https://github.com/alitalipcalikoglu/atc-webhook-out) | The durable, general-purpose outbound-webhook service: subscriptions, signed deliveries, retries, replay. API/worker split-capable. | audit |
+| atc-flags | 3007 | [atc-flags](https://github.com/alitalipcalikoglu/atc-flags) | Feature flags and typed settings per environment, rollouts, targeting rules | webhook-out, audit |
+| atc-scheduler | 3008 | [atc-scheduler](https://github.com/alitalipcalikoglu/atc-scheduler) | Cron and one-shot jobs calling HTTP targets with signatures and retries. API/worker split-capable. | flags, notify, webhook-out (targets and events), audit |
+| atc-webhook-out | 3009 | [atc-webhook-out](https://github.com/alitalipcalikoglu/atc-webhook-out) | The durable, general-purpose outbound-webhook service: subscriptions, signed deliveries, retries, replay. API/worker split-capable. | audit, status (delivers `ops.*` to the alert hub) |
 | atc-search | 3010 | [atc-search](https://github.com/alitalipcalikoglu/atc-search) | Full-text search over your documents with facets and highlights (SQLite FTS5) | audit |
 | atc-ratelimit | 3011 | [atc-ratelimit](https://github.com/alitalipcalikoglu/atc-ratelimit) | Central rate limits and quotas: policies, sliding windows, overrides, blocks | audit |
 | atc-geo | 3012 | [atc-geo](https://github.com/alitalipcalikoglu/atc-geo) | IP geolocation (MMDB), countries, currencies, time zones, phone normalization, places | audit |
-| atc-content | 3013 | [atc-content](https://github.com/alitalipcalikoglu/atc-content) | Translations and content strings: namespaces, locale fallback chains, placeholder checks, numbered releases, ETag bundles (public through the gateway at `/api/content/v1/bundles/`) | audit |
+| atc-content | 3013 | [atc-content](https://github.com/alitalipcalikoglu/atc-content) | Translations and content strings: namespaces, locale fallback chains, placeholder checks, numbered releases, ETag bundles (public through the gateway at `/api/content/v1/bundles/`) | webhook-out, audit |
 | atc-export | 3014 | [atc-export](https://github.com/alitalipcalikoglu/atc-export) | Background data exports: CSV/NDJSON from audit events, users, links, flags, media metadata and translation keys, streamed into private media files by a leased worker; retention | media, notify, audit (events + forwarding), auth, shortlink, flags, content |
 | atc-render | 3015 | [atc-render](https://github.com/alitalipcalikoglu/atc-render) | PDF rendering from versioned JSON layout templates: Unicode fonts, tables across pages, images, QR; streamed or stored in media | media, audit |
-| atc-queue | 3016 | [atc-queue](https://github.com/alitalipcalikoglu/atc-queue) | Durable message queue: delays, priorities, dedupe keys, leased pulls with ack/nack/extend, retries, dead letters with redrive | audit |
-| atc-backup | 3017 | [atc-backup](https://github.com/alitalipcalikoglu/atc-backup) | Scheduled online SQLite backups of every service database: integrity check, SHA-256, retention, download, verify, restore to a file or guarded live restore | media, audit |
-| atc-status | 3018 | [atc-status](https://github.com/alitalipcalikoglu/atc-status) | Uptime monitors for every service's /health and /ready and any URL, automatic incidents, e-mail alerts, public status page at /status through the gateway | notify, audit |
+| atc-queue | 3016 | [atc-queue](https://github.com/alitalipcalikoglu/atc-queue) | Durable message queue: delays, priorities, dedupe keys, leased pulls with ack/nack/extend, retries, dead letters with redrive | webhook-out, audit |
+| atc-backup | 3017 | [atc-backup](https://github.com/alitalipcalikoglu/atc-backup) | Scheduled online SQLite backups of every service database: integrity check, SHA-256, retention, download, verify, restore to a file or guarded live restore | media, webhook-out, audit |
+| atc-status | 3018 | [atc-status](https://github.com/alitalipcalikoglu/atc-status) | Uptime monitors for every service's /health and /ready and any URL, automatic incidents, e-mail alerts, public status page at /status through the gateway | notify, webhook-out, audit |
 | atc-payments | 3019 | [atc-payments](https://github.com/alitalipcalikoglu/atc-payments) | Stripe payment intents and refunds over REST: idempotency keys, signed webhooks at /api/payments/v1/webhooks/stripe, state machine, ledger, events | Stripe (operator keys), webhook-out, audit |
 | atc-stack | – | [atc-stack](https://github.com/alitalipcalikoglu/atc-stack) | This installer and runner | – |
 
@@ -311,6 +311,7 @@ npm run mcp:catalog                      # regenerate the tools and catalog afte
 ## Documentation
 
 - [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) — the request-id/`traceparent` propagation rules and structured-log field vocabulary every service is measured against.
+- [docs/EVENTS.md](docs/EVENTS.md) — the event catalog: who publishes which event to atc-webhook-out, and how `ops.*` events reach people through the atc-status alert hub.
 - [docs/UPGRADE.md](docs/UPGRADE.md) — how migrations apply on upgrade, what `backup`/`restore` cover, restore's validation and atomicity, and rollback.
 - [docs/READINESS_TEMPLATE.md](docs/READINESS_TEMPLATE.md) — the 19-section production-readiness contract; every service has its own filled copy at `<service>/docs/READINESS.md`.
 - [docs/READINESS.md](docs/READINESS.md) — index into every service's own `docs/READINESS.md`, one real line each.

@@ -32,6 +32,9 @@
  */
 const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_KEY: String(c.issue('atc-audit', id, 'write')) });
 
+/** Where a service publishes its events (docs/EVENTS.md): atc-webhook-out, with a key that may only publish. */
+const eventsEnv = (c, id) => ({ WEBHOOK_OUT_URL: String(c.url('atc-webhook-out')), WEBHOOK_OUT_API_KEY: String(c.issue('atc-webhook-out', id, 'publish')) });
+
 /**
  * Media must accept export files and database backups: append those types to whatever the operator allows.
  * @param {string} list
@@ -56,7 +59,7 @@ export const SERVICES = [
     id: 'atc-auth', port: 3002, keysVar: 'AUTH_API_KEYS',
     prepare: async (c) => { if (!c.exists('atc-auth', 'keys/jwt-private.pem')) await c.run('atc-auth', ['npm', 'run', 'keygen']); },
     env: (c) => ({
-      ...auditEnv(c, 'atc-auth'),
+      ...auditEnv(c, 'atc-auth'), ...eventsEnv(c, 'atc-auth'),
       NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-auth'), JWT_ISSUER: c.url('atc-gateway'), JWT_AUDIENCE: c.keep('atc-auth', 'JWT_AUDIENCE', 'app'),
       APP_NAME: c.keep('atc-auth', 'APP_NAME', 'atc-web'), // Links in verification mails point at your web app, which auth insists is https; a local stack has no app yet.
       VERIFY_URL_TEMPLATE: c.keep('atc-auth', 'VERIFY_URL_TEMPLATE', `https://${c.host}/verify-email?token={token}`), RESET_URL_TEMPLATE: c.keep('atc-auth', 'RESET_URL_TEMPLATE', `https://${c.host}/reset-password?token={token}`),
@@ -77,7 +80,7 @@ export const SERVICES = [
     id: 'atc-audit', port: 3005, keysVar: 'AUDIT_API_KEYS',
     // Signed chain anchors: without them the hash chain alone cannot prove the log was not rewritten by whoever can write the database.
     prepare: async (c) => { if (!c.exists('atc-audit', 'keys/anchor-private.pem')) await c.run('atc-audit', ['npm', 'run', 'anchor-keygen', '--', 'keys/anchor']); },
-    env: (c) => ({ ANCHOR_PRIVATE_KEY_PATH: c.keep('atc-audit', 'ANCHOR_PRIVATE_KEY_PATH', './keys/anchor-private.pem') }),
+    env: (c) => ({ ...eventsEnv(c, 'atc-audit'), ANCHOR_PRIVATE_KEY_PATH: c.keep('atc-audit', 'ANCHOR_PRIVATE_KEY_PATH', './keys/anchor-private.pem') }),
     console: { type: 'atc-audit', label: 'Audit', keyEnv: 'AUDIT_API_KEY', polling: { enabled: true, intervalSec: 60 } },
   },
   {
@@ -87,14 +90,14 @@ export const SERVICES = [
   },
   {
     id: 'atc-flags', port: 3007, keysVar: 'FLAGS_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-flags'),}),
+    env: (c) => ({ ...auditEnv(c, 'atc-flags'), ...eventsEnv(c, 'atc-flags'),}),
     console: { type: 'atc-flags', label: 'Flags', keyEnv: 'FLAGS_API_KEY' },
   },
   {
     id: 'atc-scheduler', port: 3008, keysVar: 'SCHEDULER_API_KEYS', splitWorkers: true,
     env: (c) => ({
       SIGNING_SECRET: c.secret('atc-scheduler', 'SIGNING_SECRET'),
-      ...auditEnv(c, 'atc-scheduler'),
+      ...auditEnv(c, 'atc-scheduler'), ...eventsEnv(c, 'atc-scheduler'),
       TARGET_KEYS: `atc-flags:${c.issue('atc-flags', 'atc-scheduler', 'write')},atc-notify:${c.issue('atc-notify', 'atc-scheduler')},atc-webhook-out:${c.issue('atc-webhook-out', 'atc-scheduler', 'publish')}`,
       ...c.outbound('atc-scheduler'),
     }),
@@ -102,7 +105,11 @@ export const SERVICES = [
   },
   {
     id: 'atc-webhook-out', port: 3009, keysVar: 'WEBHOOK_API_KEYS', splitWorkers: true,
-    env: (c) => ({ ...auditEnv(c, 'atc-webhook-out'), SECRETS_KEY: c.secret('atc-webhook-out', 'SECRETS_KEY'), ...c.outbound('atc-webhook-out') }),
+    env: (c) => ({
+      ...auditEnv(c, 'atc-webhook-out'), SECRETS_KEY: c.secret('atc-webhook-out', 'SECRETS_KEY'), ...c.outbound('atc-webhook-out'),
+      // The alert hub: every ops.* event is delivered, signed, to atc-status, which e-mails and lists it.
+      SUBSCRIPTION_SEEDS: `alert-hub|${c.url('atc-status')}/v1/hooks/webhook-out|ops.*|${c.secret('atc-status', 'ALERT_HOOK_SECRET')}`,
+    }),
     console: { type: 'atc-webhook-out', label: 'Webhooks', keyEnv: 'WEBHOOK_OUT_API_KEY' },
   },
   {
@@ -125,7 +132,7 @@ export const SERVICES = [
   {
     id: 'atc-content', port: 3013, keysVar: 'CONTENT_API_KEYS',
     // Bundles reach applications through the gateway route below; direct anonymous reads stay off unless the operator turns them on.
-    env: (c) => ({ ...auditEnv(c, 'atc-content'), CONTENT_PUBLIC_BUNDLES: c.keep('atc-content', 'CONTENT_PUBLIC_BUNDLES', 'false'), ACTOR_KEYS: 'atc-console' }),
+    env: (c) => ({ ...auditEnv(c, 'atc-content'), ...eventsEnv(c, 'atc-content'), CONTENT_PUBLIC_BUNDLES: c.keep('atc-content', 'CONTENT_PUBLIC_BUNDLES', 'false'), ACTOR_KEYS: 'atc-console' }),
     console: { type: 'atc-content', label: 'Content', keyEnv: 'CONTENT_API_KEY' },
   },
   {
@@ -153,13 +160,13 @@ export const SERVICES = [
   },
   {
     id: 'atc-queue', port: 3016, keysVar: 'QUEUE_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-queue') }),
+    env: (c) => ({ ...auditEnv(c, 'atc-queue'), ...eventsEnv(c, 'atc-queue') }),
     console: { type: 'atc-queue', label: 'Queues', keyEnv: 'QUEUE_API_KEY' },
   },
   {
     id: 'atc-backup', port: 3017, keysVar: 'BACKUP_API_KEYS',
     env: (c) => ({
-      ...auditEnv(c, 'atc-backup'),
+      ...auditEnv(c, 'atc-backup'), ...eventsEnv(c, 'atc-backup'),
       BACKUP_SOURCES: Object.entries(DATA_FILES).map(([id, file]) => `${id}=../${id}/data/${file}`).join(','),
       // Off-host copies: every successful backup also goes to media as a private file.
       MEDIA_URL: c.url('atc-media'), MEDIA_API_KEY: c.issue('atc-media', 'atc-backup'),
@@ -170,11 +177,12 @@ export const SERVICES = [
   {
     id: 'atc-status', port: 3018, keysVar: 'STATUS_API_KEYS',
     env: (c) => ({
-      ...auditEnv(c, 'atc-status'),
+      ...auditEnv(c, 'atc-status'), ...eventsEnv(c, 'atc-status'),
       // /health and /ready of every other service, as public monitors on the status page.
       MONITOR_SEEDS: SERVICES.filter((s) => s.id !== 'atc-status').map((s) => `${s.id}=${c.url(s.id)}`).join(','),
       NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-status'),
       ALERT_EMAILS: c.keep('atc-status', 'ALERT_EMAILS', 'ops@example.com'),
+      ALERT_HOOK_SECRET: c.secret('atc-status', 'ALERT_HOOK_SECRET'),
     }),
     console: { type: 'atc-status', label: 'Status', keyEnv: 'STATUS_API_KEY' },
   },
