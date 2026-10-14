@@ -38,7 +38,7 @@ export interface paths {
         };
         /**
          * Liveness probe.
-         * @description Always `200` once the process is up. No dependency check and no authentication. Hand-rolled here rather than using `service-core`'s `registerProbes`.
+         * @description Always `200` once the process is up. No dependency check and no authentication. Hand-rolled here rather than using `atc-service-core`'s `registerProbes`.
          */
         get: operations["atc-console.health.get"];
         put?: never;
@@ -3078,7 +3078,7 @@ export interface components {
                 /** @description Stable machine-readable code. console domain codes (`ConsoleError.STATUS`): INVALID_CREDENTIALS (401), UNAUTHENTICATED (401), TOTP_REQUIRED (401), INVALID_TOTP (401), TOTP_UNAVAILABLE (503), TOTP_SECRET_CORRUPT (500), ACCOUNT_LOCKED (423), ACCOUNT_DISABLED (403), FORBIDDEN (403), NOT_FOUND (404), EMAIL_TAKEN (409), CONFLICT (409), WEAK_PASSWORD (400), INVALID_ARGUMENT (400), LAST_ADMIN (409), RATE_LIMITED (429). Cross-cutting codes from console's own error handler: VALIDATION_FAILED (400, Ajv schema failure), NOT_FOUND (404, unmatched `/api/*` route), REQUEST_ERROR (other 4xx), INTERNAL_ERROR (500, message never leaked). */
                 code: string;
                 message: string;
-                /** @description Present on Ajv validation failures as `[{ path, message }]` — note console hand-rolls its error handler and, unlike the shared `service-core` helper every backend service uses, omits `params` from those entries. Also present on domain errors that carry structured context: `retryAfterSec` (RATE_LIMITED, ACCOUNT_LOCKED) and `problems` (WEAK_PASSWORD). */
+                /** @description Present on Ajv validation failures as `[{ path, message }]` — note console hand-rolls its error handler and, unlike the shared `atc-service-core` helper every backend service uses, omits `params` from those entries. Also present on domain errors that carry structured context: `retryAfterSec` (RATE_LIMITED, ACCOUNT_LOCKED) and `problems` (WEAK_PASSWORD). */
                 details?: unknown;
             };
         };
@@ -3110,7 +3110,7 @@ export interface components {
         };
         Info: {
             /** @constant */
-            service: "console";
+            service: "atc-console";
             /** @description This package's version. */
             version: string;
             /** @constant */
@@ -3119,7 +3119,7 @@ export interface components {
             capabilities: string[];
             /** @description The open SQLite schema version (`PRAGMA user_version`). */
             schemaVersion: number;
-            /** @description Version of the `@atc-web/atc-service-core` copy actually running. Console imports `registerInfo` from `@atc-web/atc-service-core/fastify`, so unlike `gateway` (the one service in this platform with no `service-core` dependency, where this field is always `null`) this field is always a real semver string here, never `null`. */
+            /** @description Version of the `@atc-web/atc-service-core` copy actually running. Console imports `registerInfo` from `@atc-web/atc-service-core/fastify`, so unlike `atc-gateway` (the one service in this platform with no `atc-service-core` dependency, where this field is always `null`) this field is always a real semver string here, never `null`. */
             serviceCore: string;
         };
         /** @description Administrator as `AdminService.view` projects it — never includes the password hash or the TOTP secret. */
@@ -3177,7 +3177,7 @@ export interface components {
         DocumentationService: {
             id: string;
             /** @enum {string} */
-            type: "audit" | "auth" | "console" | "flags" | "gateway" | "geo" | "media" | "notify" | "ratelimit" | "scheduler" | "search" | "shortlink" | "webhook-out";
+            type: "atc-audit" | "atc-auth" | "atc-console" | "atc-flags" | "atc-gateway" | "atc-geo" | "atc-media" | "atc-notify" | "atc-ratelimit" | "atc-scheduler" | "atc-search" | "atc-shortlink" | "atc-webhook-out";
             label: string;
         };
         /** @description A configured service instance as `ServiceRegistry#describe` projects it. API keys and metrics tokens are never included. */
@@ -3188,7 +3188,7 @@ export interface components {
              * @description Decides which proxy routes are valid for this `sid`; a type mismatch is a `404 UNKNOWN_SERVICE`.
              * @enum {string}
              */
-            type: "notify" | "auth" | "media" | "gateway" | "audit" | "shortlink" | "flags" | "scheduler" | "webhook-out" | "search" | "ratelimit" | "geo";
+            type: "atc-notify" | "atc-auth" | "atc-media" | "atc-gateway" | "atc-audit" | "atc-shortlink" | "atc-flags" | "atc-scheduler" | "atc-webhook-out" | "atc-search" | "atc-ratelimit" | "atc-geo";
             label: string;
             /** @description Base URL console calls (server-side only). */
             url: string;
@@ -3252,7 +3252,7 @@ export interface components {
             events?: {
                 [key: string]: unknown;
             }[];
-            /** @description The events response's `nextBefore` cursor, for `GET .../auth/users/{id}/events`. */
+            /** @description The events response's `nextBefore` cursor, for `GET .../atc-auth/users/{id}/events`. */
             eventsNextBefore?: string | null;
         } & {
             [key: string]: unknown;
@@ -3267,7 +3267,7 @@ export interface components {
             history?: {
                 [key: string]: unknown;
             }[];
-            /** @description The history response's `nextBefore` cursor, for `GET .../flags/flags/{id}/history`. */
+            /** @description The history response's `nextBefore` cursor, for `GET .../atc-flags/flags/{id}/history`. */
             historyNextBefore?: string | null;
         } & {
             [key: string]: unknown;
@@ -3282,7 +3282,7 @@ export interface components {
             runs?: {
                 [key: string]: unknown;
             }[];
-            /** @description The runs response's `nextBefore` cursor, for `GET .../scheduler/jobs/{id}/runs`. */
+            /** @description The runs response's `nextBefore` cursor, for `GET .../atc-scheduler/jobs/{id}/runs`. */
             runsNextBefore?: string | null;
         } & {
             [key: string]: unknown;
@@ -3297,7 +3297,7 @@ export interface components {
             deliveries?: {
                 [key: string]: unknown;
             }[];
-            /** @description The deliveries response's `nextBefore` cursor, for `GET .../webhook-out/deliveries?subscription=...`. */
+            /** @description The deliveries response's `nextBefore` cursor, for `GET .../atc-webhook-out/deliveries?subscription=...`. */
             deliveriesNextBefore?: string | null;
         } & {
             [key: string]: unknown;

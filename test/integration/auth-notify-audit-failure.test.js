@@ -14,20 +14,20 @@ import { freePort, randomSecret, ServiceProcess, stopAll, waitUntil } from './ha
  * Part A — notify is unreachable when a user signs up: `POST /v1/users` still succeeds (201, no
  * rollback of the created user) and the security-audit event for that signup is *already* on the
  * real audit service, with no dependency on notify's outcome at all. That independence is real,
- * not incidental: `AuthService#register` (auth/src/domain/auth-service.js) writes the user row and
- * the event's outbox row in one SQLite transaction (`EventStore.record`, auth/src/store/event-store.js)
+ * not incidental: `AuthService#register` (atc-auth/src/domain/auth-service.js) writes the user row and
+ * the event's outbox row in one SQLite transaction (`EventStore.record`, atc-auth/src/store/event-store.js)
  * and only afterwards calls `#sendVerification`, whose failure is caught and turned into
  * `verificationEmailSent: false` — never a throw, never a rollback.
  *
  * Part B — audit itself is unreachable at signup time. The mechanism that protects that event is
  * not an in-memory buffer (auth is wired in `AuditClient`'s durable *outbox* mode, not buffer mode —
- * see application.js) but a real SQLite table (`outbox`, auth/src/db.js) drained by a background
+ * see application.js) but a real SQLite table (`outbox`, atc-auth/src/db.js) drained by a background
  * flush timer. This part proves the row survives a full process restart and, once audit finally
  * comes up, is delivered exactly once — never duplicated — via audit's `UNIQUE(source, client_id)`
- * constraint (audit/src/db.js) keyed by the outbox row's own stable id.
+ * constraint (atc-audit/src/db.js) keyed by the outbox row's own stable id.
  *
- * A note on how both parts actually start their `auth` process: `GET /ready` on auth
- * (auth/src/http/auth-api.js `#registerPublic`) calls `this.mailer.verify()`, which is a real
+ * A note on how both parts actually start their `atc-auth` process: `GET /ready` on auth
+ * (atc-auth/src/http/auth-api.js `#registerPublic`) calls `this.mailer.verify()`, which is a real
  * `GET /health` against `NOTIFY_URL` — so auth can never become ready while notify is completely
  * unreachable, and `ServiceProcess.start()` would time out waiting for it. Both parts therefore
  * boot a real notify process just long enough for auth's own readiness probe to pass, then stop it
@@ -145,7 +145,7 @@ test('signup with notify unreachable: still 201 with no rollback, and the audit 
     const eres = await fetch(`${audit.baseUrl}/v1/events?source=atc-auth&action=atc-auth.user.registered&targetId=${userId}`, { headers: { authorization: `Bearer ${harnessAuditSecret}` } });
     const ebody = await eres.json();
     return ebody.items?.length ? ebody.items : undefined;
-  }, { timeoutMs: 5_000, message: `an auth.user.registered audit event for user ${userId} on the real audit service` });
+  }, { timeoutMs: 5_000, message: `an atc-auth.user.registered audit event for user ${userId} on the real audit service` });
   assert.equal(items.length, 1, `expected exactly one audit event for user ${userId}, got ${items.length}: ${JSON.stringify(items)}`);
   assert.equal(items[0].outcome, 'success');
 });

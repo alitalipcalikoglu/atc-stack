@@ -23,17 +23,17 @@ loss). Priority: P1.**
 
 ### Evidence
 
-`service-core/src/db.js`'s `#migrate()` (lines 84–107): `PRAGMA user_version` is read **once**,
+`atc-service-core/src/db.js`'s `#migrate()` (lines 84–107): `PRAGMA user_version` is read **once**,
 before any lock is taken and before the migration loop starts. Each migration then runs inside a
 plain `BEGIN` (deferred, not `BEGIN IMMEDIATE`) / `COMMIT`. `busy_timeout=5000` is set at connection
 open, before `#migrate()` runs. The pre-migration backup (`#backup()`, lines 115–122) writes to
 `<DB_PATH>.pre-v<current>-<Date.now()>` — a millisecond-resolution filename.
 
-`notify/src/application.js`, `scheduler/src/application.js`, `webhook-out/src/application.js` all
+`atc-notify/src/application.js`, `atc-scheduler/src/application.js`, `atc-webhook-out/src/application.js` all
 construct their own `Database(config.dbPath, ...)` unconditionally, regardless of `role`
 (`api`/`worker`/`combined`) — nothing arbitrates which of two split processes (`stack up
 --split-workers`, `<id>-api` + `<id>-worker`) gets to apply a pending migration first.
-`stack/src/stack.js`'s `up()` (lines 57–75) starts both apps back-to-back with no readiness gate
+`atc-stack/src/stack.js`'s `up()` (lines 57–75) starts both apps back-to-back with no readiness gate
 between them.
 
 **Empirical reproduction** (real separate OS processes via `child_process.spawn`, each opening the
@@ -69,7 +69,7 @@ correct, consistent database and exactly one clean process running — never cor
 duplication, never data loss.** The blast radius is a visible crash-and-restart during a
 split-workers upgrade that includes a pending migration, not a durability incident.
 
-`stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section (written during Stage 12) already
+`atc-stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section (written during Stage 12) already
 documents this risk and gives a staggered-start workaround. That documentation is accurate and does
 not overstate or understate what this audit found — it was already honest about "not proven safe,"
 and this audit now has the empirical evidence for exactly what "not safe" means (a clean crash, not
@@ -92,15 +92,15 @@ Using only existing SQLite primitives, no new dependency:
 
 ### Tests required before this ships
 - A deterministic failing regression: the same real two-process reproduction methodology used for
-  this audit (not a mock), run against `service-core` directly, proven to fail before the fix and
+  this audit (not a mock), run against `atc-service-core` directly, proven to fail before the fix and
   pass after, at a sample size large enough to be meaningful (the audit used 75 runs at ~92% trigger
   rate for the crash case — the regression test doesn't need that many runs every time it's in CI,
   but should run enough iterations to catch a regression with reasonable confidence, and should be
   tagged/skippable the same way `STACK_INTEGRATION` gates expensive tests today if it's slow).
-- Full `service-core` suite + typecheck.
+- Full `atc-service-core` suite + typecheck.
 - Full suite + typecheck for notify, scheduler, webhook-out (the only real consumers of
   `Database.MIGRATIONS`-based multi-migration schemas among the split-capable services).
-- `stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section updated to reflect the new real
+- `atc-stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section updated to reflect the new real
   guarantee (or left as a documented limitation, if the fix is deferred — see the plan).
 
 ---
@@ -114,19 +114,19 @@ Priority: P1.**
 
 No test in any of the 8 repos audited spawns a real service process against an old-schema fixture
 and asserts `/ready` + `/v1/info`'s `schemaVersion` after a real startup-triggered migration. Every
-existing migration test (`service-core/test/db.test.js`, and each service's own `test/db.test.js`)
+existing migration test (`atc-service-core/test/db.test.js`, and each service's own `test/db.test.js`)
 opens the `Database` class directly in the test's own process — real migration logic, but not a real
-process boundary. `stack/test/integration/harness.js`'s `ServiceProcess` (real `spawn`, real `/ready`
+process boundary. `atc-stack/test/integration/harness.js`'s `ServiceProcess` (real `spawn`, real `/ready`
 poll) already exists and is used for cross-service flows, but no integration test currently builds
 an old-schema fixture and points a spawned service at it.
 
-Future-schema rejection is similarly only covered in-process (`service-core/test/db.test.js`,
-`stack/test/snapshot.test.js`'s restore-path validation) — never via a real spawned process that's
+Future-schema rejection is similarly only covered in-process (`atc-service-core/test/db.test.js`,
+`atc-stack/test/snapshot.test.js`'s restore-path validation) — never via a real spawned process that's
 expected to exit non-zero / never reach ready.
 
 ### Recommended fix (design only)
 
-Build on `stack/test/integration/harness.js`'s existing `ServiceProcess`:
+Build on `atc-stack/test/integration/harness.js`'s existing `ServiceProcess`:
 - Old-schema E2E: construct a fixture DB via the service's own real `Database` subclass with a
   truncated `MIGRATIONS` array (matching an older version), point a spawned real service's `DB_PATH`
   at it, assert `/ready` reaches 200 and `/v1/info.schemaVersion` reports the FULL current
@@ -137,7 +137,7 @@ Build on `stack/test/integration/harness.js`'s existing `ServiceProcess`:
 - Representative services (per the task's own list, confirmed reasonable given real schema
   histories): notify (schemaVersion 3), console (2), webhook-out (3), auth (2).
 
-**Closed in Phase 2** (`stack/test/integration/migration-e2e.test.js`): the finding above and its
+**Closed in Phase 2** (`atc-stack/test/integration/migration-e2e.test.js`): the finding above and its
 recommended design stand as originally written — this note only records that the plan's Phase 2
 implemented it, plus audit (v1→v2) as a fifth representative service. Both directions from the
 recommended fix are covered: old-schema fixture with pre-existing domain data → real spawned process
@@ -154,8 +154,8 @@ Priority: P2.**
 
 ### Evidence
 
-`media/src/maintenance.js`: `INTERVAL_MS = 3_600_000` is a hardcoded static field, no env override
-anywhere (`media/src/config.js`, `.env.example` both confirmed to have zero `INTERVAL`/`MAINTENANCE`
+`atc-media/src/maintenance.js`: `INTERVAL_MS = 3_600_000` is a hardcoded static field, no env override
+anywhere (`atc-media/src/config.js`, `.env.example` both confirmed to have zero `INTERVAL`/`MAINTENANCE`
 vars). Triggers are exactly two: the hourly `setInterval`, and one eager run at
 `Application#start()`. No HTTP route, no CLI, exists anywhere in this codebase for triggering
 another process's maintenance work on demand — grepped every service's `src/http/*.js` for
@@ -195,12 +195,12 @@ tickets}` counts plus a new `errors` count (currently discarded, would need one 
 instead of swallow).
 
 **Closed in Phase 4 — trigger mechanism changed from this sketch, not just implemented as sketched**
-(`stack/src/media-maintenance.js`, `stack/src/stack.js`'s `Stack#maintenance`, `stack maintenance
+(`atc-stack/src/media-maintenance.js`, `atc-stack/src/stack.js`'s `Stack#maintenance`, `stack maintenance
 media` CLI command): re-verification at implementation time found media's flat API-key model is
 shared with its public upload/download surface (`api.addHook('onRequest', this.auth.hook)` covers
 every `/v1/*` route identically, `ops`'s `/metrics` included) — an HTTP endpoint under that same
 model would let any caller with any valid media key force a maintenance run, which is a materially
-different exposure than "any valid key can also do this" reads on paper. Used `stack`'s own
+different exposure than "any valid key can also do this" reads on paper. Used `atc-stack`'s own
 operational control plane instead (the same trust boundary `stack backup`/`stack restore` already
 assume), avoiding both a new auth tier and blurring the public API's own boundary — no HTTP surface
 added. The handler still calls the real `Maintenance#run()` (now `run('manual')`, not
@@ -219,7 +219,7 @@ added. The handler still calls the real `Maintenance#run()` (now `run('manual')`
 `local-storage.js`'s `detachForDelete()`/`discardDetached()` are two separate `await`ed filesystem
 operations with no persisted record between them (`token` is a local `randomUUID()`, never written
 to SQLite). A process kill between them is a real, reachable window — already independently
-documented as an accepted, known gap in `media/docs/READINESS.md`'s "Known failure modes" section
+documented as an accepted, known gap in `atc-media/docs/READINESS.md`'s "Known failure modes" section
 before this audit began (this audit confirms the documentation was already accurate, not
 discovering a hidden problem).
 
@@ -253,19 +253,19 @@ atomic as a pair) is still mid-flight. Malformed/unrecognized entries in `trash/
 existing fail-safe-per-item convention.
 
 If `stack backup`'s exclusion list for media (`tmp/`, `trash/`) changes as a result of adding
-reconciliation, `stack/docs/BACKUP.md` needs a corresponding update — but reconciliation itself
+reconciliation, `atc-stack/docs/BACKUP.md` needs a corresponding update — but reconciliation itself
 doesn't change what's excluded, only how fast `trash/` gets cleaned, so no BACKUP.md change is
 actually anticipated here.
 
-**Closed in Phase 4** (`LocalStorage#reconcileTrash`, `media/src/storage/local-storage.js`;
-`media/test/trash-reconcile.test.js`; wired into `MediaService#purge()` so it runs on every trigger
+**Closed in Phase 4** (`LocalStorage#reconcileTrash`, `atc-media/src/storage/local-storage.js`;
+`atc-media/test/trash-reconcile.test.js`; wired into `MediaService#purge()` so it runs on every trigger
 — startup, timer, manual alike). One correction to this sketch, found only by empirically testing
 the age mechanism before trusting it: **ctime, not mtime**. `mtime` on the `.object` half of a trash
 entry is the ORIGINAL upload's last-write time (renames don't touch it), completely unrelated to
 when `detachForDelete` moved it into quarantine — using it would have made the grace period
 meaningless for anything re-uploaded long ago. `ctime` (verified empirically: a real `rename()` does
 update it, `mtime` does not) is the real signal for "time since this entry entered quarantine". No
-new DB table, exactly as sketched. `stack/docs/BACKUP.md` confirmed unaffected, as anticipated.
+new DB table, exactly as sketched. `atc-stack/docs/BACKUP.md` confirmed unaffected, as anticipated.
 
 ---
 
@@ -278,13 +278,13 @@ value, genuinely new scope, needs one explicit policy decision before implementa
 ### Corrections to the prior framing
 
 - **Console does not parse or validate an inbound `traceparent` at all** — it has no regex, no
-  `parse()` method (`console/src/trace-context.js`, full file read, confirmed). Only gateway does
-  (`gateway/src/trace-context.js`). "Both generate/parse" overstated console's half; console only
+  `parse()` method (`atc-console/src/trace-context.js`, full file read, confirmed). Only gateway does
+  (`atc-gateway/src/trace-context.js`). "Both generate/parse" overstated console's half; console only
   generates/forwards, by deliberate design (it's a trust boundary reached directly by browsers,
-  documented accurately in `stack/docs/OBSERVABILITY.md`).
-- **`service-core` has no `RequestContext`/traceparent primitive today.** It appears only as planned
-  Stage 2 scope in `stack/docs/IMPLEMENTATION_PLAN.md`/`ARCHITECTURE_AUDIT.md` — never built. Confirmed
-  no `context.js` exists in `service-core/src/`.
+  documented accurately in `atc-stack/docs/OBSERVABILITY.md`).
+- **`atc-service-core` has no `RequestContext`/traceparent primitive today.** It appears only as planned
+  Stage 2 scope in `atc-stack/docs/IMPLEMENTATION_PLAN.md`/`ARCHITECTURE_AUDIT.md` — never built. Confirmed
+  no `context.js` exists in `atc-service-core/src/`.
 - **`X-Request-Id` handling is not centralized either**, contrary to an assumption in this task's own
   framing: it's 11 near-identical hand-copied two-line Fastify config blocks
   (`requestIdHeader`/`genReqId`), one per backend service, plus gateway's and console's own
@@ -309,18 +309,18 @@ could use them to correlate or spoof against internal systems.
 
 Reusable as-is: `HttpCaller.send()` takes a plain `headers` object (one-line addition per forwarding
 call site); the `AsyncLocalStorage`-based context-carrying pattern console already uses
-(`console/src/services/client.js`) generalizes cleanly with no console-specific technical constraint
+(`atc-console/src/services/client.js`) generalizes cleanly with no console-specific technical constraint
 (only a policy constraint — console never populates it from a parsed inbound header, by design).
 
 Genuinely new: the shared `TraceContext` class itself (merging gateway's validated `parse()` with
-console's `span()`), a shared `AsyncLocalStorage` context helper in `service-core`, and per-service
+console's `span()`), a shared `AsyncLocalStorage` context helper in `atc-service-core`, and per-service
 adoption (~10–15 lines each across the 11 backend services, plus one addition inside
-`service-core/src/audit-client.js` for the audit-forwarding hop, benefiting every adopter at once).
+`atc-service-core/src/audit-client.js` for the audit-forwarding hop, benefiting every adopter at once).
 
 ### Metric-label cardinality
 
 Confirmed **preventive-only, not an existing bug**: zero `.labels(` usages anywhere in the codebase
-today; the one real metrics module (`gateway/src/metrics.js`) already has an explicit
+today; the one real metrics module (`atc-gateway/src/metrics.js`) already has an explicit
 anti-high-cardinality design comment and uses only bounded dimensions (`route`, `upstream`,
 `status`). The plan should state this as a constraint to preserve, not a defect to fix.
 
@@ -328,9 +328,9 @@ anti-high-cardinality design comment and uses only bounded dimensions (`route`, 
 
 Implemented per the recommendation above, with the internal/external boundary decided as
 recommended (fixed, env-configured peer URL = internal; operator-configured target = external, never
-gets a trace header). `service-core/src/trace-context.js` (`TraceContext`, mirroring gateway's own
-field-for-field) and `service-core/src/request-context.js` (`RequestContext`, `AsyncLocalStorage`-based)
-are the new shared primitives; `service-core/src/fastify-helpers.js`'s `registerRequestContext`
+gets a trace header). `atc-service-core/src/trace-context.js` (`TraceContext`, mirroring gateway's own
+field-for-field) and `atc-service-core/src/request-context.js` (`RequestContext`, `AsyncLocalStorage`-based)
+are the new shared primitives; `atc-service-core/src/fastify-helpers.js`'s `registerRequestContext`
 wires them into a service's Fastify app in one call (`setChildLoggerFactory`, not an `onRequest`
 hook — the latter does not reach Fastify's own built-in request-log lines, discovered and fixed
 during implementation). All 11 backend services and console now consume a trusted inbound
@@ -346,7 +346,7 @@ were deliberately left unwired (batched multi-request flush / cross-request IP c
 to one request's trace). `HttpCaller` (scheduler job targets, webhook-out subscribers, audit's
 anchor webhook, notify's webhook channel) was not touched and injects nothing implicitly; each has a
 security-regression test proving no trace/request-id header reaches an external target. Full details:
-`stack/docs/OBSERVABILITY.md`.
+`atc-stack/docs/OBSERVABILITY.md`.
 
 ---
 
@@ -357,18 +357,18 @@ documented. Severity: n/a. Priority: none — no action recommended.**
 
 ### Evidence
 
-The breaker (`gateway/src/upstream-pool.js`) genuinely holds state process-locally (plain instance
+The breaker (`atc-gateway/src/upstream-pool.js`) genuinely holds state process-locally (plain instance
 fields, no shared store) — confirmed. But gateway's own scaling class is **A**, and class A is
-explicitly *defined* (`stack/docs/ARCHITECTURE_AUDIT.md`, `stack/docs/READINESS_TEMPLATE.md`) as
+explicitly *defined* (`atc-stack/docs/ARCHITECTURE_AUDIT.md`, `atc-stack/docs/READINESS_TEMPLATE.md`) as
 "any number of instances behind a load balancer, no shared-state assumption, name anything that is
-still per-instance" — the opposite of "single-instance only." `gateway/ecosystem.config.cjs:15`'s own
+still per-instance" — the opposite of "single-instance only." `atc-gateway/ecosystem.config.cjs:15`'s own
 comment explicitly invites running multiple instances behind a TCP balancer and names the exact
-per-process state (rate limits, cooldowns — the breaker) that stays per-instance. `gateway/README.md`
-and `gateway/docs/READINESS.md` both independently state this same trade-off, by name, as accepted
+per-process state (rate limits, cooldowns — the breaker) that stays per-instance. `atc-gateway/README.md`
+and `atc-gateway/docs/READINESS.md` both independently state this same trade-off, by name, as accepted
 non-defect behavior — satisfying (and exceeding) what the class-A template itself requires services
 to disclose.
 
-Nothing in `stack` tooling can ever start more than one gateway process today (`stack/src/manifest.js`
+Nothing in `atc-stack` tooling can ever start more than one gateway process today (`atc-stack/src/manifest.js`
 carries no `splitWorkers` for gateway, `Stack#up()` runs exactly one `pm2 startOrRestart` per
 service) — but this is incidental, not a stated contract; an operator raising `instances:` by hand
 (exactly as the ecosystem file's own comment suggests) is a legitimate, already-anticipated use.
@@ -385,10 +385,10 @@ the platform's core data). Priority: P1 (mechanically trivial, real value).**
 
 ### Evidence
 
-`stack/src/snapshot.js`'s `EXTRA_PATHS` includes `auth: () => ['keys']` (JWT signing keys) but has
-**no entry for audit** — `audit`'s `ANCHOR_PRIVATE_KEY_PATH`-configured key material is never part of
-a `stack backup` snapshot. `audit/README.md`'s own "Backup / restore" section already states this gap
-explicitly and accurately, in wording that matches `stack/docs/BACKUP.md`'s (Stage 12) description of
+`atc-stack/src/snapshot.js`'s `EXTRA_PATHS` includes `auth: () => ['keys']` (JWT signing keys) but has
+**no entry for audit** — `atc-audit`'s `ANCHOR_PRIVATE_KEY_PATH`-configured key material is never part of
+a `stack backup` snapshot. `atc-audit/README.md`'s own "Backup / restore" section already states this gap
+explicitly and accurately, in wording that matches `atc-stack/docs/BACKUP.md`'s (Stage 12) description of
 the same gap — **the two documents are consistent with each other, not drifted**; this audit confirms
 they already tell the truth about the current state, they just describe a real limitation rather than
 a documentation bug.
@@ -411,23 +411,23 @@ backup snapshot the same way the JWT key already does.
 
 Mechanical cost: `Snapshot`'s directory-handling, checksum, and restore-validation logic is already
 fully generic over any `EXTRA_PATHS` entry (auth/media/console/gateway all already share it) — adding
-`audit` requires one new map entry, ideally env-derived (mirroring gateway's pattern, since
+`atc-audit` requires one new map entry, ideally env-derived (mirroring gateway's pattern, since
 `ANCHOR_PRIVATE_KEY_PATH` is optional) rather than hardcoded (mirroring auth's, since auth's keys are
 mandatory), no restore-path changes.
 
 ### Recommended fix (design only)
 
-Add an env-derived `audit` entry to `EXTRA_PATHS` in `stack/src/snapshot.js`, returning the anchor
+Add an env-derived `atc-audit` entry to `EXTRA_PATHS` in `atc-stack/src/snapshot.js`, returning the anchor
 key directory only when `ANCHOR_PRIVATE_KEY_PATH` is actually configured (an empty array otherwise —
 `Snapshot.create()` already logs-and-skips any path that doesn't exist, so even a naive hardcoded
 entry would degrade gracefully, but the env-derived form is more correct and consistent with
-gateway's existing optional-feature pattern). Update `stack/docs/BACKUP.md` and `audit/README.md`
+gateway's existing optional-feature pattern). Update `atc-stack/docs/BACKUP.md` and `atc-audit/README.md`
 from "excluded, back this up yourself" to "included" language. Test: create a real anchor, back up,
 mutate both DB and key material, restore, verify the pre-existing anchor still verifies and a new
 anchor signs under continuous chain semantics.
 
-**Closed in Phase 3** (`stack/src/snapshot.js`'s `EXTRA_PATHS.audit`, `stack/test/snapshot.test.js`,
-`stack/test/integration/audit-anchor-continuity.test.js`): the finding and recommended fix above stand
+**Closed in Phase 3** (`atc-stack/src/snapshot.js`'s `EXTRA_PATHS.audit`, `atc-stack/test/snapshot.test.js`,
+`atc-stack/test/integration/audit-anchor-continuity.test.js`): the finding and recommended fix above stand
 as originally written — re-verification during implementation found the recommended design needed two
 refinements the audit's design-only sketch didn't anticipate: (1) a configured-but-missing key file is
 treated as a fatal backup error, not a graceful skip, matching `AnchorSigner.fromFiles`'s own
@@ -436,7 +436,7 @@ configured path resolving outside the audit service folder is excluded with a lo
 followed, a security boundary the design-only sketch didn't consider. Both the private key and, when
 configured, the previous public key are included — not just the private key, since historical anchor
 verification depends on whichever public key actually signed a given anchor. A pre-existing,
-unrelated gap in the shared `#copyFile` primitive (no permission-bit preservation, affecting `auth`'s
+unrelated gap in the shared `#copyFile` primitive (no permission-bit preservation, affecting `atc-auth`'s
 JWT keys too, not just audit's addition) was found and fixed in the same phase.
 
 ---
@@ -465,7 +465,7 @@ logical delivery/message/run.
 
 ### Recommended fix
 
-One sentence each, added to `webhook-out/README.md`, `notify/README.md`, and `scheduler/README.md`'s
+One sentence each, added to `atc-webhook-out/README.md`, `atc-notify/README.md`, and `atc-scheduler/README.md`'s
 existing "Security notes" sections, stating the relevant header is stable across every retry attempt
 of the same delivery/message/run and can be used by a receiver for its own dedup. No code change. The
 SMTP limitation gets a documentation note describing it honestly as out of notify's control, not a

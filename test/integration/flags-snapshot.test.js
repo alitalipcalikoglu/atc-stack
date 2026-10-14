@@ -8,12 +8,12 @@ import { after, before, test } from 'node:test';
 import { freePort, randomSecret, ServiceProcess, stopAll } from './harness.js';
 
 /**
- * Real cross-process flow: a single `flags` service, spawned as its own `node` process, exercised
+ * Real cross-process flow: a single `atc-flags` service, spawned as its own `node` process, exercised
  * purely over HTTP for the snapshot/ETag/evaluate loop a client SDK actually relies on — create a
  * flag, read its snapshot, evaluate it, change its rollout, and confirm the snapshot's version/etag
  * and the evaluation outcome both move in lockstep, including real conditional-request (304)
  * behaviour. The evaluator's bucketing math itself is already proven deterministically correct by
- * the 500 golden vectors (`flags/test/golden-vectors.test.js`); this test never re-derives that —
+ * the 500 golden vectors (`atc-flags/test/golden-vectors.test.js`); this test never re-derives that —
  * it only proves the live HTTP surface wires create → snapshot → evaluate → update → snapshot
  * correctly against a real running process.
  *

@@ -328,7 +328,7 @@ export interface components {
         };
         Info: {
             /** @enum {string} */
-            service: "audit";
+            service: "atc-audit";
             /** @description This service's own package.json semver. */
             version: string;
             /** @enum {string} */

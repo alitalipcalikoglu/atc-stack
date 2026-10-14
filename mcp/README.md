@@ -1,7 +1,7 @@
 # stack-mcp
 
 A single [Model Context Protocol](https://modelcontextprotocol.io) server foundation over the
-atc-web platform's 13 generated typed clients (`stack/clients/typescript/`). Talks to real services
+atc-web platform's 13 generated typed clients (`atc-stack/clients/typescript/`). Talks to real services
 through their real, canonical HTTP APIs — never a database, never a service's own `src/`, never a
 hand-rolled HTTP call.
 
@@ -24,7 +24,7 @@ future edit that reintroduces one of these is a failing test, not a design doc n
 ## One server, small tool set, default deny
 
 This is **not** an API mirror. Of the platform's 376 canonical operations
-(`stack/docs/API_CONTRACT_AUDIT.md`), exactly **10 tools** are exposed — see "Available tools"
+(`atc-stack/docs/API_CONTRACT_AUDIT.md`), exactly **10 tools** are exposed — see "Available tools"
 below. `mcp/tool-catalog.json` classifies all 376 operations (service, method, path,
 `READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`)
 as a **candidate universe** for future phases — it is not the exposed list. The exposed list is
@@ -36,14 +36,14 @@ is this explicit 10-tool allowlist over local STDIO only: no destructive/admin t
 transport, no MCP-specific authentication, and no package publication. This is a product decision,
 not unfinished release work; the catalog remains an audit/classification artifact, not a roadmap.
 
-No destructive, admin, or high-risk tool is exposed. `auth` and `console` have no
+No destructive, admin, or high-risk tool is exposed. `atc-auth` and `atc-console` have no
 business-operation tool at all (only their `/health`/`/ready`/`/v1/info` probes are touched, via
-`atc-stack.status` — see the flagged security-review items for why the rest of `auth` stays out).
+`atc-stack.status` — see the flagged security-review items for why the rest of `atc-auth` stays out).
 
 ## Install / build / configure / run
 
 ```bash
-cd stack/mcp
+cd atc-stack/mcp
 npm install          # isolated node_modules, separate from stack's own (see "Why isolated" below)
 npm run -w . build    # (no build step today -- source is plain .mjs + the generated .ts clients)
 ```
@@ -70,10 +70,10 @@ missing — never a vague failure, never a secret value.
 ### Running (STDIO)
 
 This process directly imports the generated `*.ts` typed clients under
-`stack/clients/typescript/`, so it must be started with Node's type-stripping flag:
+`atc-stack/clients/typescript/`, so it must be started with Node's type-stripping flag:
 
 ```bash
-node --experimental-strip-types --disable-warning=ExperimentalWarning stack/mcp/bin/stack-mcp.js
+node --experimental-strip-types --disable-warning=ExperimentalWarning atc-stack/mcp/bin/stack-mcp.js
 ```
 
 (`--disable-warning=ExperimentalWarning` just silences Node's SQLite/type-stripping experimental
@@ -86,8 +86,8 @@ is started — remote MCP hosting is out of scope here.
 
 ## Why isolated `node_modules` (not stack's root)
 
-`stack/mcp/package.json` has its own `node_modules`, deliberately separate from stack's own root
-`package.json`, for the same reason `stack/clients/typescript/` does (see that package's own
+`atc-stack/mcp/package.json` has its own `node_modules`, deliberately separate from stack's own root
+`package.json`, for the same reason `atc-stack/clients/typescript/` does (see that package's own
 README): stack's own toolchain isn't touched by anything this package needs, and vice versa. The
 official MCP SDK (`@modelcontextprotocol/sdk`) and `zod` are real runtime dependencies of a
 running `stack-mcp` process — that's normal and expected — but neither one is added to stack's
@@ -115,7 +115,7 @@ scheme, no API-path-shaped names like `notify_post_v1_messages`.
 
 `atc-notify.messages.list` returns `{items, nextCursor}`; `atc-search.query` returns
 `{hits, total, limit, offset}`. This is a **real, existing** platform inconsistency
-(`stack/docs/API_CONTRACT_AUDIT.md` §H flags it as a deferred policy question), not something this
+(`atc-stack/docs/API_CONTRACT_AUDIT.md` §H flags it as a deferred policy question), not something this
 package invented or should silently paper over. Each tool's output uses that operation's own real
 field names.
 
@@ -147,7 +147,7 @@ Every successful tool result: `{ content: [{type:'text', text: <short summary>}]
 { status, data, requestId? } }`. `data` is the real, typed response body. `requestId` is the
 service's own `X-Request-Id` when present (safe, useful for correlating with that service's logs);
 no other header is ever included — everything else on this platform is either routine or
-documented as internal-only propagation (`stack/docs/API_CONTRACT_AUDIT.md`'s tracing section).
+documented as internal-only propagation (`atc-stack/docs/API_CONTRACT_AUDIT.md`'s tracing section).
 
 ## Error translation
 

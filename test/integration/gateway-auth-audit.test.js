@@ -16,10 +16,10 @@ import { SetupContext } from '../../src/setup-context.js';
  * changed in the gateway: whether a caller-supplied `X-Request-Id` is honoured or discarded,
  * verified by what a *different process* (auth) logged after receiving it purely over HTTP.
  *
- * The gateway route used here is `stack`'s own real, unmodified `SetupContext.gatewayRoutes()`
+ * The gateway route used here is `atc-stack`'s own real, unmodified `SetupContext.gatewayRoutes()`
  * output (`buildRoutes()` below only rebinds upstream origins from the manifest's fixed ports to
  * this run's ephemeral ones — pathPrefix, stripPrefix, methods and every other field are exactly
- * what a real `stack setup` would write to `gateway/routes.json`). See the Stage 1.1 report: the
+ * what a real `stack setup` would write to `atc-gateway/routes.json`). See the Stage 1.1 report: the
  * P0 bug flagged in the Stage 1 addendum did not exist in the generator — `stripPrefix` only ever
  * removes a literal substring of the caller's URL (gateway has no path-insert capability), so the
  * correct public call is the target's real upstream path appended verbatim after `pathPrefix`
@@ -33,7 +33,7 @@ import { SetupContext } from '../../src/setup-context.js';
  * always-on tests, which exercise the harness itself without any atc-web service).
  *
  * What this does NOT (yet) prove, so the tests don't claim it: the audit event auth forwards for a
- * login has no `requestId` field today (`auth/src/store/event-store.js`'s security-event schema
+ * login has no `requestId` field today (`atc-auth/src/store/event-store.js`'s security-event schema
  * doesn't carry one), so a request id cannot appear *inside* that event's JSON — only the plain
  * fact that the event is there at all is checked. See the Stage 1 report.
  */
@@ -58,7 +58,7 @@ before(async () => {
   if (!shouldRun) return;
   scratch = mkdtempSync(join(tmpdir(), 'stack-integration-'));
   // `local: true` makes gatewayRoutes() always regenerate from the manifest, ignoring whatever
-  // `gateway/routes.json` a real `npm run setup` may have left on disk in this workspace.
+  // `atc-gateway/routes.json` a real `npm run setup` may have left on disk in this workspace.
   context = new SetupContext({ root: workspaceRoot, host: '127.0.0.1', local: true, run: async () => {} });
   jwtAudience = context.env('atc-auth').get('JWT_AUDIENCE') || 'app';
 

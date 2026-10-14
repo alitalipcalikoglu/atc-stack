@@ -24,7 +24,7 @@ acquire the 14 sibling repositories:
 
 ```bash
 git clone https://github.com/alitalipcalikoglu/atc-stack.git
-cd stack
+cd atc-stack
 npm ci
 npm link            # exposes both `stack` and the existing `atc-stack` command names
 stack install:all --admin-password '<choose-a-strong-password>'
@@ -54,7 +54,7 @@ The installation manifest is the source of truth. The immutable
 available as immutable release history; release-validation reports under [`releases/`](releases/)
 are evidence and are deliberately not consumed by the installer.
 
-Explicit development installation resolves every sibling—including `service-core`—to the current
+Explicit development installation resolves every sibling—including `atc-service-core`—to the current
 official `main` branch and reports the exact resolved commits. It is moving and non-immutable:
 
 ```bash
@@ -96,7 +96,7 @@ not installed.
 ### Configure an already-present workspace
 
 ```bash
-git clone https://github.com/alitalipcalikoglu/atc-stack.git && cd stack && npm ci
+git clone https://github.com/alitalipcalikoglu/atc-stack.git && cd atc-stack && npm ci
 npm run setup      # dependencies, secrets, keys, .env files, routes, console build, first admin
 npm run dev        # every service in this terminal, prefixed logs, Ctrl-C stops all
 ```
@@ -134,16 +134,16 @@ atc-stack maintenance media    # one-shot: purge + trash reconciliation, safe al
 ```
 
 Runs media's real production `Maintenance`/`MediaService#purge()` directly against its `.env`/data
-directory — no HTTP route, no new auth system; see [media/README.md](../media/README.md#maintenance).
+directory — no HTTP route, no new auth system; see [atc-media/README.md](../atc-media/README.md#maintenance).
 
 ## What `setup` does
 
 1. **Dependencies**: `npm ci` in every folder that has no `node_modules` (or all with `--install`).
-2. **Preparation**: `npm run keygen` in `auth` when `keys/jwt-private.pem` is missing; `npm run build` in `console` when `public/` is missing.
+2. **Preparation**: `npm run keygen` in `atc-auth` when `keys/jwt-private.pem` is missing; `npm run build` in `atc-console` when `public/` is missing.
 3. **Env files**: each service's `.env` is loaded (or started from its `.env.example`), then the stack sets `PORT`, `HOST`, every secret that is empty or still a `REPLACE_WITH…` placeholder, the URLs services use to reach each other, and the API keys:
-   - every service that issues keys (`*_API_KEYS`) gets an entry per holder: `console` (role `read` for audit, default elsewhere), `gateway` (auth, media, notify), `auth` (notify), `scheduler` (flags `write`, notify, webhook-out `publish`);
+   - every service that issues keys (`*_API_KEYS`) gets an entry per holder: `atc-console` (role `read` for audit, default elsewhere), `atc-gateway` (auth, media, notify), `atc-auth` (notify), `atc-scheduler` (flags `write`, notify, webhook-out `publish`);
    - holders receive the same secret: console `*_API_KEY` variables and `GATEWAY_METRICS_TOKEN`, gateway `AUTH_API_KEY`/`MEDIA_API_KEY`/`NOTIFY_API_KEY`, auth `NOTIFY_API_KEY`, scheduler `TARGET_KEYS`.
-4. **Files**: `gateway/routes.json` (auth, media, JWKS through the gateway) and `console/services.json` (every service with its local URL and key variable).
+4. **Files**: `atc-gateway/routes.json` (auth, media, JWKS through the gateway) and `atc-console/services.json` (every service with its local URL and key variable).
 5. **First admin**: `admin@console.local` with a generated password, printed once. Nothing is created when an administrator already exists.
 
 Running `setup` again is safe: existing secrets, keys and any value you edited by hand are kept; only placeholders and missing entries are filled. Delete a line from a `.env` to get the stack's default back. Console's adapter-node application is rebuilt on every setup boundary so a build artifact left by an older source checkout is never accepted as current.
@@ -152,7 +152,7 @@ Running `setup` again is safe: existing secrets, keys and any value you edited b
 
 By default the stack is **local**: `HOST=127.0.0.1`, plain HTTP everywhere, `COOKIE_SECURE=false`, notify's mail transport `json:` (mails are logged, not sent), and the outbound guards of scheduler and webhook-out opened for loopback (`TARGET_ALLOW_HTTP=true`, `TARGET_ALLOW_PRIVATE=true`, `TARGET_ALLOWED_HOSTS=127.0.0.1,localhost`) so jobs and webhooks can reach the other services and local receivers.
 
-`npm run setup -- --public --host 10.0.0.5` keeps every security default from the templates (HTTPS-only outbound, secure cookies, allowlists empty until you fill them), uses the given host for service-to-service URLs, keeps `PUBLIC_BASE_URL`s you set, and does not rewrite an existing `gateway/routes.json`. Put a TLS-terminating proxy in front and set `TRUST_PROXY=true` per service.
+`npm run setup -- --public --host 10.0.0.5` keeps every security default from the templates (HTTPS-only outbound, secure cookies, allowlists empty until you fill them), uses the given host for service-to-service URLs, keeps `PUBLIC_BASE_URL`s you set, and does not rewrite an existing `atc-gateway/routes.json`. Put a TLS-terminating proxy in front and set `TRUST_PROXY=true` per service.
 
 Options: `--root <dir>` (default: the parent of this checkout), `--admin-email <email>`, `--admin-password <password>` (otherwise generated), `--install`.
 
@@ -161,7 +161,7 @@ Options: `--root <dir>` (default: the parent of this checkout), `--admin-email <
 | Service | Port | Repository | What it does | Calls |
 |---|---|---|---|---|
 | atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream |
-| atc-notify | 3001 | [atc-notify](https://github.com/alitalipcalikoglu/atc-notify) | Queued e-mail with templates and retries, plus a legacy signed webhook for one-off calls (`webhook-out` is the durable delivery service — see below). API/worker split-capable. | audit |
+| atc-notify | 3001 | [atc-notify](https://github.com/alitalipcalikoglu/atc-notify) | Queued e-mail with templates and retries, plus a legacy signed webhook for one-off calls (`atc-webhook-out` is the durable delivery service — see below). API/worker split-capable. | audit |
 | atc-auth | 3002 | [atc-auth](https://github.com/alitalipcalikoglu/atc-auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, audit |
 | atc-media | 3003 | [atc-media](https://github.com/alitalipcalikoglu/atc-media) | Uploads, deduplication, image variants, signed URLs, upload tickets | audit |
 | atc-console | 3004 | [atc-console](https://github.com/alitalipcalikoglu/atc-console) | Admin web app for every service: own admins, 2FA, console log | every service, audit |
@@ -194,7 +194,7 @@ Every service is its own repository and deployable alone; "Calls" lists the serv
 
 A new service is part of the stack from its first release. In the same delivery:
 
-1. Add its entry to `src/manifest.js`: `id` (folder, PM2 name, console id), `port`, `keysVar` when it issues API keys, `env(ctx)` for the values a local stack needs (secrets via `ctx.secret`, keys via `ctx.issue`, URLs via `ctx.url`/`ctx.publicUrl`, operator-kept values via `ctx.keep`, outbound guards via `ctx.outbound`), `files(ctx)` for generated files, `prepare(ctx)` for one-off steps, and `console` when the console shows it (type, label, key variable, polling).
+1. Add its entry to `src/manifest.js`: `id` (folder, PM2 name, console id), `port`, `keysVar` when it issues API keys, `env(ctx)` for the values a local stack needs (secrets via `ctx.secret`, keys via `ctx.issue`, URLs via `ctx.url`/`ctx.publicUrl`, operator-kept values via `ctx.keep`, outbound guards via `ctx.outbound`), `files(ctx)` for generated files, `prepare(ctx)` for one-off steps, and `atc-console` when the console shows it (type, label, key variable, polling).
 2. Add the holders it needs to other entries: the console's key comes from `console.keyEnv` automatically; a key for another service is one `ctx.issue(...)` in that service's `env`.
 3. Add the port to the table above and a template line to `test/stack.test.js` so the wiring test covers it.
 4. Run `npm run setup` and `npm run dev`; every service, old and new, must report `ready`.

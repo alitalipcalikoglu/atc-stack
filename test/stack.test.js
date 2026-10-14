@@ -106,7 +106,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   // capability); the caller must therefore include the target's real upstream path verbatim after
   // pathPrefix. Regression for the Stage 1.1 finding: a caller hitting the *short* form the route
   // "looks like" it should accept (`/api/auth/login`) is a caller bug, not a generator bug — this
-  // pins the real, documented, working shape (`gateway/examples/public-route-with-injected-key.md`).
+  // pins the real, documented, working shape (`atc-gateway/examples/public-route-with-injected-key.md`).
   const authPublic = routes.routes.find((/** @type {any} */ r) => r.id === 'auth-public');
   assert.deepEqual([authPublic.pathPrefix, authPublic.stripPrefix], ['/api/auth/', '/api/auth']);
   assert.equal('/api/auth/v1/auth/login'.slice(authPublic.stripPrefix.length), '/v1/auth/login');

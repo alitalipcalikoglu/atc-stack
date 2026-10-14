@@ -205,7 +205,7 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   const password = 'correct-horse-battery-staple-9';
 
   // Seed the first admin directly against console's own DB file, exactly as `stack setup` does
-  // (`Stack#firstAdmin` in stack/src/stack.js) -- reusing console's own classes, not reimplementing
+  // (`Stack#firstAdmin` in atc-stack/src/stack.js) -- reusing console's own classes, not reimplementing
   // password hashing or admin creation by hand.
   await seedFirstAdmin(dbPath, email, password);
 

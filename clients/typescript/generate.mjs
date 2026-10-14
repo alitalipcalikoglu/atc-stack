@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Deterministic generator: canonical <service>/openapi.yaml -> stack/clients/typescript/<service>/{types.gen.ts,index.ts}.
+// Deterministic generator: canonical <service>/openapi.yaml -> atc-stack/clients/typescript/<service>/{types.gen.ts,index.ts}.
 // Run: node clients/typescript/generate.mjs [service...] (from anywhere; paths are resolved off this file's location).
 // Not wired into any CI/workflow -- local dev tooling only, per project policy.
 import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';

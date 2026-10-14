@@ -72,7 +72,7 @@ function classify(service, method, opId, p) {
   ) flags.add('ASYNC');
 
   // Gateway's own operational surface only (4 operations) -- never proxy-surface (there is none in
-  // its spec; Phase 1 confirmed gateway.openapi.yaml only documents its own 4 endpoints).
+  // its spec; Phase 1 confirmed atc-gateway/openapi.yaml only documents its own 4 endpoints).
   if (service === 'atc-gateway') flags.add('OPERATOR');
 
   return [...flags];

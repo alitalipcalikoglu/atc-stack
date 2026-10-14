@@ -8,7 +8,7 @@ import { after, before, test } from 'node:test';
 import { freePort, randomSecret, ServiceProcess, stopAll, waitUntil } from './harness.js';
 
 /**
- * Real cross-process failure-recovery test: a real `scheduler` `node` child process (not a mock,
+ * Real cross-process failure-recovery test: a real `atc-scheduler` `node` child process (not a mock,
  * not an in-process fake) is pointed at a local HTTP target that accepts the connection and then
  * never writes a response. That genuinely drives scheduler's outbound call through Node's own
  * socket-idle `timeout` (see `net/http-caller.js` / `@atc-web/atc-service-core`'s `HttpCaller.send`,
@@ -74,7 +74,7 @@ const authHeader = () => ({ authorization: `Bearer ${apiKeySecret}`, 'content-ty
 
 /**
  * Creates a job and returns its name. `retry` and `timeoutMs` are top-level create-body fields per
- * the real schema (`scheduler/src/http/schemas.js` `Schemas.create`) — NOT nested under `target`,
+ * the real schema (`atc-scheduler/src/http/schemas.js` `Schemas.create`) — NOT nested under `target`,
  * which only takes `url`/`method`/`headers`/`body`.
  * @param {{ name: string, url: string, timeoutMs: number, retry: { max: number, backoffSec: number } }} o
  */

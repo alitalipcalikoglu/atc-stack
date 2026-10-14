@@ -7,14 +7,14 @@ import { SERVICES } from '../src/manifest.js';
 import { Stack } from '../src/stack.js';
 
 /**
- * Post-production R1: `geo/ecosystem.config.cjs` had a real, deployment-blocking syntax error (a
+ * Post-production R1: `atc-geo/ecosystem.config.cjs` had a real, deployment-blocking syntax error (a
  * missing comma) that nothing caught until this was written — `require()`d, the file threw
  * `SyntaxError: Unexpected identifier`, meaning a real `pm2 start ecosystem.config.cjs` would have
  * crashed immediately. This is a load/parse + minimal-shape check only, not a PM2 process
  * supervision test or a reimplementation of PM2's own config semantics — it proves the file is
  * valid JS with the fields `Stack#up()`/`generateSplitEcosystem()` themselves rely on, nothing more.
  *
- * Depends on the real sibling repos being checked out next to `stack` (the same accepted local
+ * Depends on the real sibling repos being checked out next to `atc-stack` (the same accepted local
  * workspace contract `test/stack.test.js`'s `RouteTable` import and `test/snapshot.test.js` already
  * use) — not gated behind `STACK_INTEGRATION`, since it spawns no process and is fast.
  */

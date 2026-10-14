@@ -49,7 +49,7 @@ test('readOnlyHint matches the handler\'s real semantics: mutation tools are exp
 });
 
 test('an operation that is NOT in the allowlist cannot become a tool merely by existing in a spec (spot check)', () => {
-  // atc-auth.login is a real, valid operationId in auth/openapi.yaml -- it must never appear here.
+  // atc-auth.login is a real, valid operationId in atc-auth/openapi.yaml -- it must never appear here.
   const names = TOOLS.map((t) => t.name);
   assert.ok(!names.includes('atc-auth.login'));
   assert.ok(!names.some((n) => n.startsWith('auth.')));

@@ -5,7 +5,7 @@
 // unconfigured, to prove atc-stack.status degrades gracefully rather than requiring all 13.
 //
 // Only runs when explicitly requested, matching every other process-spawning test in this
-// workspace: `STACK_INTEGRATION=1 npm run mcp:e2e` (see stack/package.json).
+// workspace: `STACK_INTEGRATION=1 npm run mcp:e2e` (see atc-stack/package.json).
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
 import { mkdtempSync, rmSync, mkdirSync } from 'node:fs';

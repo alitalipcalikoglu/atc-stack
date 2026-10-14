@@ -1,6 +1,6 @@
 // The one MCP error-translation adapter. Every tool handler funnels its failures through
 // toErrorResult() so the boundary's error taxonomy stays small and consistent -- see
-// stack/docs/API_CONTRACT_AUDIT.md and this package's README for the full rationale.
+// atc-stack/docs/API_CONTRACT_AUDIT.md and this package's README for the full rationale.
 //
 // What is ALWAYS preserved, because it's real, useful, and safe: the target service name, the real
 // HTTP status (when we got one), the service's own canonical error code (e.g. NOT_FOUND,
@@ -58,7 +58,7 @@ export function toErrorResult(service, err) {
   if (err && typeof err === 'object' && 'error' in err && 'response' in err) {
     // The real, well-formed openapi-fetch result a tool handler re-throws on a non-2xx: `err.error`
     // is the parsed body, which on this platform is always the shared ErrorEnvelope shape
-    // `{ error: { code, message, details? } }` (see stack/docs/API_CONTRACT_AUDIT.md §B.1) --
+    // `{ error: { code, message, details? } }` (see atc-stack/docs/API_CONTRACT_AUDIT.md §B.1) --
     // preserved as-is, not reinterpreted, except `details` is dropped (it can carry field-level
     // data we haven't audited for this boundary; code+message is always enough to act on).
     const status = /** @type {{ response?: { status?: number } }} */ (err).response?.status;

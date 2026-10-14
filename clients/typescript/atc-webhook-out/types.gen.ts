@@ -845,7 +845,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @constant */
-                        service: "webhook-out";
+                        service: "atc-webhook-out";
                         /** @description This service's own package.json semver. */
                         version: string;
                         /** @constant */

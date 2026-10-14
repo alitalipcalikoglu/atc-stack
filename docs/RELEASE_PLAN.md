@@ -7,10 +7,10 @@ Nothing in this plan has been executed yet — this is the plan only, pending ap
 
 **Scope**: exactly one code change, plus one decision to make explicitly rather than default.
 
-1. `notify/test/helpers.js`: add `PORT: '0'` to `testConfig()`'s defaults, matching `scheduler`'s and
-   `webhook-out`'s own existing `testConfig()` pattern exactly (`RELEASE_AUDIT.md` §4/§confirmed
-   blocker). Does not touch `notify/src/config.js`'s real production default (`3001` stays the real
-   default). Acceptance: `npm test` in `notify`, 5 consecutive full runs, 60/60 every time, run on a
+1. `atc-notify/test/helpers.js`: add `PORT: '0'` to `testConfig()`'s defaults, matching `atc-scheduler`'s and
+   `atc-webhook-out`'s own existing `testConfig()` pattern exactly (`RELEASE_AUDIT.md` §4/§confirmed
+   blocker). Does not touch `atc-notify/src/config.js`'s real production default (`3001` stays the real
+   default). Acceptance: `npm test` in `atc-notify`, 5 consecutive full runs, 60/60 every time, run on a
    machine/moment where nothing else has taken port 3001 first is no longer a precondition for a
    correct result.
 2. Decide whether to add the minimal per-repo CI workflow recommended in `RELEASE_AUDIT.md` §16
@@ -41,15 +41,15 @@ documented in `RELEASE_AUDIT.md` §16.
 
 The CI attempt's two real findings were kept and closed on their own merits, independent of CI:
 - **Linux production runtime portability** (`RELEASE_AUDIT.md` §17): 7 repos'
-  (`media`/`shortlink`/`flags`/`scheduler`/`webhook-out`/`ratelimit`/`geo`) lockfiles only recorded
-  one platform's optional native-binary packages (`typescript`, and `sharp` for `media`) — a real
+  (`atc-media`/`atc-shortlink`/`atc-flags`/`atc-scheduler`/`atc-webhook-out`/`atc-ratelimit`/`atc-geo`) lockfiles only recorded
+  one platform's optional native-binary packages (`typescript`, and `sharp` for `atc-media`) — a real
   `npm ci` inside `node:22-alpine` (the actual production runtime family) failed. Regenerated all 7
   lockfiles via a fresh, from-scratch resolution inside `node:22-alpine`; no dependency version
   changed, every regeneration is deterministic (verified twice), all 7 pass on both Linux and macOS.
-- **`stack`'s plain suite / local workspace dependency** (`RELEASE_AUDIT.md` §18): investigated,
+- **`atc-stack`'s plain suite / local workspace dependency** (`RELEASE_AUDIT.md` §18): investigated,
   proven via an isolated `git clone` (stack + gateway only) that the dependency is real, deliberate,
-  and broader than just `gateway` (`snapshot.test.js` needs several services' real sources too).
-  Reclassified as an accepted, pre-existing part of `stack`'s own documented local-workspace
+  and broader than just `atc-gateway` (`snapshot.test.js` needs several services' real sources too).
+  Reclassified as an accepted, pre-existing part of `atc-stack`'s own documented local-workspace
   contract — not a defect, no code change made, no sibling-checkout mechanism built.
 
 R1 has not started.
@@ -87,7 +87,7 @@ port (OS-assigned, not a fixed test port — the same class of fix as R0), provi
 returns healthy → `/v1/info` returns a well-formed body (service/version/apiVersion/schemaVersion/
 serviceCore/capabilities, per `RELEASE_AUDIT.md` §15) → `SIGTERM` → exits within a bounded time. No
 new test-only production flag — uses each service's real entrypoint exactly as `ecosystem.config.cjs`
-does today. For `notify`, `scheduler`, `webhook-out`: an additional split-mode smoke — `api-main.js`
+does today. For `atc-notify`, `atc-scheduler`, `atc-webhook-out`: an additional split-mode smoke — `api-main.js`
 + `worker-main.js` against the same DB file, both independently reaching healthy, both shutting down
 gracefully — reusing the real entrypoints Hardening Phase 1's `split-worker-migration-race.test.js`
 already spawns, not a new mechanism.
@@ -109,8 +109,8 @@ inside this drill (not a separate re-test), since a release drill is exactly the
 that guarantee needs to keep holding in.
 
 **5. Rollback drill** — reusing Stage 3/Hardening Phase 3's existing backup/restore + audit anchor
-continuity coverage (`stack/test/snapshot.test.js`,
-`stack/test/integration/audit-anchor-continuity.test.js`) as the real implementation, not rewritten:
+continuity coverage (`atc-stack/test/snapshot.test.js`,
+`atc-stack/test/integration/audit-anchor-continuity.test.js`) as the real implementation, not rewritten:
 running state → `stack backup` → mutate/upgrade → `stack restore` → services restart → data restored
 → media bytes restored → auth signing continuity → audit anchor signing/verification continuity.
 Expected restore result: `restored`. No failure-injection here (Stage 3.1's own scope, already
@@ -129,19 +129,19 @@ Executed for real: full 15-repo local matrix (fresh `npm ci` each), Linux instal
 7 R0-fixed repos in real `node:22-alpine`, a real 13-service concurrent production-entrypoint
 startup smoke (real `stack.setup()`-generated wiring, real `/ready`+`/v1/info`, graceful shutdown,
 zero source-tree mutation), a real live `stack status --matrix` run against all 13, real split-mode
-job flows for `notify`/`scheduler`/`webhook-out`, and `STACK_INTEGRATION=1`'s full 70/70 (migration
+job flows for `atc-notify`/`atc-scheduler`/`atc-webhook-out`, and `STACK_INTEGRATION=1`'s full 70/70 (migration
 race, migration E2E, audit anchor continuity, and more — reused, not duplicated).
 
 This surfaced two real, confirmed release blockers, both closed within R1 (`RELEASE_AUDIT.md` §19,
-§20): `geo/ecosystem.config.cjs`'s missing-comma syntax error (a real deployment-blocking bug — one
-character fixed, a new `stack/test/ecosystem-config.test.js` regression added, confirmed it would
+§20): `atc-geo/ecosystem.config.cjs`'s missing-comma syntax error (a real deployment-blocking bug — one
+character fixed, a new `atc-stack/test/ecosystem-config.test.js` regression added, confirmed it would
 have caught the original bug) and `Snapshot#restore()`'s failure to clear stale `-wal`/`-shm`
 sidecar files on a database entry — the more serious finding, a genuine data-resurrection bug for
 any service that was not cleanly closed before a restore (confirmed via a real, unclosed SQLite
 connection — the real condition a crash or a forced shutdown-timeout exit leaves behind, not a
 synthetic stand-in). Fixed by treating a db entry's sidecars as part of the same atomic move-aside/
-revert unit as its main file; two new regression tests added to `stack/test/snapshot.test.js`; the
-original real `auth` reproduction re-run against the fix and confirmed correct.
+revert unit as its main file; two new regression tests added to `atc-stack/test/snapshot.test.js`; the
+original real `atc-auth` reproduction re-run against the fix and confirmed correct.
 
 `Stack#up()`/`Stack#down()`/`Stack#restore()`'s own PM2 stop/start wrapper remain unexecuted in this
 environment — PM2 is not installed here. Everything PM2-free under those same code paths (config
@@ -153,14 +153,14 @@ generation for both ecosystem modes, `Stack#backup()`, and — critically for th
 Two coverage gaps left open by the initial R1 pass were closed with real drills, no production code
 change (`RELEASE_AUDIT.md` §21 has the full detail):
 
-- **Upgrade drill, the two representative services `migration-e2e.test.js` didn't cover**: `media`
-  and `scheduler`, each via a real old-schema (`openOldFixtureDb`) fixture with real pre-existing
+- **Upgrade drill, the two representative services `migration-e2e.test.js` didn't cover**: `atc-media`
+  and `atc-scheduler`, each via a real old-schema (`openOldFixtureDb`) fixture with real pre-existing
   domain data, a real production entrypoint, real migration to current schema, real API
   verification (media: canonical bytes byte-for-byte plus `delete_token` backfill; scheduler: the
   seeded job, `worker_heartbeat` table creation), and a real **second** start proving the migration
   is idempotent with data still intact.
-- **Full restore drill, one coherent multi-service snapshot**: `media`, `audit`, `notify`,
-  `scheduler`, `webhook-out` running together, real pre-backup state via each service's own public
+- **Full restore drill, one coherent multi-service snapshot**: `atc-media`, `atc-audit`, `atc-notify`,
+  `atc-scheduler`, `atc-webhook-out` running together, real pre-backup state via each service's own public
   API, one real `stack.backup()` covering all five, real post-backup mutations on the same live
   processes (real, un-forced WAL activity confirmed present on all five before stop — not
   synthetic), real controlled stop, real `Snapshot#restore()` (PM2 wrapper still unexecuted, noted),
@@ -180,7 +180,7 @@ R2 has not started.
 
 ## Phase R2 — Versioning + release metadata
 
-1. Apply the version/tag policy from `RELEASE_AUDIT.md` §11–§12: `service-core` unchanged (already
+1. Apply the version/tag policy from `RELEASE_AUDIT.md` §11–§12: `atc-service-core` unchanged (already
    `v1.11.1`); the other 14 repos get a release commit (if `package.json.version` needs to actually
    change from what it already reads — see audit §12, most stay textually `1.0.0` since that value is
    already correct as a first release, so this may be a no-op commit-wise for most of them) plus a
@@ -188,7 +188,7 @@ R2 has not started.
 2. Decide and, if approved, implement the release-notes strategy (`RELEASE_AUDIT.md` §13) and the
    generated release manifest (`RELEASE_AUDIT.md` §14) — both explicitly scoped as non-source-of-truth
    conveniences, not new systems of record.
-3. Update the one confirmed stale doc line (`stack/docs/UPGRADE.md`'s "still pins v1.10.0" sentence,
+3. Update the one confirmed stale doc line (`atc-stack/docs/UPGRADE.md`'s "still pins v1.10.0" sentence,
    `RELEASE_AUDIT.md` §10) as part of this phase's own commit, not left for later.
 
 **Blocking**: yes — R3 does not tag anything until this phase's metadata decisions are made and

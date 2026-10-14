@@ -11,7 +11,7 @@ import { freePort, randomSecret, ServiceProcess, stopAll, waitUntil } from './ha
  * Stage 11: proves the real end-to-end business flow through webhook-out's actual worker —
  * retry/backoff, auto-disable and ordered-delivery blocking — against a real `node:http` receiver,
  * not fake DB mutations. The cross-process SQL-level atomicity of the ordered/per-subscription
- * concurrency cap is already proven by `webhook-out/test/ordering-and-cap.test.js`; this file only
+ * concurrency cap is already proven by `atc-webhook-out/test/ordering-and-cap.test.js`; this file only
  * exercises the worker's business-level retry/disable/ordering behaviour through the real HTTP API.
  *
  * Each scenario gets its own real `node` webhook-out process (`role: 'combined'`, the default —

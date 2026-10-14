@@ -813,7 +813,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @constant */
-                        service: "flags";
+                        service: "atc-flags";
                         /** @description This service's own package.json semver. */
                         version: string;
                         /** @constant */

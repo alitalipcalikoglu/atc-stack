@@ -237,7 +237,7 @@ export interface components {
         };
         InfoResponse: {
             /** @constant */
-            service: "notify";
+            service: "atc-notify";
             /** @description This service's own package.json semver. */
             version: string;
             /** @constant */

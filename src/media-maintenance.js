@@ -7,17 +7,17 @@ import { EnvFile } from './env-file.js';
  * Post-production Phase 4: an operator-triggered, one-shot run of media's real production
  * `Maintenance`/`MediaService#purge()` — never a second purge implementation.
  *
- * Trigger mechanism decision (see `stack/docs/POST_PRODUCTION_PLAN.md` Phase 4 and the Phase 4
+ * Trigger mechanism decision (see `atc-stack/docs/POST_PRODUCTION_PLAN.md` Phase 4 and the Phase 4
  * report): media's own HTTP API has no admin/operator auth tier distinct from its flat, roleless
  * `MEDIA_API_KEYS` (every configured key can already upload/download/delete — see
- * `media/src/http/api-key-auth.js`), so an HTTP endpoint here would either blur that public
+ * `atc-media/src/http/api-key-auth.js`), so an HTTP endpoint here would either blur that public
  * upload/download boundary with an operator action, or require inventing a whole new auth tier
- * for one operation — both explicitly out of scope. This reuses `stack`'s own existing operational
+ * for one operation — both explicitly out of scope. This reuses `atc-stack`'s own existing operational
  * control plane instead (the same trust boundary `stack backup`/`stack restore` already assume: an
- * operator who can run `stack` commands against this workspace already has full filesystem and
+ * operator who can run `atc-stack` commands against this workspace already has full filesystem and
  * database access to every service) — no new runtime role, no new auth system, no new coupling.
  *
- * Constructs the exact dependency graph `media/src/application.js#start` does — same `Config`,
+ * Constructs the exact dependency graph `atc-media/src/application.js#start` does — same `Config`,
  * `Database`, `LocalStorage`, `FileStore`, `TicketStore`, `MediaService`, `Maintenance` classes,
  * same real `.env` — minus the Fastify app/HTTP listener, which this never needs and never starts.
  * `LocalStorage#check()`, never `#prepare()`: a real, currently-running media process may hold
@@ -29,7 +29,7 @@ import { EnvFile } from './env-file.js';
  * doesn't apply across separate processes, but correctness there was never `Maintenance`'s job: the
  * DB compare-and-swap (`FileStore#finalizeOrphanBlobs`) and storage's atomic detach
  * (`LocalStorage#detachForDelete`) are what make two independent purges of the same content safe,
- * regardless of which processes they run in — see `media/test/maintenance-concurrency.test.js`.
+ * regardless of which processes they run in — see `atc-media/test/maintenance-concurrency.test.js`.
  * @param {string} root @param {string} serviceId
  * @returns {Promise<import('../../atc-media/src/maintenance.js').MaintenanceResult>}
  */

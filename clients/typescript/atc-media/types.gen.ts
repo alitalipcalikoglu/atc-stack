@@ -610,7 +610,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        service: "media";
+                        service: "atc-media";
                         /** @description This service's own package.json semver. */
                         version: string;
                         /** @enum {string} */

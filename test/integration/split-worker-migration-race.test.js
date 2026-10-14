@@ -13,7 +13,7 @@ import { freePort, openOldFixtureDb, randomSecret, waitUntil } from './harness.j
  * for the three split-capable services, proven against the REAL, unmodified `src/api-main.js` /
  * `src/worker-main.js` entry points (never a synthetic stand-in), each opening the SAME on-disk
  * SQLite file at (as close to) the same instant as `Promise.all`-spawning two real child processes
- * achieves — the same synchronization `service-core/scripts/migration-race-stress.mjs` used to
+ * achieves — the same synchronization `atc-service-core/scripts/migration-race-stress.mjs` used to
  * reproduce the original bug at an ~87-92% trigger rate, so this is a meaningful race, not a token
  * gesture. The fixture DB is one version BEHIND each service's real, current `MIGRATIONS` array (the
  * real migration SQL, not a synthetic canary), built by re-using that service's own `src/db.js`

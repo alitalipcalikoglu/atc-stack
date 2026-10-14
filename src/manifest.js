@@ -97,7 +97,7 @@ export const SERVICES = [
   },
   {
     id: 'atc-geo', port: 3012, keysVar: 'GEO_API_KEYS',
-    // MMDB_PATH stays as the operator sets it (empty = no IP geolocation; see geo/examples/ip-databases.md).
+    // MMDB_PATH stays as the operator sets it (empty = no IP geolocation; see atc-geo/examples/ip-databases.md).
     env: (c) => ({ ...auditEnv(c, 'atc-geo'), MMDB_PATH: c.keep('atc-geo', 'MMDB_PATH', ''), ASN_MMDB_PATH: c.keep('atc-geo', 'ASN_MMDB_PATH', '') }),
     console: { type: 'atc-geo', label: 'Geo', keyEnv: 'GEO_API_KEY' },
   },

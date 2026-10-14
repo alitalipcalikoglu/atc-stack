@@ -788,7 +788,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        service: "shortlink";
+                        service: "atc-shortlink";
                         /** @description This service's own package semver — unrelated to `apiVersion`. */
                         version: string;
                         /** @enum {string} */

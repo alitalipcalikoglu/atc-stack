@@ -50,7 +50,7 @@ export const TOOLS = [
             const client = await registry.probeClient(service);
             // operationId naming for the 3 operational probes is NOT consistent across the 13
             // specs (a real Phase 1 finding, worth fixing in a future contract pass, not silently
-            // patched here): gateway/ratelimit/geo use "<svc>.health.check", most others
+            // patched here): atc-gateway/atc-ratelimit/atc-geo use "atc-<svc>.health.check", most others
             // "<svc>.health.get", media uses "atc-media.ops.health", search uses
             // "atc-search.system.health" (entity and verb swapped). Matching on "does the operationId
             // contain this whole dot-segment" is robust to all three shapes without guessing which
@@ -87,7 +87,7 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-flags.evaluate -- authenticated read. flags/openapi.yaml operationId atc-flags.evaluate.post,
+  // atc-flags.evaluate -- authenticated read. atc-flags/openapi.yaml operationId atc-flags.evaluate.post,
   // request body EvaluateBody (env required; context.userId/email/attrs, keys, details all optional).
   // ---------------------------------------------------------------------------------------------
   {
@@ -116,7 +116,7 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-geo.ip.lookup -- authenticated read. geo/openapi.yaml operationId atc-geo.ip.lookup, path {ip}, query {lang?}.
+  // atc-geo.ip.lookup -- authenticated read. atc-geo/openapi.yaml operationId atc-geo.ip.lookup, path {ip}, query {lang?}.
   // ---------------------------------------------------------------------------------------------
   {
     name: 'atc-geo.ip.lookup',
@@ -138,7 +138,7 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-media.files.get -- authenticated read + real error path. media/openapi.yaml operationId
+  // atc-media.files.get -- authenticated read + real error path. atc-media/openapi.yaml operationId
   // atc-media.files.get, path {id}. Deliberately metadata-only: this tool never transports file bytes
   // through MCP (see mcp/README.md's "binary" section for why).
   // ---------------------------------------------------------------------------------------------
@@ -159,7 +159,7 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-notify.messages.list -- pagination proof (cursor-based). notify/openapi.yaml operationId
+  // atc-notify.messages.list -- pagination proof (cursor-based). atc-notify/openapi.yaml operationId
   // atc-notify.messages.list, query {status?, limit?, cursor?}. Field names (items/nextCursor) are
   // notify's own real contract, not normalized to match any other service's list shape.
   // ---------------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-notify.messages.create -- async submit (safe mutation). notify/openapi.yaml operationId
+  // atc-notify.messages.create -- async submit (safe mutation). atc-notify/openapi.yaml operationId
   // atc-notify.messages.create, body oneOf(MessageCreateEmail, MessageCreateWebhook) discriminated on
   // `channel`. Per-template email `data` shape is intentionally NOT re-derived here (server-side
   // Ajv is the real validator for that) -- this schema only re-derives the OUTER contract shape.
@@ -239,7 +239,7 @@ export const TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-shortlink.links.create -- safe mutation (create, non-destructive). shortlink/openapi.yaml
+  // atc-shortlink.links.create -- safe mutation (create, non-destructive). atc-shortlink/openapi.yaml
   // operationId atc-shortlink.links.create, body LinkCreate (url required).
   // ---------------------------------------------------------------------------------------------
   {
@@ -269,7 +269,7 @@ export const TOOLS = [
   // atc-ratelimit.check -- read-only by construction: `peek` is hard-coded true in the handler, never
   // caller-controlled, so this tool can never consume real quota (a non-peek check is a real
   // mutation of a subject's counters -- deliberately left out of the initial allowlist).
-  // ratelimit/openapi.yaml operationId atc-ratelimit.check, body CheckRequest.
+  // atc-ratelimit/openapi.yaml operationId atc-ratelimit.check, body CheckRequest.
   // ---------------------------------------------------------------------------------------------
   {
     name: 'atc-ratelimit.check',
@@ -295,9 +295,9 @@ export const TOOLS = [
   // ---------------------------------------------------------------------------------------------
   // atc-search.query -- authenticated read, offset-based pagination (deliberately different pagination
   // style from atc-notify.messages.list's cursor style -- both are real, neither is normalized to
-  // match the other; see stack/docs/API_CONTRACT_AUDIT.md §H on the platform's real field-naming
+  // match the other; see atc-stack/docs/API_CONTRACT_AUDIT.md §H on the platform's real field-naming
   // inconsistency across services, left as-is per that doc's own deferred-policy note).
-  // search/openapi.yaml operationId atc-search.query.get, path {name}, query {q?, limit?, offset?, ...}.
+  // atc-search/openapi.yaml operationId atc-search.query.get, path {name}, query {q?, limit?, offset?, ...}.
   // ---------------------------------------------------------------------------------------------
   {
     name: 'atc-search.query',

@@ -1,5 +1,5 @@
 {
-  "service": "audit",
+  "service": "atc-audit",
   "routes": [
     { "method": "GET", "path": "/.well-known/audit-anchor-key" },
     { "method": "GET", "path": "/health" },

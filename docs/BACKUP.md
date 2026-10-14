@@ -10,29 +10,29 @@ something slightly different from what shipped, that's called out inline.
 ## What a snapshot contains
 
 A snapshot is a plain directory — no archive/compression step (`Snapshot.create`,
-`stack/src/snapshot.js:184-229`). Default location `stack/backups/<timestamp>/` (ISO timestamp with
+`atc-stack/src/snapshot.js:184-229`). Default location `stack/backups/<timestamp>/` (ISO timestamp with
 `:`/`.` replaced by `-`); `--dir <path>` overrides it. Inside: one `manifest.json` plus one
 subfolder per service.
 
-Per service (`stack/src/snapshot.js:44-97`, `EXTRA_PATHS`, `DB_SERVICES`, `ALL_SERVICES`):
+Per service (`atc-stack/src/snapshot.js:44-97`, `EXTRA_PATHS`, `DB_SERVICES`, `ALL_SERVICES`):
 
 | Service | What's captured | How |
 |---|---|---|
 | Every stateful service (notify, auth, media, audit, shortlink, flags, scheduler, webhook-out, search, ratelimit, geo, console) | its SQLite database at `DB_PATH` | `PRAGMA user_version` read, then `VACUUM INTO` a fresh file — a consistent read snapshot, safe against a live WAL writer, no service is stopped (`Snapshot.#backupDb`, `snapshot.js:435-446`) |
-| `media` | `objects/` and `variants/` under `DATA_DIR` (content-addressed blob storage) | recursive directory copy |
-| `auth` | `keys/` (the JWT signing key pair) | recursive directory copy |
-| `gateway` | `routes.json` (its only state — no database) | file copy |
-| `console` | `services.json`, alongside its database | file copy |
-| `audit` | the Ed25519 anchor signing key pair — `ANCHOR_PRIVATE_KEY_PATH`, plus `ANCHOR_PREVIOUS_PUBLIC_KEY_PATH` when a rotation is in progress — **only when anchoring is configured at all** | file copy (see "Anchor key backup semantics" below — this one has real edge cases the others don't) |
-| `gateway` has no database | — | `DB_SERVICES` excludes it; `ALL_SERVICES` still includes it for `routes.json` |
+| `atc-media` | `objects/` and `variants/` under `DATA_DIR` (content-addressed blob storage) | recursive directory copy |
+| `atc-auth` | `keys/` (the JWT signing key pair) | recursive directory copy |
+| `atc-gateway` | `routes.json` (its only state — no database) | file copy |
+| `atc-console` | `services.json`, alongside its database | file copy |
+| `atc-audit` | the Ed25519 anchor signing key pair — `ANCHOR_PRIVATE_KEY_PATH`, plus `ANCHOR_PREVIOUS_PUBLIC_KEY_PATH` when a rotation is in progress — **only when anchoring is configured at all** | file copy (see "Anchor key backup semantics" below — this one has real edge cases the others don't) |
+| `atc-gateway` has no database | — | `DB_SERVICES` excludes it; `ALL_SERVICES` still includes it for `routes.json` |
 
 Every directory/file path above is resolved from that service's own `.env` at backup time (e.g.
 media's `DATA_DIR`, gateway's `ROUTES_FILE`, audit's `ANCHOR_PRIVATE_KEY_PATH`), not hardcoded — the
 manifest always reflects what the service was actually configured to use (`snapshot.js:16-34`,
-`envVar`/`relTo`/`pathInside` helpers). `auth`'s `keys` is the one exception, hardcoded rather than
+`envVar`/`relTo`/`pathInside` helpers). `atc-auth`'s `keys` is the one exception, hardcoded rather than
 resolved from `JWT_PRIVATE_KEY_PATH` — a pre-existing convention this phase deliberately left alone
 (out of scope: this phase closes audit's gap, not auth's hardcoding; see "Auth regression" coverage
-in `stack/test/snapshot.test.js`, which proves the existing behavior still works unchanged).
+in `atc-stack/test/snapshot.test.js`, which proves the existing behavior still works unchanged).
 
 `manifest.json` (`manifestVersion: 1`, `createdAt`, `entries: []`) records, per entry: `service`,
 `kind` (`'db'`, `'dir'`, or `'file'`), `path` (relative to the service folder), `packageVersion`
@@ -51,7 +51,7 @@ actual bytes exist in exactly one place in a snapshot: its own file, under that 
   key backup semantics" below for what this means operationally.
 - **`node_modules`, PM2 logs** — not data, regenerable/rotated independently.
 - **media's `tmp/` and `trash/`** — excluded because `EXTRA_PATHS.media` only lists `objects` and
-  `variants` (`snapshot.js:45-48`). Per `media/src/storage/local-storage.js:27,51-53,62`: `tmp/`
+  `variants` (`snapshot.js:45-48`). Per `atc-media/src/storage/local-storage.js:27,51-53,62`: `tmp/`
   holds in-flight uploads and scratch content, wiped on every `prepare()` (service start) and left
   alone by `check()` (the readiness probe); `trash/` holds objects/variants a purge has quarantined,
   pending permanent deletion — as of post-production Phase 4, media's own maintenance
@@ -73,7 +73,7 @@ actual bytes exist in exactly one place in a snapshot: its own file, under that 
   snapshot entry that turns out to be a symlink (`#assertNoSymlinks`, `snapshot.js:472-476`).
 
 **Plan-vs-code note:** `IMPLEMENTATION_PLAN.md` Stage 3 describes the backup scope as it stood at
-Stage 3 (per-service DB, media objects/variants, auth/keys, gateway routes.json, console
+Stage 3 (per-service DB, media objects/variants, atc-auth/keys, gateway routes.json, console
 services.json) — written before audit's anchor feature existed, so it says nothing about audit
 either way. Post-production Phase 3 added audit's anchor key material to `EXTRA_PATHS` without
 touching the Stage 3 scope for any other service; this is an addition to the plan's original scope,
@@ -102,7 +102,7 @@ stop/start and a readiness wait; the validation and apply/rollback logic below i
 3. **Staged DB validation** — for every database entry, the snapshot's copy is copied to a temp
    file and opened through *that target service's own, currently-checked-out* `Database` subclass
    (`import(...'/src/db.js')`, `#validateStagedDb`, `snapshot.js:361-374`). This is the real
-   forward-schema guard: `Database`'s constructor (`service-core/src/db.js:88-91`) throws
+   forward-schema guard: `Database`'s constructor (`atc-service-core/src/db.js:88-91`) throws
    `ConfigError` — `` `database is newer than this build supports (schema v${current}, build
    supports up to v${migrations.length}); refusing to open ${this.path}` `` — the moment it sees a
    `user_version` higher than the running code's `MIGRATIONS.length`, so a snapshot from a newer
@@ -127,7 +127,7 @@ stop/start and a readiness wait; the validation and apply/rollback logic below i
    (`#copyFile`, `snapshot.js:479-489` — see "Permissions" under "Anchor key backup semantics" below).
 
 This is per-`runId` **across every requested item together, not per service** — when audit's database
-and its anchor key are both part of one `restore()` call (the default: restoring "audit" restores
+and its anchor key are both part of one `restore()` call (the default: restoring "atc-audit" restores
 everything the manifest recorded for it), they share the same prepare/apply pass. A failure applying
 the key after the database has already been applied rolls **both** back together, not just the one
 that failed — see "Restore atomicity for audit's DB + key" below; this isn't special-cased code, it's
@@ -181,7 +181,7 @@ This is a best-effort, in-process saga, not a filesystem transaction spanning ev
 apply — a permissions problem, a full disk, a missing aside copy — every one of those is caught and
 produces `rolled_back` or `rollback_incomplete` as above. **It does not protect against the `stack
 restore` process itself being killed, or the host losing power, partway through prepare or apply.**
-There is no journal and no automatic resume: `stack/test/snapshot.test.js` covers the ordinary
+There is no journal and no automatic resume: `atc-stack/test/snapshot.test.js` covers the ordinary
 failure paths (a real permission failure preparing one target rolls back everything untouched; with
 at least two targets already applied, a real I/O failure on the third rolls all three back; a
 second, distinct failure during rollback itself reports `rollback_incomplete` rather than pretending
@@ -222,8 +222,8 @@ touched. Clean them up by hand once you no longer need them.
 
 ## ⚠ Stack backup now contains cryptographic private material
 
-**A `stack backup` snapshot can contain real signing-key private material — `auth`'s JWT private key
-always, and `audit`'s anchor private key whenever anchoring is configured.** Anyone with read access
+**A `stack backup` snapshot can contain real signing-key private material — `atc-auth`'s JWT private key
+always, and `atc-audit`'s anchor private key whenever anchoring is configured.** Anyone with read access
 to a snapshot directory has read access to those services' signing identities: they could mint valid
 access tokens (auth) or sign anchors indistinguishable from the real service's own (audit), not merely
 read data.
@@ -250,28 +250,28 @@ read data.
 restored without separately keeping the matching `.env` in sync can silently break verification paths
 that a restored database alone cannot detect at restore time:
 
-- **`auth`** — the JWT signing key pair (`keys/`) **is** included in `stack backup` (`EXTRA_PATHS.auth`,
+- **`atc-auth`** — the JWT signing key pair (`keys/`) **is** included in `stack backup` (`EXTRA_PATHS.auth`,
   `snapshot.js:49`), so a `stack backup`/`stack restore` round-trip keeps the database and `keys/`
   together automatically. The risk is only if you restore the database by some other path (the
   automatic `.pre-v<N>-<ts>` copy alone, say) without also restoring `keys/` from the same point in
-  time: `auth/README.md` ("Backup / restore") states that restoring the database with a different
+  time: `atc-auth/README.md` ("Backup / restore") states that restoring the database with a different
   signing key than the one used when it was backed up invalidates every outstanding access token.
   `JWT_PREVIOUS_PUBLIC_KEY_PATH` (env-only, in `.env`) matters here too during a key-rotation window.
-- **`console`** — TOTP secrets are sealed at rest under `SECRETS_KEY` (`console/README.md`, "TOTP
+- **`atc-console`** — TOTP secrets are sealed at rest under `SECRETS_KEY` (`atc-console/README.md`, "TOTP
   secret storage"). `SECRETS_KEY`/`SECRETS_PREVIOUS_KEY` live only in `.env`, which `stack backup`
   never touches. Restoring console's database without the `SECRETS_KEY` that was live when that
   snapshot was taken means every sealed TOTP row fails to decrypt — the service actually refuses to
-  start in that state (`ConfigError`, per `console/README.md`, "TOTP secret storage"), rather than
+  start in that state (`ConfigError`, per `atc-console/README.md`, "TOTP secret storage"), rather than
   silently losing 2FA, but only because that specific failure mode was designed to be loud.
-- **`media`** — signed URL verification uses `SIGNING_SECRET`/`SIGNING_SECRET_PREVIOUS`, both
+- **`atc-media`** — signed URL verification uses `SIGNING_SECRET`/`SIGNING_SECRET_PREVIOUS`, both
   `.env`-only. Restoring media's database (URLs, metadata) without the matching signing secret
   breaks verification of any URL signed before the restore point.
-- **`audit`** — chain anchor verification uses the Ed25519 key pair — **now included** in `stack
+- **`atc-audit`** — chain anchor verification uses the Ed25519 key pair — **now included** in `stack
   backup` when `ANCHOR_PRIVATE_KEY_PATH` is configured (`EXTRA_PATHS.audit`, `snapshot.js:52-95` — see
   "Anchor key backup semantics" below for the full behavior, including what happens when it isn't
   configured, or is configured but missing, or points outside the audit service folder).
-- **`webhook-out`** — per-subscription signing secrets are sealed under `SECRETS_KEY` (AES-256-GCM,
-  `.env`-only, same exclusion). `webhook-out/README.md` ("Backup / restore") states plainly:
+- **`atc-webhook-out`** — per-subscription signing secrets are sealed under `SECRETS_KEY` (AES-256-GCM,
+  `.env`-only, same exclusion). `atc-webhook-out/README.md` ("Backup / restore") states plainly:
   restoring means putting the database back with the *same* `SECRETS_KEY` that sealed it, or every
   subscriber secret becomes permanently unrecoverable.
 
@@ -287,7 +287,7 @@ and files are involved, as above.
 ## Anchor key backup semantics
 
 `EXTRA_PATHS.audit` (`snapshot.js:52-95`) resolves `ANCHOR_PRIVATE_KEY_PATH` and (if set)
-`ANCHOR_PREVIOUS_PUBLIC_KEY_PATH` from audit's own `.env`, the same way `media`/`gateway`/`console`
+`ANCHOR_PREVIOUS_PUBLIC_KEY_PATH` from audit's own `.env`, the same way `atc-media`/`atc-gateway`/`atc-console`
 resolve their configurable paths — not a hardcoded `keys/` guess. Three states:
 
 - **Anchoring not configured** (`ANCHOR_PRIVATE_KEY_PATH` empty, the default) — nothing to back up;
@@ -298,7 +298,7 @@ resolve their configurable paths — not a hardcoded `keys/` guess. Three states
 - **Configured but the file is missing** — `stack backup` **refuses** (throws, whole backup fails),
   rather than silently completing a snapshot that looks whole but can never restore a working anchor
   identity. This matches the real service's own contract exactly: `AnchorSigner.fromFiles`
-  (`audit/src/crypto/anchor-signer.js:98-103`) does the identical `readFileSync` that would throw, and
+  (`atc-audit/src/crypto/anchor-signer.js:98-103`) does the identical `readFileSync` that would throw, and
   `Application`'s constructor doesn't catch it — a real audit deployment in this exact state already
   refuses to start. A backup tool silently producing a "complete" snapshot for a service that can't
   currently start is a worse failure mode than a loud backup error.
@@ -308,7 +308,7 @@ current private key (the running service derives its own current public key from
 separate public-key file the service reads back for itself; `anchor-keygen`'s public-key output is for
 operator export/publishing only). But *verifying* an anchor signed under a since-rotated-out key needs
 that old key's **public** half — `ANCHOR_PREVIOUS_PUBLIC_KEY_PATH` — since the database itself never
-stores key material, only a `key_id`/`signature` pair per anchor (`audit/src/db.js`'s `anchors` table).
+stores key material, only a `key_id`/`signature` pair per anchor (`atc-audit/src/db.js`'s `anchors` table).
 Backing up only the current private key and skipping a configured previous-public-key file would
 silently break verification of every anchor signed before the last rotation — this is why
 `EXTRA_PATHS.audit` resolves and validates both independently, not just the private key.
@@ -320,26 +320,26 @@ a separate secrets pipeline) is deliberately not something `stack backup` reache
 is a warning (`this.log`), not a fatal backup error — a security choice, not a completeness one; the
 warning is exactly where a `--dir`/log-watching operator would see it.
 
-**Restore atomicity for audit's DB + key:** restoring "audit" restores its database and its anchor
+**Restore atomicity for audit's DB + key:** restoring "atc-audit" restores its database and its anchor
 key entries in the **same** `restore()` call, sharing one prepare/apply pass — this is the same
-mechanism (`stack/test/snapshot.test.js`) proves for every other multi-entry service; nothing
+mechanism (`atc-stack/test/snapshot.test.js`) proves for every other multi-entry service; nothing
 audit-specific was added. A failure applying the key after the database has already been applied
 rolls **both** back to their pre-restore state together, never leaving the database on the new
-snapshot with the old key (or the reverse). Regression-tested: `stack/test/snapshot.test.js`
+snapshot with the old key (or the reverse). Regression-tested: `atc-stack/test/snapshot.test.js`
 ("restore failure rolls the audit database and its anchor key back together, as one consistency
 unit").
 
 **Permissions:** `#copyFile` (`snapshot.js:479-489`) now preserves the source file's POSIX permission
 bits on every copy (backup AND restore), instead of `writeFileSync`'s process-umask default — a
 private key written by `AnchorKeyGenerator`/`KeyGenerator` at `0600` stays `0600` through a
-backup/restore round-trip rather than coming back world/group-readable. This applies to `auth`'s
+backup/restore round-trip rather than coming back world/group-readable. This applies to `atc-auth`'s
 `keys/` the same way it now applies to audit's — a pre-existing gap in the shared copy primitive that
 this phase closed for both, not an audit-specific fix. **Best-effort on non-POSIX filesystems**:
 `chmodSync` has limited effect on Windows (it can only toggle the read-only attribute, not set
 arbitrary POSIX bits) — this is a real, narrow platform limitation, not a claim that Windows restores
 are exactly as protected as POSIX ones.
 
-**Cryptographic continuity, proven end-to-end**: `stack/test/integration/audit-anchor-continuity.test.js`
+**Cryptographic continuity, proven end-to-end**: `atc-stack/test/integration/audit-anchor-continuity.test.js`
 (`STACK_INTEGRATION=1`) spawns a real audit process, signs a real anchor with a real Ed25519 key (K1)
 over a real event, takes a real `stack backup`, mutates the live database and rotates the live key to
 a second real key (K2) which signs its own new anchor, runs a real `stack restore`, and proves — all

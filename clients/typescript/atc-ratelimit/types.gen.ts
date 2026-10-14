@@ -122,7 +122,7 @@ export interface paths {
          * Check and consume one subject's quota against one policy
          * @description Evaluates every window of the effective limit set (the subject's active override, if any, else the policy's own limits) and, unless `peek: true`, atomically consumes `cost` units (default 1) when every window allows it — a denied check never consumes anything.
          *
-         *     **HTTP `200` is returned for both an allow and a deny.** The business decision is the body's `allowed` field, never the HTTP status. This is deliberate, not an oversight: only this service's own self-throttle (see `components.responses.RateLimited`) ever produces an HTTP `429` here, and it is a completely separate mechanism from a policy's own limit — a `429` means "you called `ratelimit` itself too often," never "this subject is over its policy limit." No `Retry-After` HTTP header is ever set for a business-level denial; the domain-level `retryAfter` on the returned `Decision` is body-only.
+         *     **HTTP `200` is returned for both an allow and a deny.** The business decision is the body's `allowed` field, never the HTTP status. This is deliberate, not an oversight: only this service's own self-throttle (see `components.responses.RateLimited`) ever produces an HTTP `429` here, and it is a completely separate mechanism from a policy's own limit — a `429` means "you called `atc-ratelimit` itself too often," never "this subject is over its policy limit." No `Retry-After` HTTP header is ever set for a business-level denial; the domain-level `retryAfter` on the returned `Decision` is body-only.
          *
          *     Requires a `check` (or `readwrite`) API key, scoped to the target policy (a key with a `policies` allowlist that does not include `policy` gets `403 FORBIDDEN`, checked before the policy is even looked up).
          */
@@ -398,7 +398,7 @@ export interface components {
         };
         InfoResponse: {
             /** @constant */
-            service: "ratelimit";
+            service: "atc-ratelimit";
             /** @description ratelimit's own package.json version. */
             version: string;
             /** @constant */

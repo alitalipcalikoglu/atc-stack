@@ -7,7 +7,7 @@ There is no static version matrix maintained in this repository. The live, autho
 npm run status -- --matrix
 ```
 
-which runs `Stack#matrix()` (`stack/src/stack.js`) against the actually-deployed processes — never
+which runs `Stack#matrix()` (`atc-stack/src/stack.js`) against the actually-deployed processes — never
 a hand-maintained table that drifts the moment one service is redeployed. This document explains
 what that command reports, what each field means, and the compatibility rules around it. See
 [API_CONTRACT.md](API_CONTRACT.md) for the exact `/v1/info` response shape each field is read from.
@@ -21,10 +21,10 @@ For every service in `src/manifest.js`, `Stack#matrix()` (`stack.js:182-194`) in
 
 These two checks are **fully independent per service** — a service can be `ok: true` (healthy,
 ready) while its `/v1/info` is unreachable, malformed, or missing, and vice versa is possible too
-in principle. `test/matrix.test.js` proves this directly: `audit` is healthy (`ok: true`) while its
+in principle. `test/matrix.test.js` proves this directly: `atc-audit` is healthy (`ok: true`) while its
 `/v1/info` body throws on `.json()` (`infoOk: false`, `malformed`), and the row still contains both
 independent verdicts (`matrix.test.js:71-73`). One bad or unreachable service never aborts the
-command or throws for the rest — `shortlink` in that same test is fully unreachable
+command or throws for the rest — `atc-shortlink` in that same test is fully unreachable
 (`ok: false`, `infoOk: false`) while every other row still parses normally
 (`matrix.test.js:67-69, 85-87`).
 
@@ -35,9 +35,9 @@ command or throws for the rest — `shortlink` in that same test is fully unreac
 | `ok` | `/health` + `/ready` both `200` | Reachability, exactly like plain `stack status` — never affected by version comparison. |
 | `version` | `/v1/info` `version` | The service's own `package.json` semver — a release number, unrelated to the API contract. |
 | `apiVersion` | `/v1/info` `apiVersion` | The `/v1` HTTP contract this instance serves. Stays `"v1"` across many package releases; only changes when the `/v1` contract itself is replaced wholesale. |
-| `schemaVersion` | `/v1/info` `schemaVersion` | That service's own, currently-open database schema version (`Database#schemaVersion`, live `PRAGMA user_version` — never hand-maintained). `null` for a stateless service (today, only `gateway`). |
-| `serviceCore` | `/v1/info` `serviceCore` | The `@atc-web/atc-service-core` version actually running in that process (`SERVICE_CORE_VERSION`, read from that package's own `package.json` at import time — `service-core/src/fastify-helpers.js:14`). `null` for `gateway`, the one service with no dependency on `service-core` at all — `gateway/src/http/gateway-api.js:19-24` documents this as a deliberate, pre-existing design choice, not an oversight: gateway inlines the same `readServiceVersion`-style read of its own `package.json` for `version`, and simply has nothing to report for `serviceCore`. |
-| `capabilities` | `/v1/info` `capabilities` | Real, currently-enabled behaviors only, e.g. audit's `['chain-verification', 'anchors', 'export']` (`audit/src/http/audit-api.js:69-74`) or notify's channel list plus `'templates'`/`'idempotency'`, which drops `'webhook'` when `NOTIFY_WEBHOOK_CHANNEL=false` (`notify/src/app.js:204-212`) — never a planned/future feature. |
+| `schemaVersion` | `/v1/info` `schemaVersion` | That service's own, currently-open database schema version (`Database#schemaVersion`, live `PRAGMA user_version` — never hand-maintained). `null` for a stateless service (today, only `atc-gateway`). |
+| `serviceCore` | `/v1/info` `serviceCore` | The `@atc-web/atc-service-core` version actually running in that process (`SERVICE_CORE_VERSION`, read from that package's own `package.json` at import time — `atc-service-core/src/fastify-helpers.js:14`). `null` for `atc-gateway`, the one service with no dependency on `atc-service-core` at all — `atc-gateway/src/http/gateway-api.js:19-24` documents this as a deliberate, pre-existing design choice, not an oversight: gateway inlines the same `readServiceVersion`-style read of its own `package.json` for `version`, and simply has nothing to report for `serviceCore`. |
+| `capabilities` | `/v1/info` `capabilities` | Real, currently-enabled behaviors only, e.g. audit's `['chain-verification', 'anchors', 'export']` (`atc-audit/src/http/audit-api.js:69-74`) or notify's channel list plus `'templates'`/`'idempotency'`, which drops `'webhook'` when `NOTIFY_WEBHOOK_CHANNEL=false` (`atc-notify/src/app.js:204-212`) — never a planned/future feature. |
 
 Every field is read defensively: wrong-typed or missing (an older or partial contract) reads as
 `null`/`[]`, never throws (`stack.js:222-229`). A too-old service with no `/v1/info` route yet
@@ -58,7 +58,7 @@ Precisely:
   unaffected by it.
 - **Minor mismatch** (e.g. `1.9.0` next to `1.10.0`) is **not flagged at all** — it is grouped into
   the same `v1.x` bucket as everyone else, silently. `matrix.test.js:96-97` asserts this precisely:
-  `geo` on `serviceCore: '1.9.0'` shows up inside the `v1.x:` group with everyone else, and the
+  `atc-geo` on `serviceCore: '1.9.0'` shows up inside the `v1.x:` group with everyone else, and the
   warning text never contains `v1.9`, i.e. a minor-only difference never creates its own bucket or
   its own warning.
 - A `serviceCore: null` row (gateway) is **excluded** from the comparison entirely — it is never
@@ -66,7 +66,7 @@ Precisely:
   (`matrix.test.js:95`, `doesNotMatch(warning, /gateway/)`).
 
 **Exit code / `ok` semantics never change because of any of this.** `matrix.test.js`'s second test
-is written specifically to prove it: `media` has a mismatched major (`'2.0.0'` vs. everyone else's
+is written specifically to prove it: `atc-media` has a mismatched major (`'2.0.0'` vs. everyone else's
 `'1.10.0'`) but is otherwise healthy, and `media.ok === true` — `ok` reflects only `/health`+`/ready`
 reachability, exactly like plain `status()`, never the version comparison
 (`matrix.test.js:100-107`). `bin/stack.js:48` (`status --matrix`'s CLI exit code) computes its exit
@@ -92,7 +92,7 @@ These are unrelated concerns that happen to both show up as columns in the same 
 - **`schemaVersion` (DB schema compatibility)** is an *entirely internal-to-that-one-service*
   concern: whether **that service's own** on-disk SQLite schema matches what **that service's own
   currently-running build** knows how to read. It has nothing to do with any other service. This is
-  enforced, not just reported: `Database`'s migration runner (`service-core/src/db.js:84-91`)
+  enforced, not just reported: `Database`'s migration runner (`atc-service-core/src/db.js:84-91`)
   compares the database's real `PRAGMA user_version` against `this.constructor.MIGRATIONS.length`
   at construction time, and if the on-disk schema is **newer** than what this build supports, it
   throws `ConfigError('database is newer than this build supports (schema v${current}, build
@@ -101,10 +101,10 @@ These are unrelated concerns that happen to both show up as columns in the same 
   to the one service opening its one database file; it is never triggered by, or related to,
   anything another service's `/v1/info` reports.
 
-Put plainly: a `serviceCore` major mismatch between `notify` and `media` is a warning with no
+Put plainly: a `serviceCore` major mismatch between `atc-notify` and `atc-media` is a warning with no
 consequence for either service's ability to talk over HTTP; a `schemaVersion` behind what
-`notify`'s own code expects is business as usual (the migration runner just applies the pending
-migrations on next start); a `schemaVersion` **ahead of** what `notify`'s own code expects (an old
+`atc-notify`'s own code expects is business as usual (the migration runner just applies the pending
+migrations on next start); a `schemaVersion` **ahead of** what `atc-notify`'s own code expects (an old
 build pointed at a newer database) is the one scenario that actually refuses to start — and it is a
 single-service event, never a cross-service one.
 
@@ -114,15 +114,15 @@ Two real (not mocked) test suites exercise this, and the guarantee below is scop
 they prove — no broader claim ("any version combination works") is made, because that isn't what's
 tested.
 
-**`stack/test/integration/v1-info-matrix.test.js`** (`STACK_INTEGRATION=1 npm test`, spawns real
-`audit` and `notify` processes, not an in-process fake): asserts each real service's live `/v1/info`
+**`atc-stack/test/integration/v1-info-matrix.test.js`** (`STACK_INTEGRATION=1 npm test`, spawns real
+`atc-audit` and `atc-notify` processes, not an in-process fake): asserts each real service's live `/v1/info`
 matches the documented contract shape exactly (`service`, `version`, `apiVersion`, `capabilities`,
 `schemaVersion`, `serviceCore` all present and correctly typed), and that `Stack#matrix()` pointed
 at those two real processes parses their actual responses correctly, while the other 11 manifest
 entries (pointed at closed ports, nothing spawned for them) come back as ordinary unreachable rows
 without the command throwing (`v1-info-matrix.test.js:83-100`).
 
-**`console/test/about.test.js`** (Stage 10) exercises the console's own consumer of this same
+**`atc-console/test/about.test.js`** (Stage 10) exercises the console's own consumer of this same
 contract, `GET /api/services/about`, against a fake service returning five distinct response
 shapes, and proves `ClientRegistry#about()` degrades per-service in every case without crashing the
 page:

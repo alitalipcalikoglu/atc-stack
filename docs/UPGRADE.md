@@ -2,7 +2,7 @@
 
 There is no `stack upgrade` command. An upgrade is this documented sequence of existing commands —
 `atc-stack backup`/`restore`/`status`/`up`/`down` (`npm run backup`/`restore`/`status`/`up`/`down`
-from `stack/`, or `git`/`npm ci` per service — see `stack/bin/stack.js:1-13` for the full command
+from `stack/`, or `git`/`npm ci` per service — see `atc-stack/bin/stack.js:1-13` for the full command
 surface). See [BACKUP.md](BACKUP.md) for what a snapshot actually contains and the full restore
 outcome/rollback mechanics; this document only covers the upgrade sequence itself.
 
@@ -15,7 +15,7 @@ outcome/rollback mechanics; this document only covers the upgrade sequence itsel
   `ConfigError` at startup if one is missing — see "Config validation" below).
 - `atc-stack status --matrix` (from `stack/`) to record the current `version`/`schemaVersion`/
   `serviceCore` of every service before you touch anything — this is your rollback reference point,
-  and the same command you'll re-run at the end to confirm the upgrade (`stack/src/stack.js:182-255`,
+  and the same command you'll re-run at the end to confirm the upgrade (`atc-stack/src/stack.js:182-255`,
   `Stack#matrix`).
 
 ## Backup
@@ -32,10 +32,10 @@ database, per BACKUP.md).
 ## Service-core compatibility check
 
 Every service pins its own `@atc-web/atc-service-core` version and reports it at `GET /v1/info` as
-`serviceCore` (Stage 7, `stack/src/manifest.js` / each service's `/v1/info` route). `atc-stack status
+`serviceCore` (Stage 7, `atc-stack/src/manifest.js` / each service's `/v1/info` route). `atc-stack status
 --matrix` reads this from every service and prints a warning line when more than one `serviceCore`
-major is present across the fleet (`Stack#matrix` → `#printMatrix`, `stack/src/stack.js:232-255`;
-proven by `stack/test/matrix.test.js`, "a mismatched serviceCore major never affects the
+major is present across the fleet (`Stack#matrix` → `#printMatrix`, `atc-stack/src/stack.js:232-255`;
+proven by `atc-stack/test/matrix.test.js`, "a mismatched serviceCore major never affects the
 ok/exit-code semantics").
 
 **This warning is informational only.** Per that same test and the code it exercises: a
@@ -66,7 +66,7 @@ which shared-library generation each service was built against.
 There is no separate "validate config" command. Configuration validation happens as an unavoidable
 part of a service actually starting: every service's entry point builds its `Config` via
 `Config.fromEnv(process.env)` as the first argument to its `Application` constructor (e.g.
-`notify/src/application.js:76-78`, and the equivalent in every other service), which runs — and can
+`atc-notify/src/application.js:76-78`, and the equivalent in every other service), which runs — and can
 throw `ConfigError` — strictly before that service's `Database` is even constructed, let alone
 migrated. A missing or malformed required env var therefore always fails fast, before any migration
 is attempted, as part of the normal `pm2 start`/`stack up` step below. There is nothing to run ahead
@@ -78,9 +78,9 @@ Every stateful service's `Database` (`@atc-web/atc-service-core/src/db.js`, subc
 that service's own `static MIGRATIONS` array) applies any pending migration the moment its
 constructor runs, inside the service's own normal startup path — there is no separate migration
 step or command, and a fresh install and an upgrade of an existing database go through the exact
-same code path (`service-core/src/db.js:84-107`, `#migrate`).
+same code path (`atc-service-core/src/db.js:84-107`, `#migrate`).
 
-**Migrations are forward-only. There is no `migrate down`, in this codebase or in `service-core`.**
+**Migrations are forward-only. There is no `migrate down`, in this codebase or in `atc-service-core`.**
 Every migration is one SQL block in `MIGRATIONS[]`, applied in its own `BEGIN`/`COMMIT`; nothing
 generates or runs an inverse.
 
@@ -94,7 +94,7 @@ and refuses outright when the file is ahead of what the running build supports:
 database is newer than this build supports (schema v<current>, build supports up to v<migrations.length>); refusing to open <path>
 ```
 
-(the exact message thrown as `ConfigError`, `service-core/src/db.js:90`). This is not a soft warning
+(the exact message thrown as `ConfigError`, `atc-service-core/src/db.js:90`). This is not a soft warning
 — it is a hard refusal to open the database at all, so an older binary started against a newer
 schema does not start. **This applies even if a given migration happens to be additive-only and
 would, in principle, tolerate the old code reading around the new column/table** — the guard doesn't
@@ -102,17 +102,17 @@ inspect what a migration actually changed, only the version number, so it refuse
 special-case a "safe" migration in an upgrade runbook on that basis. **The supported rollback path
 is restoring the pre-migration backup** — either the automatic `<DB_PATH>.pre-v<N>-<timestamp>` copy
 `Database` itself writes just before applying the first pending migration (`#backup`,
-`service-core/src/db.js:109-122`, skipped for `:memory:` and for a brand-new database with nothing
+`atc-service-core/src/db.js:109-122`, skipped for `:memory:` and for a brand-new database with nothing
 to protect), or an `atc-stack backup` snapshot taken beforehand — not simply checking out the old
 code and pointing it at the now-migrated file. See [BACKUP.md](BACKUP.md) for the full restore
 procedure and its outcome states.
 
 ### Worker-split rollout ordering (notify, scheduler, webhook-out)
 
-These three services are the ones with `splitWorkers: true` in `stack/src/manifest.js` and their own
+These three services are the ones with `splitWorkers: true` in `atc-stack/src/manifest.js` and their own
 `src/api-main.js`/`src/worker-main.js` entry points (Stage 6), started as `<id>-api` + `<id>-worker`
 under `atc-stack up --split-workers` instead of one combined process
-(`Stack#generateSplitEcosystem`, `stack/src/stack.js:102-127`). Both processes independently
+(`Stack#generateSplitEcosystem`, `atc-stack/src/stack.js:102-127`). Both processes independently
 construct their own `Application`, and every `Application` constructor — regardless of `role` — opens
 its own `Database(config.dbPath, ...)` against the same file.
 
@@ -124,15 +124,15 @@ that loses the race for a given migration version's lock blocks until the winner
 commits, then discovers on its own fresh read that the version it was about to apply is already
 there, and starts normally without re-running that migration's SQL. `atc-stack up --split-workers`
 starting `<id>-api` and `<id>-worker` back-to-back with no readiness gate between them — exactly what
-it already does (`Stack#up`, `stack/src/stack.js:65-75`) — is the normal, supported path for a
+it already does (`Stack#up`, `atc-stack/src/stack.js:65-75`) — is the normal, supported path for a
 pending migration too, not something to work around.
 
-This is proven, not assumed: `service-core/test/migration-race.test.js` reproduces the race
+This is proven, not assumed: `atc-service-core/test/migration-race.test.js` reproduces the race
 deterministically (barrier-synchronized real, separate OS processes, not timing luck), and
-`stack/test/integration/split-worker-migration-race.test.js` proves it end to end for notify,
+`atc-stack/test/integration/split-worker-migration-race.test.js` proves it end to end for notify,
 scheduler and webhook-out specifically, spawning their real, unmodified `api-main.js`/
 `worker-main.js` against a real one-version-behind fixture built from each service's own real
-migration SQL. A 100-run empirical stress comparison (`service-core/scripts/
+migration SQL. A 100-run empirical stress comparison (`atc-service-core/scripts/
 migration-race-stress.mjs`) found the unfixed code failed (one process crashing, cleanly, with zero
 data corruption in every case) 87–92% of the time under a genuine simultaneous start; the fixed code
 succeeded 100/100 times with zero corruption and zero duplicate migration effects.
@@ -154,11 +154,11 @@ succeeded 100/100 times with zero corruption and zero duplicate migration effect
 
 Every other service in the manifest has no `splitWorkers` flag and only ever runs one process per
 service, so this scenario does not apply to it — one process, one `Database` instance, nothing to
-race. Every consumer (all 11 other backend services plus `console`) is now pinned to
+race. Every consumer (all 11 other backend services plus `atc-console`) is now pinned to
 `@atc-web/atc-service-core` v1.11.1, well past the v1.10.1 that first shipped this guarantee — updated
 post-production Phase 5, which needed the newer tag anyway for its own centralized trace-context
-work (see `service-core/VERSIONING.md` on why a pin bump is each service's own deliberate act, and
-`stack/docs/OBSERVABILITY.md` for what Phase 5 actually changed). None of these 12 services run in
+work (see `atc-service-core/VERSIONING.md` on why a pin bump is each service's own deliberate act, and
+`atc-stack/docs/OBSERVABILITY.md` for what Phase 5 actually changed). None of these 12 services run in
 split mode, so this guarantee is not exercised for their own startup today, but nothing blocks a
 future adoption if one of them ever gains a `splitWorkers` template.
 
@@ -179,7 +179,7 @@ an upgrade of an existing database go through the exact same migration code, so 
 "first run" path to get out of sync with the upgrade path.
 
 For the whole workspace at once: `atc-stack up [--split-workers]` (`npm run up` from `stack/`) —
-iterates every service in manifest order (`stack/src/manifest.js`) and `pm2 startOrRestart`s it.
+iterates every service in manifest order (`atc-stack/src/manifest.js`) and `pm2 startOrRestart`s it.
 
 ## Readiness verification
 
@@ -187,7 +187,7 @@ iterates every service in manifest order (`stack/src/manifest.js`) and `pm2 star
 npm run status              # from stack/ — confirm every service reports health=200 ready=200
 ```
 
-`Stack#status` (`stack/src/stack.js:154-164`) probes every service's `/health` and `/ready` in
+`Stack#status` (`atc-stack/src/stack.js:154-164`) probes every service's `/health` and `/ready` in
 manifest order and reports `ok` only when both are `200`. Do this before moving on to the matrix
 check below — a service that isn't ready yet will also just show `?` fields in the matrix, which is
 less specific about what's actually wrong.
@@ -199,7 +199,7 @@ npm run status -- --matrix    # or: atc-stack status --matrix
 ```
 
 Confirms, per service, `version`/`apiVersion`/`schemaVersion`/`serviceCore`/`capabilities` as read
-from its own `GET /v1/info` (`Stack#matrix`, `stack/src/stack.js:182-194`). Compare against the
+from its own `GET /v1/info` (`Stack#matrix`, `atc-stack/src/stack.js:182-194`). Compare against the
 preflight snapshot you took at the start: `schemaVersion` for each upgraded service should now match
 that service's own highest `MIGRATIONS` index; `version`/`apiVersion` should match what you intended
 to deploy. A service that hasn't adopted `/v1/info` yet, or is unreachable, reports `infoOk: false`

@@ -50,7 +50,7 @@ async function keyIdFromPublicFile(publicKeyPath) {
  * A real audit checkout, not a synthetic stand-in: symlinks the real `src/`/`node_modules` (so
  * `ServiceProcess` spawns the exact real `src/index.js` entry point and `@atc-web/atc-service-core`
  * resolves normally) with its own `.env`/`data`/`keys` under a throwaway scratch dir — same
- * convention `stack/test/snapshot.test.js`'s `realServiceFixture` uses.
+ * convention `atc-stack/test/snapshot.test.js`'s `realServiceFixture` uses.
  * @param {string} scratch
  */
 function auditFixture(scratch) {

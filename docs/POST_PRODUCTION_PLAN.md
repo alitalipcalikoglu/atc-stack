@@ -18,14 +18,14 @@ Nothing in this plan reopens `IMPLEMENTATION_PLAN.md` Stage 0–12 or starts a n
 risk, and record item 6 (gateway breaker) as a closed non-finding.
 
 **Scope**:
-- `webhook-out/README.md` "Security notes": one sentence stating `X-Webhook-Delivery` (and
+- `atc-webhook-out/README.md` "Security notes": one sentence stating `X-Webhook-Delivery` (and
   `X-Webhook-Id`) stay identical across every retry attempt of the same delivery, so a receiver can
   dedupe on it.
-- `notify/README.md` "Security notes": same, for `X-Notify-Id` on the webhook channel; a companion
+- `atc-notify/README.md` "Security notes": same, for `X-Notify-Id` on the webhook channel; a companion
   sentence noting the email/SMTP channel has no equivalent protocol-level dedup hook and a resend can
   arrive twice in the inbox — an accepted limitation, not a gap being tracked for a future fix.
-- `scheduler/README.md` "Security notes": same, for `X-Scheduler-Run`.
-- No change to `gateway/README.md`/`docs/READINESS.md` — the audit found the existing text already
+- `atc-scheduler/README.md` "Security notes": same, for `X-Scheduler-Run`.
+- No change to `atc-gateway/README.md`/`docs/READINESS.md` — the audit found the existing text already
   correct and sufficient; nothing to do here beyond noting it closed in the audit trail.
 
 **Invariants**: no code touched; no test behavior changes.
@@ -51,7 +51,7 @@ pending migration resolve to exactly one migration application and one clean sta
 using only existing SQLite primitives.
 
 **Scope**:
-1. `service-core/src/db.js`'s `#migrate()`: change `BEGIN` to `BEGIN IMMEDIATE`; move the pending-
+1. `atc-service-core/src/db.js`'s `#migrate()`: change `BEGIN` to `BEGIN IMMEDIATE`; move the pending-
    migration check inside the loop so `user_version` is re-read fresh immediately after the lock is
    acquired for each iteration, skipping (not re-applying) any migration the fresh read shows is
    already applied.
@@ -79,14 +79,14 @@ only. No new migration is added, no schema shape changes, no public API changes.
 acceptable here):
 1. A deterministic failing regression using real separate OS processes (via `child_process.spawn`,
    mirroring the audit's own reproduction script) that currently fails against unmodified
-   `service-core` and must pass after the fix: N real simultaneous-start races (N large enough for
+   `atc-service-core` and must pass after the fix: N real simultaneous-start races (N large enough for
    confidence — the audit used 75 at ~92% trigger rate; a CI-suitable regression can use fewer per run
    but should be run enough times, or with enough internal iterations, to make a regression here hard
    to miss) against at least one real multi-migration service's schema (webhook-out or notify),
    asserting: both processes reach a running state (no crash), the migration applied exactly once,
    final `schemaVersion` and `schema_migrations` are consistent, and pre-seeded data survived
    unchanged.
-2. Full `service-core` suite + typecheck.
+2. Full `atc-service-core` suite + typecheck.
 3. Full suite + typecheck for notify, scheduler, webhook-out (regression only — no functional changes
    expected in these repos, this proves the fix doesn't disturb any of their own migration-adjacent
    tests).
@@ -97,7 +97,7 @@ one defined, documented (if unenforced) contract; no consumer-visible behavior c
 non-racing case, which is every deployment today (split-workers races require both apps starting
 literally simultaneously with a pending migration, an upgrade-time-only scenario).
 
-**Rollback implications**: a single, self-contained `service-core` change; reverting it reverts
+**Rollback implications**: a single, self-contained `atc-service-core` change; reverting it reverts
 `#migrate()`'s locking to today's behavior (same known, bounded, already-documented risk it has
 today — not a new risk introduced by attempting and reverting this fix).
 
@@ -117,7 +117,7 @@ production code changes).
 audit — prove the full production migration path (real process, real startup, real `/ready`, real
 `/v1/info`) for both the normal upgrade case and the forward-version refusal case.
 
-**Scope**: new test file(s) under `stack/test/integration/`, built on the existing
+**Scope**: new test file(s) under `atc-stack/test/integration/`, built on the existing
 `ServiceProcess`/`freePort`/`waitUntil` harness (no new harness primitives expected to be needed —
 confirm during implementation, add only if a genuine gap is found):
 1. **Old-schema → real migration → ready → schemaVersion**, for notify (v2→v3), console (v1→v2),
@@ -137,7 +137,7 @@ If Phase 1 has landed by the time this phase runs, these new E2E tests incidenta
 additional real-process-level regression witness for Phase 1's fix; if Phase 1 hasn't landed yet, this
 phase's tests still stand on their own and don't depend on it.
 
-**Required tests**: the new tests themselves (must pass); full `stack` suite (plain and
+**Required tests**: the new tests themselves (must pass); full `atc-stack` suite (plain and
 `STACK_INTEGRATION=1`) to confirm nothing else regressed; no other repo's test suite is expected to
 change since no production code changes there.
 
@@ -150,11 +150,11 @@ services turns out to require touching that service's own production code (it sh
 `Database` subclass's `MIGRATIONS` array is already a static field a test can subclass or slice
 against), stop and reconsider before doing so; this phase must stay test-only.
 
-**Implemented**: `stack/test/integration/migration-e2e.test.js`. Covers all four planned services
+**Implemented**: `atc-stack/test/integration/migration-e2e.test.js`. Covers all four planned services
 plus audit (v1→v2, anchors — a fifth representative kept since its hash-chain migration is a
 meaningfully different shape from the others' plain `ALTER TABLE`s) for case 1, and both notify
 (split-capable) and auth (normal) for case 2, per the plan's "at least one" minimum. No production
-code changed in any of the five services; `stack/test/integration/harness.js` gained one shared
+code changed in any of the five services; `atc-stack/test/integration/harness.js` gained one shared
 `openOldFixtureDb` helper (extracted from Phase 1's own fixture-building code, not new surface).
 
 ---
@@ -168,14 +168,14 @@ audit's anchor signing key material, bringing it to parity with how auth's JWT s
 handled.
 
 **Scope**:
-1. `stack/src/snapshot.js`'s `EXTRA_PATHS`: add an `audit` entry, env-derived from
+1. `atc-stack/src/snapshot.js`'s `EXTRA_PATHS`: add an `atc-audit` entry, env-derived from
    `ANCHOR_PRIVATE_KEY_PATH` (returning an empty list when unset, matching the feature's own
    optionality — not a hardcoded `['keys']` the way auth's mandatory keys are), covering both the
    current private key and, when present, the previous public key file used during a rotation window.
-2. `stack/docs/BACKUP.md`: move audit from the "What's excluded" list to the normal per-service
+2. `atc-stack/docs/BACKUP.md`: move audit from the "What's excluded" list to the normal per-service
    contents table; the "Secret and key backup semantics" section's audit paragraph updates from
    "not included, back it up yourself" to "included as of [this phase]."
-3. `audit/README.md`'s "Backup / restore" section: same update, matching the wording pattern already
+3. `atc-audit/README.md`'s "Backup / restore" section: same update, matching the wording pattern already
    established for auth's own key-backup framing.
 
 **Invariants**:
@@ -203,8 +203,8 @@ schema or API change.
    material, and a newly-signed anchor after restore continues the chain correctly (matches the
    audit's own "anchor create → backup → mutate → restore → old anchor verifies → new anchor signing
    continuity correct" acceptance criterion verbatim).
-3. Full `stack` suite (`snapshot.test.js` and friends) + typecheck.
-4. Full `audit` suite + typecheck (README-only change there, but confirm nothing else drifted).
+3. Full `atc-stack` suite (`snapshot.test.js` and friends) + typecheck.
+4. Full `atc-audit` suite + typecheck (README-only change there, but confirm nothing else drifted).
 
 **Compatibility impact**: additive only — existing snapshots taken before this change remain valid and
 restorable exactly as before; they simply won't have the audit key directory, which is the same
@@ -217,14 +217,14 @@ proceed unless the security-posture judgment call flagged in the audit (is backi
 signing key via the same mechanism as auth's JWT key acceptable) comes back "no" from the user, in
 which case this phase is dropped entirely, not partially done.
 
-**Implemented**: `stack/src/snapshot.js`'s `EXTRA_PATHS.audit`, `stack/test/snapshot.test.js` (7 new
-tests), `stack/test/integration/audit-anchor-continuity.test.js`, `stack/docs/BACKUP.md`,
-`audit/README.md`, `audit/docs/READINESS.md`. Two design refinements beyond this plan's original
+**Implemented**: `atc-stack/src/snapshot.js`'s `EXTRA_PATHS.audit`, `atc-stack/test/snapshot.test.js` (7 new
+tests), `atc-stack/test/integration/audit-anchor-continuity.test.js`, `atc-stack/docs/BACKUP.md`,
+`atc-audit/README.md`, `atc-audit/docs/READINESS.md`. Two design refinements beyond this plan's original
 scope, both re-verified against real code before implementing (not applied on the audit's design
 sketch alone): configured-but-missing key material fails the backup (fatal, matching
 `AnchorSigner.fromFiles`'s own startup-refusal contract) rather than degrading silently; a configured
 path outside the audit service folder is excluded with a warning rather than followed, a security
-boundary. `#copyFile`'s missing permission-bit preservation (a pre-existing gap affecting `auth`'s
+boundary. `#copyFile`'s missing permission-bit preservation (a pre-existing gap affecting `atc-auth`'s
 keys too) was found and fixed in the same phase, since leaving it would have made every restored
 private key world/group-readable, audit's new one included. No audit production code changed.
 
@@ -293,13 +293,13 @@ a sane built-in default so no operator action is required to adopt this phase).
    - Reconciliation is safe to run again immediately after a previous run (idempotent — a second pass
      over an already-clean `trash/` does nothing) and safe to run again after a process restart
      (crash-safe by construction, since it relies only on mtime, not in-memory state).
-3. Full `media` suite + typecheck.
+3. Full `atc-media` suite + typecheck.
 
 **Compatibility impact**: additive only. No existing route's behavior changes. Operators who never call
 the new endpoint see identical behavior to today except for reconciliation quietly recovering disk
 space that previously leaked — a strict improvement with no opt-in required.
 
-**Rollback implications**: self-contained to `media`; reverting removes the new route and the
+**Rollback implications**: self-contained to `atc-media`; reverting removes the new route and the
 reconciliation step, returning to today's exact two-trigger, no-reconciliation behavior (the known,
 already-documented starting state, not a new risk).
 
@@ -310,8 +310,8 @@ the user in favor of adding a role concept to media, stop and re-scope this phas
 **Implemented, with two corrections found only by re-verifying against real code before building**:
 
 1. **Trigger mechanism changed, not just the route path** — the user's own decision (see the Phase 4
-   report) was `stack`'s operational control plane instead of an HTTP route: `stack/src/media-
-   maintenance.js` + `Stack#maintenance('media')` + `stack maintenance <service>` CLI, constructing
+   report) was `atc-stack`'s operational control plane instead of an HTTP route: `atc-stack/src/media-
+   maintenance.js` + `Stack#maintenance('atc-media')` + `stack maintenance <service>` CLI, constructing
    the real `Config`/`Database`/`LocalStorage`/`FileStore`/`TicketStore`/`MediaService`/`Maintenance`
    graph directly (same classes `Application#start` wires, minus the Fastify listener) and calling
    the real `Maintenance#run('manual')` — never a second purge implementation, matching this plan's
@@ -319,7 +319,7 @@ the user in favor of adding a role concept to media, stop and re-scope this phas
 2. **This changes the plan's own concurrency assumption** — "no cross-process concurrency to guard
    against for media" (this plan's own Invariants, above) is no longer true: `stack maintenance
    media` runs as a genuinely separate OS process from the live, already-running media server.
-   Verified safe anyway, empirically, not just by re-reading the existing reasoning: `media/test/
+   Verified safe anyway, empirically, not just by re-reading the existing reasoning: `atc-media/test/
    maintenance-concurrency.test.js` races two fully independent `MediaService`/`Database`/
    `LocalStorage` object graphs (standing in for two separate processes) against the same real
    SQLite file and real data directory, confirming the DB compare-and-swap + storage fencing already
@@ -358,11 +358,11 @@ arbitrary/operator-configured target (a scheduler job's target URL, a webhook-ou
 those continue to carry only their existing service-specific headers, unchanged by this phase.
 
 **Scope**:
-1. `service-core/src/trace-context.js` (new): a `TraceContext` class combining gateway's validated
+1. `atc-service-core/src/trace-context.js` (new): a `TraceContext` class combining gateway's validated
    `parse()`/`HEADER_PATTERN` (W3C format, lowercase-hex-only, all-zero trace-id/parent-id rejected)
    with console's `span()` (fresh span-id per outbound hop). Also export a small `AsyncLocalStorage`
-   context helper generalizing the pattern already proven in `console/src/services/client.js`.
-2. `service-core`'s existing per-service `X-Request-Id` wiring: while touching this area, consider
+   context helper generalizing the pattern already proven in `atc-console/src/services/client.js`.
+2. `atc-service-core`'s existing per-service `X-Request-Id` wiring: while touching this area, consider
    (does not have to be in the same commit if it's cleaner separately) consolidating the 11
    copy-pasted `requestIdHeader`/`genReqId` blocks into one shared helper alongside the new trace
    primitive, since both live in the same request-context space and the audit found the current
@@ -404,7 +404,7 @@ schema changes anywhere in this phase.
   exact behavior — confirm this is actually the intended behavior to preserve, or an explicit decision
   to change it, before locking in the test.
 - console→backend and gateway→backend propagation, for at least one representative service each
-  (real cross-process, using the existing `stack/test/integration/harness.js` pattern).
+  (real cross-process, using the existing `atc-stack/test/integration/harness.js` pattern).
 - backend→backend propagation only for the specific internal-peer paths in scope (auth→notify,
   any-service→audit) — no test should assert propagation to an arbitrary-target call, since that's
   explicitly out of scope by the confirmed policy.
@@ -419,7 +419,7 @@ or log field is affected; `traceparent` is new surface, not a replacement of any
 
 **Rollback implications**: the largest-surface phase in this plan (12 repos touched), but each
 service's change is small and independent — a problem discovered in one service's adoption does not
-require reverting the others; the shared `service-core` primitive itself is additive (a new file, not
+require reverting the others; the shared `atc-service-core` primitive itself is additive (a new file, not
 a change to `HttpCaller`'s core behavior) so reverting it in isolation is also safe.
 
 **Stop condition**: do not begin per-service adoption before the internal-vs-external forwarding
@@ -442,7 +442,7 @@ sites beyond auth→notify/any-service→audit — gateway→ratelimit (wired) a
 left unwired, cross-request IP cache has no single request to attribute to) — no call site was found
 that didn't fit the internal/external classification. All required test categories delivered,
 including the real cross-process console→backend and gateway→backend propagation tests. Full
-details and the final trust-model statement: `stack/docs/OBSERVABILITY.md`.
+details and the final trust-model statement: `atc-stack/docs/OBSERVABILITY.md`.
 
 ---
 
@@ -454,7 +454,7 @@ to land before the platform can be considered releasable as-is.
 
 **Can ship with documented limitations, exactly as it stands today, pending this plan's phases:**
 - The split-worker migration race (Phase 1) — already has a working, documented, safe workaround
-  (staggered start) in `stack/docs/UPGRADE.md`, and empirically never causes data loss, only a
+  (staggered start) in `atc-stack/docs/UPGRADE.md`, and empirically never causes data loss, only a
   bounded, self-recovering crash under PM2's existing restart policy.
 - The migration E2E coverage gap (Phase 2) — a test-coverage gap, not a runtime defect; the mechanism
   it would be testing is already covered at the unit level.

@@ -367,7 +367,7 @@ export interface components {
         };
         InfoResponse: {
             /** @constant */
-            service: "scheduler";
+            service: "atc-scheduler";
             /** @description This service's own package semver. */
             version: string;
             /** @constant */

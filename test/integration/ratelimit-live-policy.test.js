@@ -8,7 +8,7 @@ import { freePort, randomSecret, ServiceProcess, stopAll, waitUntil } from './ha
 
 /**
  * Stage 11 item 10: a policy updated live (`PATCH /v1/policies/:name`) while concurrent `/v1/check`
- * traffic is in flight against it, against the real `ratelimit` process (not a mock). The ground
+ * traffic is in flight against it, against the real `atc-ratelimit` process (not a mock). The ground
  * truth this test leans on: `policy-store.js#update` is one `UPDATE ... WHERE name = ?` statement,
  * so SQLite's single-process atomicity guarantees a concurrent reader only ever sees the fully-old
  * or fully-new row — never a torn one. What this test does NOT claim (per the Stage 11 spec): which

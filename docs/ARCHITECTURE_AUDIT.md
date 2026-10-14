@@ -19,7 +19,7 @@ Platform: 13 services plus this installer, one public repository each under `git
 | geo | 8b27d0c |
 | stack | 027f652 |
 
-## 1. Dependency graph (from code and `stack/src/manifest.js`)
+## 1. Dependency graph (from code and `atc-stack/src/manifest.js`)
 
 ```
 browser ──HTTPS──▶ gateway ──▶ auth      (routes.json; JWKS for auth:"user" routes)
@@ -91,13 +91,13 @@ Decision: no OpenTelemetry runtime dependency. A 60-line `RequestContext` helper
 
 ### 4.2 Shared runtime (recommendation 4)
 
-Duplication is real and mechanical (section 2). Decision: create `service-core` as a small, versioned package (`@alitalipcalikoglu/service-core`, semver, published from its own repository, consumed as an exact-version dependency) containing only: `EnvReader` + `ConfigError`, `Database` (migration runner), `AuditClient` (+ hook/route), `ApiKeyAuth` (with pluggable role/scope check), `RequestContext`/`traceparent`, `HttpCaller` primitives (timeout, pinned-DNS `NetGuard`, retry classification), `Signer`, `Lifecycle` (signals, force-exit, PM2 ready), `errorHandler`/`probes`/`metricsText` helpers, `StatementCache`. Nothing domain-specific. Services adopt it one by one; a service keeps working without it (copy stays until its own stage). Each service pins the version; the `stack` compatibility check reads `service-core` version from `/v1/info`.
+Duplication is real and mechanical (section 2). Decision: create `atc-service-core` as a small, versioned package (`@alitalipcalikoglu/atc-service-core`, semver, published from its own repository, consumed as an exact-version dependency) containing only: `EnvReader` + `ConfigError`, `Database` (migration runner), `AuditClient` (+ hook/route), `ApiKeyAuth` (with pluggable role/scope check), `RequestContext`/`traceparent`, `HttpCaller` primitives (timeout, pinned-DNS `NetGuard`, retry classification), `Signer`, `Lifecycle` (signals, force-exit, PM2 ready), `errorHandler`/`probes`/`metricsText` helpers, `StatementCache`. Nothing domain-specific. Services adopt it one by one; a service keeps working without it (copy stays until its own stage). Each service pins the version; the `atc-stack` compatibility check reads `atc-service-core` version from `/v1/info`.
 
 Rejected: a shared Fastify "app factory" that hides routing, and any shared domain code.
 
 ### 4.3 Database and migrations (recommendation 5)
 
-Already implemented consistently: ordered `MIGRATIONS[]`, `user_version`, one transaction per migration, failure aborts startup, WAL. Missing: backup-before-migrate, documented rollback limits, migration tests beyond "schema applies", version stamp in a table (only `user_version`). Decision: `Database` moves to `service-core` with `migrate({ backupDir })` that copies the file (`VACUUM INTO` or `.backup` API) before applying a pending migration, records `schema_migrations(version, applied_at, description)` (additive to `user_version`), refuses to open a database whose version is newer than the code (forward-incompat guard), and exposes `Database.expectedVersion` for `/v1/info`. Rollback = restore the pre-migration copy; documented as the only path. No down migrations.
+Already implemented consistently: ordered `MIGRATIONS[]`, `user_version`, one transaction per migration, failure aborts startup, WAL. Missing: backup-before-migrate, documented rollback limits, migration tests beyond "schema applies", version stamp in a table (only `user_version`). Decision: `Database` moves to `atc-service-core` with `migrate({ backupDir })` that copies the file (`VACUUM INTO` or `.backup` API) before applying a pending migration, records `schema_migrations(version, applied_at, description)` (additive to `user_version`), refuses to open a database whose version is newer than the code (forward-incompat guard), and exposes `Database.expectedVersion` for `/v1/info`. Rollback = restore the pre-migration copy; documented as the only path. No down migrations.
 
 ### 4.4 Transactional outbox (recommendation 6)
 
@@ -115,15 +115,15 @@ Already implemented: auth JWT previous public key; webhook-out per-subscriber du
 
 ### 4.7 Backup and restore (recommendation 9)
 
-Missing everywhere except README one-liners (`sqlite3 .backup`). Decision: `stack backup` writes `<dir>/<ts>/<service>.db` via SQLite backup API (consistent under WAL) plus `media/objects` and `media/variants` (rsync-style copy) and `auth/keys`; `stack restore <ts>` stops the service, restores, starts, checks `/ready`; a stack test runs backup → mutate → restore → verify on temp dirs. Per-service README gets a "Backup / restore" section with the invariant (database + object dir must be from the same snapshot for media).
+Missing everywhere except README one-liners (`sqlite3 .backup`). Decision: `stack backup` writes `<dir>/<ts>/<service>.db` via SQLite backup API (consistent under WAL) plus `media/objects` and `media/variants` (rsync-style copy) and `atc-auth/keys`; `stack restore <ts>` stops the service, restores, starts, checks `/ready`; a stack test runs backup → mutate → restore → verify on temp dirs. Per-service README gets a "Backup / restore" section with the invariant (database + object dir must be from the same snapshot for media).
 
 ### 4.8 Integration tests (recommendation 10)
 
-Missing entirely at stack level (each repo tests itself with in-memory DBs and fakes). Decision: `stack/test/integration/*.test.js` that spawn real services from the workspace on ephemeral ports with generated envs (the `dev` runner already does most of this) and drive: signup → auth → notify (fake SMTP `json:` transport) → audit; gateway → JWT → policy (ratelimit) → upstream, including ratelimit down with `failOpen:false`; publish → webhook-out → receiver failing twice → retry → success, and subscriber auto-disable; scheduler job → target (flags write) → run history, target 500 → retry; media upload → signed URL → download → delete → purge; flag update → snapshot ETag change → evaluate. Marked `integration` and skipped when `STACK_INTEGRATION` is unset so unit runs stay fast.
+Missing entirely at stack level (each repo tests itself with in-memory DBs and fakes). Decision: `atc-stack/test/integration/*.test.js` that spawn real services from the workspace on ephemeral ports with generated envs (the `dev` runner already does most of this) and drive: signup → auth → notify (fake SMTP `json:` transport) → audit; gateway → JWT → policy (ratelimit) → upstream, including ratelimit down with `failOpen:false`; publish → webhook-out → receiver failing twice → retry → success, and subscriber auto-disable; scheduler job → target (flags write) → run history, target 500 → retry; media upload → signed URL → download → delete → purge; flag update → snapshot ETag change → evaluate. Marked `integration` and skipped when `STACK_INTEGRATION` is unset so unit runs stay fast.
 
 ### 4.9 Production readiness contract (recommendations 11, 27)
 
-Missing as a document. Decision: `docs/READINESS.md` in every service (template in `stack/docs/READINESS_TEMPLATE.md`) with the 19 mandated sections and the scaling class. Classes from the code as it stands:
+Missing as a document. Decision: `docs/READINESS.md` in every service (template in `atc-stack/docs/READINESS_TEMPLATE.md`) with the 19 mandated sections and the scaling class. Classes from the code as it stands:
 
 | Class | Services |
 |---|---|
@@ -167,13 +167,13 @@ No service will be promoted to C/D in this plan; each README will say so.
 ## Addendum, discovered during Stage 1
 
 Found while building the real multi-process integration test
-(`stack/test/integration/gateway-auth-audit.test.js`), not present in the original discovery pass
+(`atc-stack/test/integration/gateway-auth-audit.test.js`), not present in the original discovery pass
 because gateway's own test suite proxies to a fake echo upstream that cannot catch a path mismatch
 against a real service's actual routes:
 
-`SetupContext.gatewayRoutes()` (`stack/src/setup-context.js`) generates the `auth-public` route as
-`{ pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('auth')], ... }`. Auth's
-real routes live under `/v1/auth/*` (`auth/src/http/auth-api.js` registers `#registerV1` at prefix
+`SetupContext.gatewayRoutes()` (`atc-stack/src/setup-context.js`) generates the `auth-public` route as
+`{ pathPrefix: '/api/auth/', stripPrefix: '/api/auth', upstreams: [this.url('atc-auth')], ... }`. Auth's
+real routes live under `/v1/auth/*` (`atc-auth/src/http/auth-api.js` registers `#registerV1` at prefix
 `/v1`, with `POST /auth/login` inside it). Stripping `/api/auth` from `/api/auth/login` leaves
 `/login`, which does not exist on auth — every login/register/refresh/etc. call made through a
 *real deployed* gateway using this generated `routes.json` would 404. This is a P0 correctness bug
@@ -186,9 +186,9 @@ would not silently mask this.
 
 ### Stage 1.1 correction: this was not a generator bug
 
-Re-investigated in Stage 1.1 by re-reading `gateway/src/route-table.js`'s actual rewrite semantics
+Re-investigated in Stage 1.1 by re-reading `atc-gateway/src/route-table.js`'s actual rewrite semantics
 and, critically, gateway's own pre-existing documentation for this exact route shape:
-`gateway/examples/public-route-with-injected-key.md` and `gateway/examples/user-authenticated-route.md`.
+`atc-gateway/examples/public-route-with-injected-key.md` and `atc-gateway/examples/user-authenticated-route.md`.
 
 `stripPrefix` only ever removes a literal, contiguous substring of the caller's own request path
 (`RouteTable.rewrite()`: `path.slice(route.stripPrefix.length)`) — gateway has no path-insertion or
@@ -200,13 +200,13 @@ documents exactly this: "`fetch('https://api.example.com/api/auth/v1/auth/login'
 "What auth receives: `POST /v1/auth/login`". Feeding that same math through by hand confirms it:
 stripping the 9-character `/api/auth` from `/api/auth/v1/auth/login` leaves `/v1/auth/login`, which
 is auth's real route. The `media-user` route is the same pattern (`/api/media/v1/files` →
-`/v1/files`), also already documented in `gateway/examples/user-authenticated-route.md` and
-`gateway/examples/cors.md`.
+`/v1/files`), also already documented in `atc-gateway/examples/user-authenticated-route.md` and
+`atc-gateway/examples/cors.md`.
 
 The Stage 1 integration test called the *short* form (`/api/auth/login`) instead, got a 404, and
 misdiagnosed the generator as broken rather than the test's own assumed calling convention. There
-was no defect in `stack/src/setup-context.js`, and none of its route values have changed.
-`stack/test/integration/gateway-auth-audit.test.js` now calls the real, unmodified
+was no defect in `atc-stack/src/setup-context.js`, and none of its route values have changed.
+`atc-stack/test/integration/gateway-auth-audit.test.js` now calls the real, unmodified
 `SetupContext.gatewayRoutes()` output directly (only rebinding upstream origins from the manifest's
 fixed ports to the test's ephemeral ones) for both the auth login flow and a new media-user upload
 regression, over real spawned processes, proving the generator's actual output has always worked.

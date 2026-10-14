@@ -25,15 +25,15 @@ the one that supports it) on the *same* flag that already governs trusting `X-Fo
 - **gateway** (the public edge): honours an inbound `X-Request-Id` only when `TRUST_PROXY=true`
   (meaning: something in front of the gateway is known to set it faithfully — a CDN, another
   reverse proxy). Otherwise a fresh id is generated for every request, regardless of what a client
-  sent. Implemented in `gateway/src/http/gateway-api.js` (`genReqId`, gated by
-  `GatewayApi.#inboundRequestId`) and forwarded to the matched upstream in `gateway/src/proxy.js`.
+  sent. Implemented in `atc-gateway/src/http/gateway-api.js` (`genReqId`, gated by
+  `GatewayApi.#inboundRequestId`) and forwarded to the matched upstream in `atc-gateway/src/proxy.js`.
   An accepted-or-generated id is always echoed back to the caller as `X-Request-Id` on the
   response.
 - **console** (the admin app, reached directly by browsers): always generates its own id
-  (`requestIdHeader: false` in `console/src/http/console-api.js`) — there is no upstream proxy
+  (`requestIdHeader: false` in `atc-console/src/http/console-api.js`) — there is no upstream proxy
   whose header it would make sense to trust here, so there is no gate to configure. Its own id is
   then forwarded on every outbound call it makes to a service, via `AsyncLocalStorage` in
-  `console/src/services/client.js` (`requestIdContext`), so no route handler has to pass it
+  `atc-console/src/services/client.js` (`requestIdContext`), so no route handler has to pass it
   explicitly.
 
 **Every other backend service** (audit, notify, auth, media, shortlink, flags, scheduler,
@@ -65,7 +65,7 @@ closed in post-production Phase 5).** Two independent, behaviourally-identical i
 the same convention:
 
 - **gateway** (no `@atc-web/atc-service-core` dependency — a deliberate, standing choice, unrelated to
-  this convention): `gateway/src/trace-context.js` (`TraceContext`) parses an inbound header,
+  this convention): `atc-gateway/src/trace-context.js` (`TraceContext`) parses an inbound header,
   validates it (rejects a malformed value and the spec's reserved all-zero trace-id/parent-id), and
   — under the *same* `TRUST_PROXY` gate as the request id — either continues the caller's trace-id
   or starts a fresh one; a new span id is always minted for the gateway's own hop, never the
@@ -79,7 +79,7 @@ the same convention:
   `@atc-web/atc-service-core/fastify`'s `registerRequestContext(app, { trustProxy: config.trustProxy })`
   — the identical trust gate every one of these services already declares for `X-Forwarded-*`,
   reused, not a new boundary. **console previously kept its own independent copy of this
-  (`console/src/trace-context.js`, an `AsyncLocalStorage` in `services/client.js`) — that copy is
+  (`atc-console/src/trace-context.js`, an `AsyncLocalStorage` in `services/client.js`) — that copy is
   gone; console now uses the exact same shared primitive every backend does**, with its own
   `trustProxy` (default `false`, since a browser reaches console directly — no proxy in front of it
   by default) governing whether it ever adopts a browser-supplied trace-id, same policy as before,
@@ -88,8 +88,8 @@ the same convention:
 **What this means concretely, end to end:** a call that goes browser → gateway → auth now gets a
 `traceId` in the gateway's own log AND in auth's own log — the SAME trace-id, with auth minting its
 own fresh `spanId` for that hop, `parentSpanId` set to the span gateway used — proven with two real,
-separate OS processes in `stack/test/integration/gateway-auth-audit.test.js`. The same is true for
-console → any backend (`stack/test/integration/console-audit-trace.test.js`), with console's own
+separate OS processes in `atc-stack/test/integration/gateway-auth-audit.test.js`. The same is true for
+console → any backend (`atc-stack/test/integration/console-audit-trace.test.js`), with console's own
 trust boundary (default: never trusts an inbound browser-supplied traceparent) applying exactly as
 it always did, now via the shared primitive. Every backend service's `request.log` — including
 Fastify's own automatic "incoming request"/"request completed" lines, not just explicit
@@ -113,15 +113,15 @@ anchor webhook; notify's webhook channel has its own pre-existing, unrelated tra
 touched by this: it has no notion of trust and injects nothing implicitly, and none of those three
 wrapper classes build a trace header into what they send. Proven as a security regression, not just
 asserted: each has a test capturing the real outbound HTTP headers to a real local receiver and
-asserting `traceparent`/`x-request-id` are absent (`scheduler/test/worker.test.js`, `webhook-out/
-test/worker.test.js`, `notify/test/worker.test.js`, `audit/test/anchors.test.js`). Propagation is
+asserting `traceparent`/`x-request-id` are absent (`atc-scheduler/test/worker.test.js`, `webhook-out/
+test/worker.test.js`, `atc-notify/test/worker.test.js`, `atc-audit/test/anchors.test.js`). Propagation is
 opt-in and explicit at exactly the internal, trusted-platform-dependency call sites that use it —
 `RequestContext#propagationHeaders()`, called by name, never automatic — currently: auth → notify
-(`auth/src/domain/mailer.js`) and gateway → ratelimit (`gateway/src/rate-limit-client.js`, gateway's
+(`atc-auth/src/domain/mailer.js`) and gateway → ratelimit (`atc-gateway/src/rate-limit-client.js`, gateway's
 own request/trace, no service-core dependency needed for this one call site). Two internal call
 sites were deliberately left unwired despite being "trusted internal" by classification — every
 service → audit (`@atc-web/atc-service-core/audit`'s `AuditClient`) and gateway → geo
-(`gateway/src/geo-client.js`) — both because they don't have a single originating request to
+(`atc-gateway/src/geo-client.js`) — both because they don't have a single originating request to
 propagate from: `AuditClient` batches events from possibly-many different requests into one flush
 call, and `GeoClient` caches lookups by IP across many requests, so neither outbound HTTP call maps
 cleanly to "this one request's trace"; forcing propagation onto either would be attaching a
@@ -161,5 +161,5 @@ Unrelated to tracing, but the other half of "observability": every service's `/h
 "is the process up" check with no dependency lookups, and `/ready` is a cached (typically 10–15 s)
 check of that service's own dependencies (its database, and for a couple of services one
 synchronous upstream — see each service's `docs/READINESS.md`). Neither endpoint should ever have
-a side effect beyond reading current status; Stage 0 fixed one service (`media`) where `/ready` had
-one (see `media/docs/READINESS.md`, "Readiness endpoint").
+a side effect beyond reading current status; Stage 0 fixed one service (`atc-media`) where `/ready` had
+one (see `atc-media/docs/READINESS.md`, "Readiness endpoint").

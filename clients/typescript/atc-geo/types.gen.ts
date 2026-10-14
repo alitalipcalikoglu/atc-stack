@@ -547,7 +547,7 @@ export interface components {
         };
         InfoResponse: {
             /** @constant */
-            service: "geo";
+            service: "atc-geo";
             /** @description geo's own package.json version. */
             version: string;
             /** @constant */

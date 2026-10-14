@@ -7,7 +7,7 @@ import { after, before, test } from 'node:test';
 import { freePort, randomSecret, ServiceProcess, stopAll, waitUntil } from './harness.js';
 
 /**
- * Stage 11: a real `media` file's whole life over its actual HTTP API — upload, download, soft
+ * Stage 11: a real `atc-media` file's whole life over its actual HTTP API — upload, download, soft
  * delete (already 404s over HTTP), then a genuine production purge pass that removes the bytes
  * from disk, then a 404 on the exact same object once more. Every step is a real `node` child
  * process (never mocks, never an in-process fake, never a direct DB write).

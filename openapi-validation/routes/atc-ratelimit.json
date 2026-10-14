@@ -1,5 +1,5 @@
 {
-  "service": "ratelimit",
+  "service": "atc-ratelimit",
   "routes": [
     { "method": "GET", "path": "/health" },
     { "method": "GET", "path": "/openapi.yaml" },

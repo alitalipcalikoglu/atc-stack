@@ -4,9 +4,9 @@ Audit-only. No code, version, tag or commit changes were made while producing th
 number below comes from a command run directly against each repo's real HEAD during this audit
 (`git`, `node -pe require(...)`, `npm audit`, `npm ls`, `npm test`), not from a prior report.
 
-Scope: the 15 repos under `atc-web/` — `stack`, `service-core`, `gateway`, and the 12 backend
-services (`notify`, `auth`, `media`, `console`, `audit`, `shortlink`, `flags`, `scheduler`,
-`webhook-out`, `search`, `ratelimit`, `geo`).
+Scope: the 15 repos under `atc-web/` — `atc-stack`, `atc-service-core`, `atc-gateway`, and the 12 backend
+services (`atc-notify`, `atc-auth`, `atc-media`, `atc-console`, `atc-audit`, `atc-shortlink`, `atc-flags`, `atc-scheduler`,
+`atc-webhook-out`, `atc-search`, `atc-ratelimit`, `atc-geo`).
 
 ## 1. Repository matrix
 
@@ -31,8 +31,8 @@ All 15 repos, as of this audit, verified directly:
 | geo | main | `6aadbf7` | same | clean | 0/0 | 1.0.0 | none | >=22.13 | yes | yes | none |
 
 15/15 clean, 15/15 pushed (0 ahead, 0 behind `origin/main`, re-verified with a live `git fetch`, not
-cached state). `LICENSE` (MIT) and `.env.example` present in all 15 where applicable (`stack` and
-`service-core` are not deployed services, so no `.env.example`/Dockerfile/ecosystem file — correctly
+cached state). `LICENSE` (MIT) and `.env.example` present in all 15 where applicable (`atc-stack` and
+`atc-service-core` are not deployed services, so no `.env.example`/Dockerfile/ecosystem file — correctly
 absent, not missing). Every one of the 13 deployable services (gateway + 12 backends) has an
 identically-shaped `## Run` section in its README with real `npm ci` / PM2 / Docker instructions —
 spot-checked all 13, uniform, no drift.
@@ -43,7 +43,7 @@ spot-checked all 13, uniform, no drift.
 ## 2. Versioning audit
 
 **service-core is classified C (package version + git tag together, source of truth):**
-`service-core/VERSIONING.md` documents the real policy already in force: every consumer pins an
+`atc-service-core/VERSIONING.md` documents the real policy already in force: every consumer pins an
 exact git tag (`#v1.11.1`), `package.json.version` always equals the tag it was cut at, patch/minor/
 major rules are defined and were followed correctly through 19 real tags (`v1.0.0` → `v1.11.1`).
 Verified directly, not assumed:
@@ -51,7 +51,7 @@ Verified directly, not assumed:
 - `git rev-parse v1.11.0` → `ee472d45f2ee326feb66af13658635f1a7ac9568`
 - `git rev-parse v1.11.1` → `934af4f5a45f4be6fab9c77ba5f24f6c44c37c83`
 - Both distinct, neither is HEAD's ancestor-of-a-moved-tag artifact — v1.11.0 was not moved.
-- All 12 consumers' `package-lock.json` resolves `@atc-web/service-core` to
+- All 12 consumers' `package-lock.json` resolves `@atc-web/atc-service-core` to
   `934af4f5a45f4be6fab9c77ba5f24f6c44c37c83` with `version: 1.11.1` — the lockfile's *resolved
   commit*, not just the `package.json` string, matches the tag's real commit in every case. No
   consumer is silently on a stale or diverged install.
@@ -76,7 +76,7 @@ None of the following blocker categories from the task's own definition were fou
 
 - Production test deterministic fail: **none**, except §4 (notify port collision — is a blocker, see
   below, already root-caused).
-- Build fail: **none** (only `console` has a real build step — `vite build` — not run during this
+- Build fail: **none** (only `atc-console` has a real build step — `vite build` — not run during this
   audit since it's a validation-matrix item for the implementation phase, not an audit-phase check;
   flagged as a to-run item in RELEASE_PLAN.md, not a currently-confirmed failure).
 - Typecheck fail: **none observed** — every repo's typecheck passed as of the Phase 5 closure run
@@ -94,7 +94,7 @@ None of the following blocker categories from the task's own definition were fou
 - Broken deployment generation: not evaluated in this audit pass — see §7, PM2 itself is not
   installed in this environment, so config-generation can be checked but a live `pm2 start` cannot.
 - Backup/restore correctness failure: not evaluated in this audit pass (existing coverage:
-  `stack/test/snapshot.test.js`, `stack/test/integration/audit-anchor-continuity.test.js` — both
+  `atc-stack/test/snapshot.test.js`, `atc-stack/test/integration/audit-anchor-continuity.test.js` — both
   passing as of the pre-audit Hardening Phase 5 run; re-run scheduled for implementation phase).
 - Secret committed: **none found** — see §9.
 - Immutable tag mismatch: **none** — service-core's two most recent tags verified as distinct,
@@ -105,10 +105,10 @@ None of the following blocker categories from the task's own definition were fou
 ### Confirmed blocker: notify's `test/runtime.test.js`, 2/60 deterministic failures
 
 **Root cause, confirmed by direct comparison with sibling services, not guessed:**
-`notify/test/helpers.js`'s `testConfig()` does not override `PORT`, so `Config.fromEnv()` falls back
-to its real production default (`notify/src/config.js:104`, `port: r.integer('PORT', 3001, ...)`).
-Three tests in `notify/test/runtime.test.js` each call `Application.start()` against this config,
-binding real TCP port 3001. `scheduler` and `webhook-out` — the two other split-capable services with
+`atc-notify/test/helpers.js`'s `testConfig()` does not override `PORT`, so `Config.fromEnv()` falls back
+to its real production default (`atc-notify/src/config.js:104`, `port: r.integer('PORT', 3001, ...)`).
+Three tests in `atc-notify/test/runtime.test.js` each call `Application.start()` against this config,
+binding real TCP port 3001. `atc-scheduler` and `atc-webhook-out` — the two other split-capable services with
 an identically-shaped `runtime.test.js` (the file's own top comment even says "See scheduler's
 identical test for why") — do **not** have this problem, because their own `test/helpers.js`
 `testConfig()` already sets `PORT: '0'` (OS-assigned ephemeral port). This is a pre-existing gap in
@@ -127,10 +127,10 @@ whose pass/fail depends on what else happens to be running on the machine is a b
 right, independent of today's specific collision** — this is why it is classified as a confirmed
 blocker rather than an environmental footnote.
 
-**Fix (not applied — audit phase only):** add `PORT: '0'` to `notify/test/helpers.js`'s
-`testConfig()`, matching `scheduler`'s and `webhook-out`'s own existing, already-working pattern
+**Fix (not applied — audit phase only):** add `PORT: '0'` to `atc-notify/test/helpers.js`'s
+`testConfig()`, matching `atc-scheduler`'s and `atc-webhook-out`'s own existing, already-working pattern
 exactly — no new convention invented. This is a one-line test-harness change; it does not touch
-`notify/src/config.js`'s real production default (`3001` stays the documented, real default port —
+`atc-notify/src/config.js`'s real production default (`3001` stays the documented, real default port —
 per the task's explicit instruction not to change production port/config semantics). Scheduled as
 Phase R0 in `RELEASE_PLAN.md`. Acceptance: 5 consecutive full-suite runs, 60/60 every time.
 
@@ -138,16 +138,16 @@ Phase R0 in `RELEASE_PLAN.md`. Acceptance: 5 consecutive full-suite runs, 60/60 
 
 `PORT: '0'` was not usable as-is: notify's own `PORT` validator requires `min: 1` (unlike
 scheduler's/webhook-out's `min: 0`), so it was rejected by config validation before reaching a
-bind. Real fix applied: `notify/test/helpers.js` gained a `freePort()` helper (the same
-bind-to-0/read-assigned-port/close technique `stack/test/integration/harness.js` already uses),
+bind. Real fix applied: `atc-notify/test/helpers.js` gained a `freePort()` helper (the same
+bind-to-0/read-assigned-port/close technique `atc-stack/test/integration/harness.js` already uses),
 and `test/runtime.test.js`'s three `Application.start()` call sites now pass
 `PORT: String(await freePort())` instead of relying on the real production default. Verified with
 port 3001 deliberately held by a disposable local process for the entire run: **10/10 consecutive
-full-suite runs, 60/60 every time, 0 `EADDRINUSE`**. `notify/src/config.js`'s real default (3001)
+full-suite runs, 60/60 every time, 0 `EADDRINUSE`**. `atc-notify/src/config.js`'s real default (3001)
 and every other config/entrypoint/Docker/PM2 path are unchanged.
 
 A second, unrelated, genuinely new blocker was discovered while establishing R0's local baseline:
-`scheduler` and `webhook-out`'s `#stats()` (`src/http/scheduler-api.js`, `src/http/webhook-api.js`)
+`atc-scheduler` and `atc-webhook-out`'s `#stats()` (`src/http/scheduler-api.js`, `src/http/webhook-api.js`)
 computed their `last24h` stats window from real `Date.now()`, while their own test fixtures
 (`test/helpers.js`) freeze a `FakeClock` at `2026-09-17T10:00:00Z` — a fixed anchor date, not
 relative to real time. Once real wall-clock time passed 24h beyond that anchor, the window stopped
@@ -175,7 +175,7 @@ non-blocker examples:
 
 - No CHANGELOG/RELEASE_NOTES in any repo today (§2) — a release-notes *strategy* is proposed in §13,
   not required before this release.
-- `stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section states "every service besides
+- `atc-stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section states "every service besides
   these three still pins v1.10.0" — **stale as of Hardening Phase 5**: all 12 consumers now pin
   `v1.11.1` (§2). This is a documentation-drift item (§10), not a release blocker — the guarantee it
   describes (migration-race safety) is unaffected and, if anything, now applies more broadly than the
@@ -206,9 +206,9 @@ service-core v1.11.1 (934af4f)
 ├─ ratelimit     pins v1.11.1 — lockfile resolves to 934af4f ✓
 └─ geo           pins v1.11.1 — lockfile resolves to 934af4f ✓
 
-gateway — no @atc-web/service-core dependency (deliberate, standing architectural decision,
+gateway — no @atc-web/atc-service-core dependency (deliberate, standing architectural decision,
           confirmed unrelated to this release; gateway keeps its own independent trace-context.js)
-stack   — no @atc-web/service-core dependency (orchestration tooling, not a running service)
+stack   — no @atc-web/atc-service-core dependency (orchestration tooling, not a running service)
 ```
 
 All 12 real consumers on the identical, current, correctly-tagged commit. No split-pin situation, no
@@ -218,10 +218,10 @@ consumer lagging behind.
 
 **Test scripts** — identical shape in all 15: `"test": "node [--disable-warning=ExperimentalWarning]
 --test \"test/**/*.test.js\""`. **Typecheck scripts** — identical shape in all 15: `"typecheck": "tsc
--p jsconfig.json"`, with `console` additionally running `svelte-check --workspace ui --tsconfig
-./jsconfig.json` for its Svelte UI. **Build script** — only `console` has one (`"build": "vite
+-p jsconfig.json"`, with `atc-console` additionally running `svelte-check --workspace ui --tsconfig
+./jsconfig.json` for its Svelte UI. **Build script** — only `atc-console` has one (`"build": "vite
 build"`, compiling `ui/` to `public/`, which is gitignored); no other repo has or needs a build step
-(plain ESM, no bundling). `notify`/`scheduler`/`webhook-out` additionally expose `"api"`/`"worker"`
+(plain ESM, no bundling). `atc-notify`/`atc-scheduler`/`atc-webhook-out` additionally expose `"api"`/`"worker"`
 scripts for split-process mode.
 
 All test suites were run to completion once already, immediately before this audit, as part of
@@ -243,11 +243,11 @@ clean in all 15 — no missing, invalid, or extraneous packages, no duplicate-re
 ## 7. Deployment findings
 
 Every one of the 13 deployable services (gateway + 12 backends) ships an identically-structured
-`ecosystem.config.cjs` (PM2, fork mode) and `Dockerfile`, confirmed present. `stack/src/stack.js`
+`ecosystem.config.cjs` (PM2, fork mode) and `Dockerfile`, confirmed present. `atc-stack/src/stack.js`
 generates both the normal single-process ecosystem file and, for the three split-capable services
-(`notify`, `scheduler`, `webhook-out`), a `<id>-api` + `<id>-worker` split ecosystem
-(`Stack#generateSplitEcosystem`, `stack/src/stack.js:102-127`) — this logic was inspected directly in
-this audit and matches what `stack/docs/UPGRADE.md`'s own description of it says, except for the one
+(`atc-notify`, `atc-scheduler`, `atc-webhook-out`), a `<id>-api` + `<id>-worker` split ecosystem
+(`Stack#generateSplitEcosystem`, `atc-stack/src/stack.js:102-127`) — this logic was inspected directly in
+this audit and matches what `atc-stack/docs/UPGRADE.md`'s own description of it says, except for the one
 stale sentence noted in §4.
 
 **PM2 is not installed in this audit environment** (`which pm2` → not found). Per the task's own
@@ -258,7 +258,7 @@ and should be validated in the implementation phase without PM2 itself: (a) the 
 `kill_timeout`, naming — is pure data generation and testable without PM2 running; (b) each service's
 real production entrypoint (`node src/index.js`, or `src/api-main.js`/`src/worker-main.js` for the
 split three) can be smoke-tested directly as a child process, which is exactly what
-`stack/test/integration/*.test.js` already does today and what RELEASE_PLAN.md's startup-smoke phase
+`atc-stack/test/integration/*.test.js` already does today and what RELEASE_PLAN.md's startup-smoke phase
 extends. The PM2-specific half (real process supervision, `kill_timeout` actually enforced by PM2's
 own signal handling, `pm2 save`/`pm2 startup` round-trip) stays an accepted gap of *this specific
 audit environment*, not a statement that PM2 itself is untested in real deployment — it is called out
@@ -269,12 +269,12 @@ explicitly per the task's instruction rather than silently assumed to have been 
 Existing, already-passing coverage this audit identified as the real foundation for the
 implementation-phase drills (not to be duplicated, only extended to a release-level system view):
 
-- `service-core/test/migration-race.test.js` + `stack/test/integration/split-worker-migration-race.test.js`
+- `atc-service-core/test/migration-race.test.js` + `atc-stack/test/integration/split-worker-migration-race.test.js`
   — real, separate-process, barrier-synchronized proof that concurrent split-worker startup against
   one SQLite file never double-applies or corrupts a pending migration (Hardening Phase 1).
-- `stack/test/integration/migration-e2e.test.js` — real HTTP-level migration coverage (Hardening
+- `atc-stack/test/integration/migration-e2e.test.js` — real HTTP-level migration coverage (Hardening
   Phase 2).
-- `stack/test/snapshot.test.js` + `stack/test/integration/audit-anchor-continuity.test.js` — backup/
+- `atc-stack/test/snapshot.test.js` + `atc-stack/test/integration/audit-anchor-continuity.test.js` — backup/
   restore correctness and audit anchor signing/verification continuity across a restore (Stage
   3/Hardening Phase 3).
 
@@ -290,10 +290,10 @@ already exists.
 
 **Secrets scan** (private key blocks, AWS-style access keys, GitHub PAT patterns, Slack token
 patterns, tracked `.env` files, tracked `.pem`/`.key`/password-named files) — **zero real findings**
-across all 15 repos. The only name matches were legitimate source: `service-core/src/secret-box.js`
-+ `webhook-out/src/crypto/secret-box.js` (an encryption-helper *class*, not a secret value),
-`console/ui/src/pages/webhook/SecretDialog.svelte` (a UI component), `console/test/totp-secrets.test.js`
-(a test file name), `auth/examples/password-change.md`/`password-reset.md` (documentation examples).
+across all 15 repos. The only name matches were legitimate source: `atc-service-core/src/secret-box.js`
++ `atc-webhook-out/src/crypto/secret-box.js` (an encryption-helper *class*, not a secret value),
+`console/ui/src/pages/webhook/SecretDialog.svelte` (a UI component), `atc-console/test/totp-secrets.test.js`
+(a test file name), `atc-auth/examples/password-change.md`/`password-reset.md` (documentation examples).
 No tracked `.env`, no tracked private key material, no hardcoded credential anywhere matched.
 
 **Artifact hygiene** — no `node_modules/`, `.log`, `.db`/`.db-wal`/`.db-shm`, `.DS_Store`, `dist/`,
@@ -309,7 +309,7 @@ each service actually generates that kind of runtime artifact. No gap found; no 
 ## 10. Documentation drift
 
 One confirmed stale claim, found by direct re-read during this audit (§4 non-blocking-limitations
-entry): `stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section states every service besides
+entry): `atc-stack/docs/UPGRADE.md`'s "Worker-split rollout ordering" section states every service besides
 notify/scheduler/webhook-out "still pins v1.10.0" for service-core — false as of Hardening Phase 5,
 all 12 consumers now pin v1.11.1. Everywhere else this audit checked for the specific stale phrases
 named in the task (staggered split-worker startup required, audit key not backed up, media trash
@@ -324,7 +324,7 @@ consumers as of v1.10.1+, correcting "still pins v1.10.0" to reflect the real, c
 ## 11. Recommended release policy
 
 Adopt for all 15 repos, modeled directly on service-core's own already-working, already-documented
-convention (`service-core/VERSIONING.md`), without forcing service-core's *registry-avoidance*
+convention (`atc-service-core/VERSIONING.md`), without forcing service-core's *registry-avoidance*
 reasoning onto services that are deployed, not installed as a dependency:
 
 - **SemVer in `package.json.version`.**
@@ -363,16 +363,16 @@ has.
 ## 13. Release notes strategy (recommendation, not yet implemented)
 
 Given 15 independent repos with real, direct dependency relationships between exactly two of them
-(gateway has none; 12 backends depend on service-core; `stack` orchestrates all 15 but is not a
+(gateway has none; 12 backends depend on service-core; `atc-stack` orchestrates all 15 but is not a
 runtime dependency of any), the simplest model that actually shows the dependency relationship
-without new infrastructure: **a root release manifest in `stack` (generated, not source-of-truth —
+without new infrastructure: **a root release manifest in `atc-stack` (generated, not source-of-truth —
 see §14) plus one lightweight tag+commit-message-based release note per repo**, not a full
 per-repo `CHANGELOG.md` file (14 of the 15 repos have never needed one and a full changelog process
 would be new process weight for a first release) and not one single combined stack-suite release
 note (it would hide which specific repo/commit changed, which matters here because each repo deploys
 and rolls back independently). Concretely: each release commit's own message states what changed
 (already this project's practice for every commit in Stage 0–12/Hardening); the tag `vX.Y.Z` is the
-addressable release pointer; `stack`'s generated manifest (§14) is where someone looks to see the
+addressable release pointer; `atc-stack`'s generated manifest (§14) is where someone looks to see the
 whole platform's release state at a glance. No new document type is introduced by this
 recommendation. Not implemented in this audit pass — this is a recommendation, to be decided before
 Phase R2 (RELEASE_PLAN.md).
@@ -382,7 +382,7 @@ Phase R2 (RELEASE_PLAN.md).
 A machine-readable manifest is worth having given 15 independently-tagged repos, but it must be a
 **generated snapshot, not a source of truth** — live `/v1/info` (already real, already implemented
 per §"API compatibility" below) and each repo's own git tags stay the real sources. Recommended
-shape: `stack` gains a command (e.g. `stack manifest`) that writes a JSON snapshot — service id,
+shape: `atc-stack` gains a command (e.g. `stack manifest`) that writes a JSON snapshot — service id,
 version, commit, tag, service-core pin, schema version — derived by reading each repo's own
 `package.json`/git state directly (the same way this audit did), not by hand-maintaining a table. If
 this manifest goes stale (a repo re-tagged after the manifest was generated), nothing in production
@@ -392,13 +392,13 @@ implemented in this audit pass.
 
 ## 15. API compatibility (`/v1/info`) — confirmed real, not just documented
 
-`registerInfo` (`service-core/src/fastify-helpers.js:224`) is the single shared implementation of
+`registerInfo` (`atc-service-core/src/fastify-helpers.js:224`) is the single shared implementation of
 `GET /v1/info`, called directly by all 12 backend services including console — confirmed by grepping
 every one of their `src/http/*-api.js` (or `src/app.js` for notify) files for the actual call site,
-not assumed from documentation. `gateway` implements its own equivalent independently (matching its
-standing no-service-core-dependency architecture). `stack/src/stack.js`'s `status --matrix` command
+not assumed from documentation. `atc-gateway` implements its own equivalent independently (matching its
+standing no-service-core-dependency architecture). `atc-stack/src/stack.js`'s `status --matrix` command
 reads these live endpoints directly (`service`, `version`, `apiVersion`, `schemaVersion`,
-`serviceCore`, `capabilities` — the `MatrixRow` type at `stack/src/stack.js:15`) and is already the
+`serviceCore`, `capabilities` — the `MatrixRow` type at `atc-stack/src/stack.js:15`) and is already the
 single live source of truth this task asked to confirm — no static compatibility table exists or is
 proposed. Live verification (actually starting all services and running `stack status --matrix`
 against them) is scheduled as part of the implementation-phase startup smoke, not this audit (this
@@ -427,35 +427,35 @@ touches all 15 repos and wasn't explicitly requested — flagged here for an exp
 ### Decided in R0 (superseding the minimal-CI attempt below)
 
 A minimal per-repo `.github/workflows/ci.yml` (checkout + setup-node + `npm ci`/`test`/`typecheck`,
-`console` also `build`) was built and pushed to all 15 repos, then run for real. It surfaced two
+`atc-console` also `build`) was built and pushed to all 15 repos, then run for real. It surfaced two
 genuine, pre-existing findings (§10's Linux-lockfile-portability note and §"stack sibling
 dependency" below) that were worth finding — but the project's own decision, made explicitly during
 R0, is that **GitHub Actions/CI is not part of this project's release process at all**. Every
 workflow file added during this R0 attempt was removed again (a plain `git rm` + commit per repo,
 no history rewrite, no force-push) before R0 closed. **Release validation is local-only**: the exact
-commands in §6 (`npm ci && npm test && npm run typecheck`, plus `npm run build` for `console`), run
+commands in §6 (`npm ci && npm test && npm run typecheck`, plus `npm run build` for `atc-console`), run
 by hand (or by an agent) against each repo's real `package.json` scripts, is the accepted, sufficient
 validation model — not a stand-in for CI, not an interim state pending a future CI rollout. The two
 real findings the brief CI attempt surfaced were **not discarded along with the workflow files**:
 the Linux-lockfile-portability issue is closed in §17 below (it was real independent of CI,
-reproduced directly in `node:22-alpine`, the actual production runtime family), and the `stack`
+reproduced directly in `node:22-alpine`, the actual production runtime family), and the `atc-stack`
 sibling-repo question was investigated and resolved on its own merits in §18 — CI was the messenger
 for both, not the reason either mattered. `GITHUB_TOKEN`/PAT/`git config` credential questions from
 the abandoned CI attempt are moot now.
 
 ## 17. Linux production runtime portability — closed in R0
 
-**Finding (real, pre-existing, independent of CI):** `media`, `shortlink`, `flags`, `scheduler`,
-`webhook-out`, `ratelimit` and `geo`'s `package-lock.json` files only recorded the optional
+**Finding (real, pre-existing, independent of CI):** `atc-media`, `atc-shortlink`, `atc-flags`, `atc-scheduler`,
+`atc-webhook-out`, `atc-ratelimit` and `atc-geo`'s `package-lock.json` files only recorded the optional
 platform-specific native-binary package for the machine they were last generated on
 (`darwin-arm64`) — `typescript@7.0.2` ships one such package per OS/arch (it replaced its old
-pure-JS `tsc` with a native binary), and `media` additionally has `sharp`'s own long-standing
+pure-JS `tsc` with a native binary), and `atc-media` additionally has `sharp`'s own long-standing
 per-platform native packages. A clean `npm ci` against these lockfiles inside `node:22-alpine`
 (the actual family every one of these services' own `Dockerfile` deploys with — verified with
 `--platform linux/amd64`, matching a typical x86_64 production host, and confirmed the arm64 variant
 of the same image fails identically) cannot resolve the Linux binary at all: `npm run typecheck`
 throws `Unable to resolve @typescript/typescript-linux-x64` before running a single check, and
-`media`'s test suite throws `Could not load the "sharp" module using the linux-x64 runtime`. This
+`atc-media`'s test suite throws `Could not load the "sharp" module using the linux-x64 runtime`. This
 is a real production-deployment-reproducibility gap, not merely a CI artifact — any operator running
 `npm ci` on a fresh Linux host from these lockfiles as committed would hit the same failure.
 
@@ -467,15 +467,15 @@ it at 1 recorded platform variant). The only way to get npm to enumerate every p
 registry metadata lists for an optional dependency is a **fully fresh resolution with no existing
 lockfile at all** — confirmed by deleting `package-lock.json` and running `npm install` from
 scratch inside `node:22-alpine` (`--platform linux/amd64`), which produced a lockfile with all 20
-`@typescript/typescript-*` platform packages (matching `auth`'s/`notify`'s/`gateway`'s/etc.'s own
-already-correct lockfiles exactly in shape), and for `media`, all of `sharp`'s platform variants
+`@typescript/typescript-*` platform packages (matching `atc-auth`'s/`atc-notify`'s/`atc-gateway`'s/etc.'s own
+already-correct lockfiles exactly in shape), and for `atc-media`, all of `sharp`'s platform variants
 including the Alpine-specific `musl` ones (`@img/sharp-linuxmusl-x64`, matching the real Dockerfile
 target — not just glibc `linux-x64`, which would be wrong for `alpine`). A fresh resolution needs
-`git` on `PATH` (`apk add --no-cache git`) purely to resolve the `@atc-web/service-core` git-tag
+`git` on `PATH` (`apk add --no-cache git`) purely to resolve the `@atc-web/atc-service-core` git-tag
 dependency — `npm ci` against an *existing* lockfile never needed it (the resolved commit SHA is
 already recorded), but a from-scratch `npm install` does one `git ls-remote`-equivalent lookup for
 it. No dependency version changed: `typescript` stayed `7.0.2`, `sharp` stayed `0.35.4`,
-`@atc-web/service-core` still resolves to the exact same commit
+`@atc-web/atc-service-core` still resolves to the exact same commit
 (`934af4f5a45f4be6fab9c77ba5f24f6c44c37c83`, tag `v1.11.1`) in every regenerated lockfile, `fastify`
 stayed `5.12.4`, and every repo's `package.json` is byte-identical before and after (diffed
 directly). Every regenerated lockfile is **deterministic**: deleting it and regenerating a second
@@ -489,49 +489,49 @@ for the fresh resolution above; `openssl` only because the bare base image lacks
 a self-signed cert, exactly as the real `Dockerfile`-built image would already have it available)
 → copy the regenerated `package-lock.json` back over the repo's real one → confirm `rm -rf
 node_modules && npm ci && npm test && npm run typecheck` succeeds *both* inside a second, independent
-`node:22-alpine` container *and* on the host (macOS). All 7 passed on both: `geo` 44/44, `shortlink`
-23/23, `flags` 20/20, `scheduler` 46/46, `webhook-out` 44/44, `ratelimit` 33/33, `media` 78/78 —
-`media`'s own existing suite already exercises `sharp` directly (`test/image-processor.test.js`), so
+`node:22-alpine` container *and* on the host (macOS). All 7 passed on both: `atc-geo` 44/44, `atc-shortlink`
+23/23, `atc-flags` 20/20, `atc-scheduler` 46/46, `atc-webhook-out` 44/44, `atc-ratelimit` 33/33, `atc-media` 78/78 —
+`atc-media`'s own existing suite already exercises `sharp` directly (`test/image-processor.test.js`), so
 78/78 passing on real Linux is itself the sharp-load proof; no new test or production helper was
 added for it. `npm audit --production` stayed at 0 advisories and `npm ls --all` stayed clean in
 all 7 after regeneration.
 
-## 18. `stack`'s plain suite and the local workspace contract — investigated in R0, not a defect
+## 18. `atc-stack`'s plain suite and the local workspace contract — investigated in R0, not a defect
 
-**Finding, reclassified during R0:** `stack/test/stack.test.js` imports
-`../../gateway/src/route-table.js` directly (a real runtime ESM import, not a type-only reference)
-to assert that the `routes.json` `stack` generates for `gateway` actually parses under `gateway`'s
+**Finding, reclassified during R0:** `atc-stack/test/stack.test.js` imports
+`../../atc-gateway/src/route-table.js` directly (a real runtime ESM import, not a type-only reference)
+to assert that the `routes.json` `atc-stack` generates for `atc-gateway` actually parses under `atc-gateway`'s
 own real validation — a comment already on that import (present before this session touched the
 file) explains this was a deliberate Stage 9 decision: reuse gateway's real parser rather than
-reimplement or fake its rules inside `stack`, "the same pattern `snapshot.test.js` [already] uses."
-Grepping `stack/src/` (production code, not tests) for any cross-repo import found only two
-JSDoc-only `@returns {Promise<import('../../media/src/maintenance.js').MaintenanceResult>}` type
+reimplement or fake its rules inside `atc-stack`, "the same pattern `snapshot.test.js` [already] uses."
+Grepping `atc-stack/src/` (production code, not tests) for any cross-repo import found only two
+JSDoc-only `@returns {Promise<import('../../atc-media/src/maintenance.js').MaintenanceResult>}` type
 annotations — resolved by the TypeScript checker for type-checking purposes only, never a runtime
-`import`, so `stack`'s actual production runtime has no cross-repo dependency at all. The dependency
+`import`, so `atc-stack`'s actual production runtime has no cross-repo dependency at all. The dependency
 is entirely test-time, as instructed to verify first.
 
-Grepping the rest of `stack/test/` (excluding the already-known-and-intentional
+Grepping the rest of `atc-stack/test/` (excluding the already-known-and-intentional
 `test/integration/*`, which is `STACK_INTEGRATION=1`-gated and already, by design, spawns other
-services' real processes) found the same class of dependency is not unique to `gateway`:
+services' real processes) found the same class of dependency is not unique to `atc-gateway`:
 `test/snapshot.test.js` dynamically imports `<service>/src/db.js` for several real backend services
-and `audit/scripts/anchor-keygen.js`, via a `workspaceRoot = resolve('../..')` pattern, to prove
-`stack`'s own backup/restore logic round-trips each service's *real* `Database` class — the exact
+and `atc-audit/scripts/anchor-keygen.js`, via a `workspaceRoot = resolve('../..')` pattern, to prove
+`atc-stack`'s own backup/restore logic round-trips each service's *real* `Database` class — the exact
 same "exercise the real consumer's code, don't reimplement its rules" reasoning as the `RouteTable`
-case, just for more services. This is not a one-off; it is `stack`'s established, several-services-
+case, just for more services. This is not a one-off; it is `atc-stack`'s established, several-services-
 wide plain-suite pattern, present well before this session.
 
-**Isolated-clone proof, run for real (not assumed):** a fresh `git clone` of `stack` plus `gateway`
+**Isolated-clone proof, run for real (not assumed):** a fresh `git clone` of `atc-stack` plus `atc-gateway`
 alone (the other 13 sibling repos deliberately absent) into an empty directory, then `npm ci && npm
 test`: 21 pass, 16 fail, 30 skip. Every one of the 16 failures is in `snapshot.test.js`'s backup/
-restore tests, needing `ratelimit`, `media`, `audit` and `auth`'s real sources (confirmed by name in
-the failing tests' own titles) — none in `stack.test.js`, which passed cleanly with only `gateway`
-present, confirming that specific dependency really is just on `gateway`. This is the "hidden
-sibling dependency scan" the task asked for: `gateway` is not the only one — `stack`'s plain suite,
+restore tests, needing `atc-ratelimit`, `atc-media`, `atc-audit` and `atc-auth`'s real sources (confirmed by name in
+the failing tests' own titles) — none in `stack.test.js`, which passed cleanly with only `atc-gateway`
+present, confirming that specific dependency really is just on `atc-gateway`. This is the "hidden
+sibling dependency scan" the task asked for: `atc-gateway` is not the only one — `atc-stack`'s plain suite,
 as it already existed, depends on the *full* local workspace, not a special-cased single sibling.
 
 **Resolution: accepted, no code change.** Per the task's own decision tree, this is squarely
-category A — "the natural part of `stack`'s already-documented local workspace contract," not
-category B. `stack`'s entire reason to exist (`stack/README.md`, the root `CLAUDE.md`'s own "`stack/`
+category A — "the natural part of `atc-stack`'s already-documented local workspace contract," not
+category B. `atc-stack`'s entire reason to exist (`atc-stack/README.md`, the root `CLAUDE.md`'s own "`stack/`
 ... sets up and runs the whole workspace") is to orchestrate the other 14 repos from within
 `atc-web/`, the local multi-repo workspace — its plain test suite proving its own generated
 artifacts are valid against the *real* services it orchestrates is consistent with that job, not a
@@ -539,26 +539,26 @@ defect in it. Extracting just the `RouteTable` assertion into a separately-gated
 `snapshot.test.js`'s much broader multi-service dependency untouched, would be an inconsistent,
 partial fix for a pattern that is not actually broken — explicitly not done, per instruction, no
 fake/reimplemented validation logic was written, no new sibling-checkout mechanism was built,
-`gateway`'s source was not copied into `stack`, and no new package dependency was introduced.
+`atc-gateway`'s source was not copied into `atc-stack`, and no new package dependency was introduced.
 Local release validation (§6) always runs from inside the full `atc-web/` workspace — the exact
-context `stack`'s plain suite has always assumed — so there is nothing left to fix.
+context `atc-stack`'s plain suite has always assumed — so there is nothing left to fix.
 
-## 19. `geo/ecosystem.config.cjs` syntax error — found in R1, closed in R1
+## 19. `atc-geo/ecosystem.config.cjs` syntax error — found in R1, closed in R1
 
 **Finding: a real, confirmed deployment blocker.** `max_memory_restart: '600M'` was missing its
 trailing comma before the next field (`wait_ready: true,`) — `require()`ing the file threw
-`SyntaxError: Unexpected identifier 'wait_ready'`. This is `geo`'s own real, committed, production
-PM2 process file; `pm2 start ecosystem.config.cjs` would have crashed immediately on `geo`, right
+`SyntaxError: Unexpected identifier 'wait_ready'`. This is `atc-geo`'s own real, committed, production
+PM2 process file; `pm2 start ecosystem.config.cjs` would have crashed immediately on `atc-geo`, right
 now, on the pre-fix HEAD. Found by direct `require()` of all 13 real `ecosystem.config.cjs` files
-during R1's `stack up` config-generation validation — `geo` was the only one that failed; the other
+during R1's `stack up` config-generation validation — `atc-geo` was the only one that failed; the other
 12 were already syntactically valid.
 
 **Closed**: added the missing comma — the only change, no other formatting touched. Verified: the
-file now `require()`s cleanly; `geo`'s full suite (44/44) and typecheck pass unchanged; a real
+file now `require()`s cleanly; `atc-geo`'s full suite (44/44) and typecheck pass unchanged; a real
 production-entrypoint smoke (`node --env-file=... src/index.js`, the file's own real `node_args`
 shape) starts, listens, and exits gracefully on `SIGTERM`; re-verified in a real `node:22-alpine`
-container (`--platform linux/amd64`) alongside the rest of `geo`'s already-fixed lockfile. A new
-regression test, `stack/test/ecosystem-config.test.js`, `require()`s all 13 real sibling
+container (`--platform linux/amd64`) alongside the rest of `atc-geo`'s already-fixed lockfile. A new
+regression test, `atc-stack/test/ecosystem-config.test.js`, `require()`s all 13 real sibling
 `ecosystem.config.cjs` files and asserts their minimal shape (one app, matching name, `src/index.js`
 entrypoint, numeric `kill_timeout`) — confirmed, by temporarily reverting the fix and re-running,
 that this test would have caught the original bug.
@@ -566,7 +566,7 @@ that this test would have caught the original bug.
 ## 20. `Snapshot#restore()` stale WAL/SHM correctness bug — found in R1, closed in R1
 
 **Finding: a real, confirmed, severe restore-correctness bug**, found via a real backup→mutate→
-restore drill against a real, running `auth` process (not a synthetic fixture): a user registered
+restore drill against a real, running `atc-auth` process (not a synthetic fixture): a user registered
 after a `stack.backup()` call could still log in *after* a restore to that same backup — the restore
 had not actually discarded it.
 
@@ -590,7 +590,7 @@ either exists; both are optional — as part of the same atomic move-aside/rever
 file, not separate content. The backup manifest is unchanged — sidecars are never listed in it, only
 handled as live-target state during restore's own prepare/rollback. Fault injection (`_fault`) still
 keys on the main target path only, firing exactly once per entry per phase, unchanged for every other
-entry kind. Two new regression tests in `stack/test/snapshot.test.js` reproduce a **real** WAL (a
+entry kind. Two new regression tests in `atc-stack/test/snapshot.test.js` reproduce a **real** WAL (a
 live, unclosed connection's genuine post-backup write — never a hand-created stand-in file):
 "successful restore discards a stale, un-checkpointed WAL" (confirmed, by temporarily reverting the
 fix, that this test fails against the old code — a true differential regression test) and
@@ -600,7 +600,7 @@ rollback specifically, since it never touched them either way; this test is a ge
 proof of the new mechanism, not a differential one against the original bug — noted honestly, not
 overstated). All 18 `snapshot.test.js` tests pass (16 existing, unchanged, plus these 2), all 70
 `STACK_INTEGRATION=1` tests pass including `audit-anchor-continuity` (cryptographic continuity
-across a real restore, unaffected). The original real-world reproduction — real `auth` process,
+across a real restore, unaffected). The original real-world reproduction — real `atc-auth` process,
 real register → backup → register → stop → restore → restart → login — was re-run against the fixed
 code and now behaves correctly: the pre-backup user logs in, the post-backup user does not, JWKS
 signing key continuity holds. `Stack#restore()`'s own PM2 stop/start wrapper remains unexecuted in
@@ -613,12 +613,12 @@ Two coverage gaps identified in R1's first pass, closed with real drills, no pro
 change.
 
 **Media upgrade drill (real, no shortcuts):** a real one-version-old fixture (`openOldFixtureDb`
-against `media`'s own real `Database` — v1 schema, no `delete_token` column) seeded with a real
+against `atc-media`'s own real `Database` — v1 schema, no `delete_token` column) seeded with a real
 `blobs` row, a real `files` row, and real canonical bytes on disk at the real sharded path
 (`objects/<sha[0:2]>/<sha[2:4]>/<sha>`). Real `node src/index.js` start migrates to v2; `/v1/info`
 reports `schemaVersion: 2`; `GET /v1/files/:id` returns the correct `sha256`; the on-disk bytes at
 the canonical path are still byte-identical; `delete_token` backfilled `NULL` for the pre-existing
-row (direct SQLite check, matching the `notify` migration test's own verification style). A real
+row (direct SQLite check, matching the `atc-notify` migration test's own verification style). A real
 **second** start of the same real entrypoint against the now-current-schema file: migration is a
 no-op, the file is still there via the real API. Trash/quarantine (Phase 4 territory) untouched —
 not seeded, not exercised.
@@ -627,13 +627,13 @@ not seeded, not exercised.
 without `owner_token`/`lease_until`, no `worker_heartbeat` table) seeded with a real `jobs` row (a
 one-off `schedule.at` one year in the future — never due during the drill, so no worker-execution
 concern even though the drill deliberately used the API-only `src/api-main.js` entrypoint, matching
-`notify`'s own established pattern for this exact reason). Real start migrates to v2; `/v1/info`
+`atc-notify`'s own established pattern for this exact reason). Real start migrates to v2; `/v1/info`
 reports `schemaVersion: 2`; the real `GET /v1/jobs/:name` API confirms the job survived with its
 name and `enabled` flag intact; direct SQLite check confirms `worker_heartbeat` was created by the
 migration. A real second start: no-op migration, job still there via the real API.
 
-**Full multi-service restore drill (real, one coherent snapshot):** `media`, `audit`, `notify`,
-`scheduler`, `webhook-out` — five real service processes, started together against one
+**Full multi-service restore drill (real, one coherent snapshot):** `atc-media`, `atc-audit`, `atc-notify`,
+`atc-scheduler`, `atc-webhook-out` — five real service processes, started together against one
 `stack.setup()`-wired scratch workspace (real generated secrets/cross-service keys, not hand-rolled).
 Pre-backup state created through each service's own real public API: a real media file upload (a
 genuine, distinct, valid 1×1 PNG — not a hand-edited byte stream, which was tried first and correctly

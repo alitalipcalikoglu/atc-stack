@@ -641,7 +641,7 @@ export interface components {
         };
         InfoResponse: {
             /** @constant */
-            service: "auth";
+            service: "atc-auth";
             /** @description This service's own package.json semver. */
             version: string;
             /** @constant */

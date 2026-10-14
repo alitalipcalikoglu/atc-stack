@@ -18,7 +18,7 @@ export const API_KEY_SERVICES = ['atc-notify', 'atc-media', 'atc-flags', 'atc-sh
 /** @param {string} service */
 const envKey = (service) => service.replace(/^atc-/, '').toUpperCase().replace(/-/g, '_');
 
-/** Default request timeout: matches gateway's own `UPSTREAM_TIMEOUT_MS` default (`gateway/src/config.js`) -- reused, not reinvented. */
+/** Default request timeout: matches gateway's own `UPSTREAM_TIMEOUT_MS` default (`atc-gateway/src/config.js`) -- reused, not reinvented. */
 export const DEFAULT_TIMEOUT_MS = 30_000;
 
 /**

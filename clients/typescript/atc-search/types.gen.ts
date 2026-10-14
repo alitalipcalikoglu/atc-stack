@@ -505,7 +505,7 @@ export interface components {
         };
         InfoResponse: {
             /** @enum {string} */
-            service: "search";
+            service: "atc-search";
             /** @description This instance's package.json version. */
             version: string;
             /** @enum {string} */

@@ -53,7 +53,7 @@ const EXTRA_PATHS = {
    * The Ed25519 anchor signing key pair — cryptographic continuity material for
    * `chain/verify`/anchoring, not reconstructible from the database alone (the private key is
    * never stored there; `anchors` rows carry only a `key_id`, `signature` pair — see
-   * `audit/src/crypto/anchor-signer.js`). Unlike `auth`'s hardcoded `'keys'`, both paths here are
+   * `atc-audit/src/crypto/anchor-signer.js`). Unlike `atc-auth`'s hardcoded `'keys'`, both paths here are
    * genuinely operator-configurable (`ANCHOR_PRIVATE_KEY_PATH`/`ANCHOR_PREVIOUS_PUBLIC_KEY_PATH`),
    * so they're resolved from the service's real `.env`, not assumed.
    *
@@ -62,10 +62,10 @@ const EXTRA_PATHS = {
    * `AnchorSigner.fromFiles`'s own behavior (the real service itself refuses to start in that
    * state) — a backup silently completing without the key it was told exists would claim a
    * "complete recoverable snapshot" that isn't one. A path that resolves outside the audit service
-   * folder is deliberately never followed into an arbitrary host location (unlike `media`/
-   * `gateway`/`console`'s in-tree defaults, an operator-chosen out-of-tree key path, e.g. an HSM
+   * folder is deliberately never followed into an arbitrary host location (unlike `atc-media`/
+   * `atc-gateway`/`atc-console`'s in-tree defaults, an operator-chosen out-of-tree key path, e.g. an HSM
    * mount, is excluded with a loud warning rather than silently or fatally handled — see
-   * `stack/docs/BACKUP.md`).
+   * `atc-stack/docs/BACKUP.md`).
    * @param {string} dir @param {(line: string) => void} [log]
    */
   'atc-audit': (dir, log = () => {}) => {
@@ -73,7 +73,7 @@ const EXTRA_PATHS = {
     const resolveKeyPath = (envName, configuredPath) => {
       const resolved = resolve(dir, configuredPath);
       if (!pathInside(dir, resolved)) {
-        log(`audit: ${envName} (${configuredPath}) resolves outside the audit service folder — refusing to pull an arbitrary host path into the snapshot; back this key up separately (see stack/docs/BACKUP.md)`);
+        log(`audit: ${envName} (${configuredPath}) resolves outside the audit service folder — refusing to pull an arbitrary host path into the snapshot; back this key up separately (see atc-stack/docs/BACKUP.md)`);
         return null;
       }
       if (!existsSync(resolved)) {
@@ -152,12 +152,12 @@ const ALL_SERVICES = [...new Set([...DB_SERVICES, ...Object.keys(EXTRA_PATHS)])]
  * end of phase 2 leaves some targets on the new content and some `.before-restore-<runId>` aside
  * copies sitting next to the rest, with no automatic detection or resume on the next run — an
  * operator must compare the aside copies against the current files by hand. This is a deliberate
- * scope decision (see `stack/docs/UPGRADE.md`), not an oversight: a restore-journal that detects and
+ * scope decision (see `atc-stack/docs/UPGRADE.md`), not an oversight: a restore-journal that detects and
  * resumes an interrupted run is real complexity for a failure mode (concurrent process kill during a
  * restore, which itself needs services already stopped) that in-process error handling does not need.
  *
  * `.before-restore-<runId>` copies are never deleted automatically, on success or failure — see
- * `stack/docs/UPGRADE.md` for retention.
+ * `atc-stack/docs/UPGRADE.md` for retention.
  */
 export class Snapshot {
   /**
@@ -531,7 +531,7 @@ export class Snapshot {
    * Copies file bytes AND permission bits — a plain `writeFileSync` would otherwise create `dest`
    * at the process umask's default (typically world-readable), silently loosening a private key's
    * `0600` on every backup/restore round-trip. Best-effort on non-POSIX filesystems (`chmodSync`
-   * has limited effect on Windows — see `stack/docs/BACKUP.md`).
+   * has limited effect on Windows — see `atc-stack/docs/BACKUP.md`).
    * @param {string} src @param {string} dest
    */
   static #copyFile(src, dest) {

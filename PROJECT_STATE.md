@@ -22,8 +22,8 @@ not replace source, tests, OpenAPI, installation manifests, release manifests, o
 ## Workspace topology
 
 The workspace root is local-only and is not a Git repository. It contains 15 independent sibling
-repositories (all named `atc-<name>` since `v1.14.0`): 13 independently deployable HTTP services, `service-core` (shared runtime package),
-and `stack` (suite installer, orchestrator, and release-management repository). There is no
+repositories (all named `atc-<name>` since `v1.14.0`): 13 independently deployable HTTP services, `atc-service-core` (shared runtime package),
+and `atc-stack` (suite installer, orchestrator, and release-management repository). There is no
 monorepo-level commit or branch.
 
 ## Source-of-truth hierarchy
@@ -32,8 +32,8 @@ Consult these in order before trusting a summary here:
 
 1. Repository source, configuration, and tests.
 2. Each HTTP service's canonical root `openapi.yaml`.
-3. Authoritative `stack/installation-manifests/` release-selection data and other stack manifests.
-4. Immutable Git tags and their peeled commits; `stack/releases/` is historical validation
+3. Authoritative `atc-stack/installation-manifests/` release-selection data and other stack manifests.
+4. Immutable Git tags and their peeled commits; `atc-stack/releases/` is historical validation
    evidence, not installer input.
 5. This living handoff summary.
 
@@ -70,7 +70,7 @@ state update is necessarily newer.
 - Supported production suite: all 15 repositories at `v1.14.0`, every one named `atc-<name>`.
 - `atc-stack` `v1.14.0` peels to `72a13784cc1171d2ba9a80d7408198882288cf27`;
   `atc-service-core` `v1.14.0` peels to `c94dd7ee73b0604a469121503e515078287a5773`.
-- Historical suite tags `v1.0.0` to `v1.13.0` and `service-core` tags `v1.11.1` to `v1.13.0` remain
+- Historical suite tags `v1.0.0` to `v1.13.0` and `atc-service-core` tags `v1.11.1` to `v1.13.0` remain
   immutable; their manifests use the pre-rename names, which GitHub redirects.
 - The authoritative install matrix is `installation-manifests/v1.14.0.json`, selected by
   `installation-manifests/supported.json`. Historical manifests are immutable. Never move tags.
@@ -165,7 +165,7 @@ The Console SvelteKit migration is complete. There is no M11 or further migratio
 Console M0 is closed at `5a806e41ea782ace48b6b67cdedd76e2af3f06bf`
 (`test: freeze console migration contracts`), whose parent is the immutable Console v1.1.0 commit
 `367790d8a1e5d560c93140b4efaaf8724bb4d69a`. Framework-neutral oracles live under
-`console/test/migration/`; they are tests, not production configuration or an API registry.
+`atc-console/test/migration/`; they are tests, not production configuration or an API registry.
 
 M0 closure evidence: Console 122 paths / 156 operations, suite 376 operations, frontend 34 URL
 patterns, 112/112 Console tests, typecheck with 0 errors/warnings, successful production build,
@@ -359,7 +359,7 @@ Console M10 is closed by immutable suite `v1.1.2`, with Console at
 `4747229ea30511f9fde6e44d7a9d6e5b2198355b`. The patch corrects stale current-version test
 oracles using package metadata read through independent test paths; it does not change runtime
 behavior or public contracts. Every suite package was versioned `1.1.2` before the complete final
-test gate. `service-core` remains independently at `v1.12.0`.
+test gate. `atc-service-core` remains independently at `v1.12.0`.
 
 M10 closure evidence: all version-bumped repositories passed their full suites after the final
 version change (Console 131/131, Gateway 52/52, Stack 92/92 with integration and zero skips; exact
@@ -383,8 +383,8 @@ Security patch `v1.1.3` is published and verified (`releases/v1.1.3.json`). Auth
 `DELETE /v1/users/{id}/sessions` and `.../sessions/{sid}` now require the `write` role, with a
 documented `403`. Media audits upload tickets by SHA-256 hash. Scheduler and webhook-out audit meta
 keep header names only, and scheduler drops the job target body. Fastify moved to `5.12.5` in
-every service and `service-core` `v1.12.1`; Console `devalue` moved to `5.9.4`. Console declares
-`fastify` as a dev-only dependency plus `types: ["node"]` so `service-core` JSDoc types resolve.
+every service and `atc-service-core` `v1.12.1`; Console `devalue` moved to `5.9.4`. Console declares
+`fastify` as a dev-only dependency plus `types: ["node"]` so `atc-service-core` JSDoc types resolve.
 Evidence: all 15 suites green after `npm ci`, Stack 92/92 with integration, all Console smokes
 including real Chrome, contracts unchanged at 376 operations, production audit zero, candidate
 `--ref main` and fresh default installs 14/14 exact and 13/13 ready, 14/14 reuse, historical tags

@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import { Snapshot } from '../src/snapshot.js';
 
 /**
- * These tests exercise `Snapshot` against real service checkouts (`ratelimit`, `media`) from this
+ * These tests exercise `Snapshot` against real service checkouts (`atc-ratelimit`, `atc-media`) from this
  * workspace, through their own, real `Database` subclass — not a synthetic stand-in — per the plan's
  * requirement that backup/restore is proven "using each service's Database through the core". Each
  * fixture service directory symlinks the real `src/` and `node_modules` (so `@atc-web/atc-service-core`
@@ -148,7 +148,7 @@ test('failed-restore rollback restores the WAL/SHM sidecars together with the ma
   const rtDbPath = join(rtDir, 'data', 'ratelimit.db');
   assert.ok(existsSync(`${rtDbPath}-wal`) && statSync(`${rtDbPath}-wal`).size > 0, 'precondition: real, un-checkpointed WAL on ratelimit before the restore attempt');
 
-  // manifest.entries order (ALL_SERVICES): media/db, media/objects, ratelimit/db — fault the last
+  // manifest.entries order (ALL_SERVICES): atc-media/db, atc-media/objects, atc-ratelimit/db — fault the last
   // entry's apply, after ratelimit's db (and its WAL) has already been moved aside in phase 1.
   const snapWithFault = new Snapshot({
     root, exec: fakeExec,
@@ -305,7 +305,7 @@ test('regression: at least two targets applied successfully, a real I/O failure 
   rtdb2.prepare("INSERT INTO policies (name, limits, created_by, created_at, updated_at) VALUES ('v2', '[]', 'mutated', 0, 0)").run();
   rtdb2.close();
 
-  // manifest.entries order (ALL_SERVICES): media/db, media/objects, ratelimit/db — inject a
+  // manifest.entries order (ALL_SERVICES): atc-media/db, atc-media/objects, atc-ratelimit/db — inject a
   // deterministic apply-phase failure on the third, after the first two have genuinely been applied.
   let applyCount = 0;
   const snapWithFault = new Snapshot({
@@ -414,7 +414,7 @@ test('audit anchor private key is included in stack backup and checksummed in th
   const snap = new Snapshot({ root, exec: fakeExec });
   const { manifest } = await snap.create();
   const keyEntry = manifest.entries.find((/** @type {any} */ e) => e.service === 'atc-audit' && e.path === 'keys/anchor-private.pem');
-  assert.ok(keyEntry, `expected an audit/keys/anchor-private.pem entry, got: ${JSON.stringify(manifest.entries.map((/** @type {any} */ e) => e.path))}`);
+  assert.ok(keyEntry, `expected an atc-audit/keys/anchor-private.pem entry, got: ${JSON.stringify(manifest.entries.map((/** @type {any} */ e) => e.path))}`);
   assert.equal(keyEntry.kind, 'file');
   const { createHash } = await import('node:crypto');
   assert.equal(keyEntry.sha256, createHash('sha256').update(readFileSync(join(dir, 'keys', 'anchor-private.pem'))).digest('hex'));
@@ -509,7 +509,7 @@ test('auth regression: JWT signing keys are still included, restored, and manife
   const snap = new Snapshot({ root, exec: fakeExec });
   const { dir: snapshotDir, manifest } = await snap.create();
   const keyEntry = manifest.entries.find((/** @type {any} */ e) => e.service === 'atc-auth' && e.path === 'keys');
-  assert.ok(keyEntry, 'auth/keys directory still included');
+  assert.ok(keyEntry, 'atc-auth/keys directory still included');
   assert.equal(keyEntry.kind, 'dir');
 
   writeFileSync(join(dir, 'keys', 'jwt-private.pem'), 'mutated after backup');

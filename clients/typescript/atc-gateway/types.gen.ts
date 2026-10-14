@@ -134,7 +134,7 @@ export interface components {
         };
         InfoResponse: {
             /** @constant */
-            service: "gateway";
+            service: "atc-gateway";
             /** @description gateway's own package.json version. */
             version: string;
             /** @constant */
