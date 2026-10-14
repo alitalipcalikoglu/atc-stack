@@ -107,7 +107,7 @@ export class Release {
     }
     state.steps.prepared = true;
     this.#save(state);
-    this.log(`prepare ${this.tag}: 15 repositories bumped, service-core tagged, candidate manifest pushed`);
+    this.log(`prepare ${this.tag}: ${REPOSITORIES.length + 1} repositories bumped, service-core tagged, candidate manifest pushed`);
     return state;
   }
 
