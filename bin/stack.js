@@ -17,6 +17,7 @@ import { Stack } from '../src/stack.js';
  *   backup   --root <dir> --dir <snapshot dir>                     (default dir: <root>/backups/<timestamp>)
  *   restore  <snapshot dir> --root <dir> --service <id>             (default: every service the snapshot covers)
  *   maintenance <service>   --root <dir>                            (one-shot; today: media only)
+ *   keys [list] | keys rotate <issuer> <holder>                     (who may call what, no secrets; replace one key's secret)
  *   mcp:config [--read-only | --full] [--print]                     (MCP keys + mcp.env + .mcp.json)
  *   compose  [--port-offset n] --root <dir>                         (writes compose/docker-compose.yml + env files)
  *   load     [--url http://127.0.0.1:3000] [--duration 10] [--concurrency 10] [--routes "GET /health,..."] [--json]
@@ -105,6 +106,21 @@ export class Cli {
         if (flags.print) { console.log(JSON.stringify(r.json, null, 2)); return 0; }
         console.log(`wrote ${r.envPath} and ${r.jsonPath} (${r.readOnly ? 'read-only keys' : 'full MCP keys'}; 0600, they hold API keys)`);
         if (r.changed.length) console.log(`keys changed on: ${r.changed.join(', ')} -- restart them ("npm run up") before using the MCP server`);
+        return 0;
+      }
+      case 'keys': {
+        const [action, issuer, holder] = positional;
+        if (action === 'rotate') {
+          if (!issuer || !holder) throw new Error('usage: keys rotate <issuer> <holder>   (for example: keys rotate atc-media atc-gateway)');
+          const r = await stack.rotateKey({ issuer, holder });
+          console.log(`rotated the key ${holder} uses on ${issuer}; rewrote .env of: ${r.changed.join(', ')}`);
+          console.log('restart them ("npm run up") so the old secret stops working');
+          return 0;
+        }
+        if (action && action !== 'list') throw new Error('usage: keys [list] | keys rotate <issuer> <holder>');
+        const rows = stack.listKeys();
+        const w = Math.max(...rows.map((r) => r.issuer.length));
+        for (const r of rows) console.log(`${r.issuer.padEnd(w)}  ${r.holder.padEnd(24)} ${r.role.padEnd(10)} ${r.expires ? `expires ${r.expires}` : ''}`.trimEnd());
         return 0;
       }
       case 'compose': {

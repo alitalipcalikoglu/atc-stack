@@ -26,6 +26,7 @@
     "restore": "node bin/stack.js restore",
     "compose": "node bin/stack.js compose",
     "mcp:config": "node bin/stack.js mcp:config",
+    "keys": "node bin/stack.js keys",
     "load": "node bin/stack.js load",
     "release:prepare": "node bin/stack.js release:prepare",
     "release:verify": "node bin/stack.js release:verify",

@@ -32,7 +32,11 @@
  */
 const auditEnv = (c, id) => ({ AUDIT_URL: String(c.url('atc-audit')), AUDIT_API_KEY: String(c.issue('atc-audit', id, 'write')) });
 
-/** Where a service publishes its events (docs/EVENTS.md): atc-webhook-out, with a key that may only publish. */
+/**
+ * Where a service publishes its events (docs/EVENTS.md): atc-webhook-out, with a key that may only publish.
+ * @param {import('./setup-context.js').SetupContext} c
+ * @param {string} id
+ */
 const eventsEnv = (c, id) => ({ WEBHOOK_OUT_URL: String(c.url('atc-webhook-out')), WEBHOOK_OUT_API_KEY: String(c.issue('atc-webhook-out', id, 'publish')) });
 
 /**

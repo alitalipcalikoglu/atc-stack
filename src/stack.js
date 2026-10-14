@@ -84,6 +84,35 @@ export class Stack {
   }
 
   /**
+   * Replace the key `holder` uses to call `issuer` with a new secret, everywhere it is written (the
+   * issuer's key list, the holder's `.env`, the MCP files). The old secret stops working once both
+   * services are restarted (`npm run up`). Use it when a key leaked or a person left.
+   * @param {{ issuer: string, holder: string, host?: string }} o
+   */
+  async rotateKey({ issuer, holder, host = '127.0.0.1' }) {
+    const ctx = new SetupContext({ root: this.root, host, local: true, run: (id, argv) => this.#run(join(this.root, id), argv), log: this.log });
+    const before = new Map(SERVICES.map((s) => [s.id, ctx.env(s.id).toString()]));
+    if (!ctx.revoke(issuer, holder)) throw new Error(`${issuer} has no key for "${holder}"; see "npm run keys"`);
+    await ctx.compute();
+    const mcp = new McpConfig({ stackDir: this.stackDir });
+    const mcpEnv = mcp.issue(ctx, { readOnly: mcp.savedReadOnly() });
+    /** @type {string[]} */ const changed = [];
+    ctx.save((path, text) => {
+      const id = SERVICES.find((s) => path === join(this.root, s.id, '.env'))?.id;
+      if (!id || before.get(id) === text) return;
+      writeFileSync(path, text);
+      changed.push(id);
+    });
+    mcp.write(mcpEnv);
+    return { changed };
+  }
+
+  /** Who may call which service, with roles and expiry; no secrets. @param {{ host?: string }} [o] */
+  listKeys({ host = '127.0.0.1' } = {}) {
+    return new SetupContext({ root: this.root, host, local: true, run: () => { throw new Error('keys runs no commands'); }, log: this.log }).keyList();
+  }
+
+  /**
    * Issue (or re-role) the MCP server's keys and rewrite mcp.env and .mcp.json, without a full
    * setup. Services whose key list changed need a restart (`npm run up`) to accept the new key.
    * @param {{ host?: string, readOnly?: boolean }} [o] `readOnly` undefined keeps the saved mode.

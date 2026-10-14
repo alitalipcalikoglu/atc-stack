@@ -211,6 +211,10 @@ Default routes are public and change nothing: `/health`, `/.well-known/jwks.json
 
 Every service is its own repository and deployable alone; "Calls" lists the services it talks to over HTTP when configured (all optional except auth → notify for verification and reset mails). Browsers only ever reach the gateway and the console.
 
+## API keys
+
+`npm run keys` lists who may call which service (holder, role, expiry; never secrets). `npm run keys -- rotate <issuer> <holder>` mints a new secret for one key and writes it on both sides: the issuer's key list and the holder's `.env` (and the MCP files when they hold it). Example after a leak: `npm run keys -- rotate atc-media atc-gateway`, then `npm run up` so both services restart and the old secret stops working. Nothing else changes. A key line may end in `@YYYY-MM-DD` to expire after that day once the service runs an `atc-service-core` release that understands it; `setup` never writes expiry dates itself.
+
 ## Ports
 
 | Service | Port | | Service | Port |

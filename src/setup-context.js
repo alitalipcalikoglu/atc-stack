@@ -124,6 +124,39 @@ export class SetupContext {
     return { TARGET_ALLOW_HTTP: 'true', TARGET_ALLOW_PRIVATE: 'true', TARGET_ALLOWED_HOSTS: `${this.host},localhost` };
   }
 
+  /**
+   * Drop the key `holder` uses to call `issuer` (so the next `issue()` mints a new secret). Returns false when there was none.
+   * @param {string} issuer @param {string} holder
+   */
+  revoke(issuer, holder) {
+    const service = SetupContext.service(issuer);
+    if (!service.keysVar) throw new Error(`${issuer} issues no API keys`);
+    const e = this.env(issuer);
+    const entries = (e.get(service.keysVar) ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+    const kept = entries.filter((s) => s.split(':')[0] !== holder);
+    if (kept.length === entries.length) return false;
+    e.set(service.keysVar, kept.join(','));
+    return true;
+  }
+
+  /**
+   * The keys each service accepts: holder id, role and (when the entry ends in `@YYYY-MM-DD`) its expiry. Never the secrets.
+   * @returns {{ issuer: string, holder: string, role: string, expires: string|null }[]}
+   */
+  keyList() {
+    /** @type {{ issuer: string, holder: string, role: string, expires: string|null }[]} */
+    const out = [];
+    for (const s of SERVICES) {
+      if (!s.keysVar) continue;
+      for (const entry of (this.env(s.id).get(s.keysVar) ?? '').split(',').map((x) => x.trim()).filter(Boolean)) {
+        const expires = /@(\d{4}-\d{2}-\d{2})$/.exec(entry)?.[1] ?? null;
+        const [holder, , role = ''] = entry.replace(/@\d{4}-\d{2}-\d{2}$/, '').split(':');
+        out.push({ issuer: s.id, holder, role: role || 'default', expires });
+      }
+    }
+    return out;
+  }
+
   consoleServices() {
     return SERVICES.filter((s) => s.console);
   }

@@ -132,7 +132,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   // Cross-service holders.
   assert.equal(env('atc-auth').NOTIFY_API_KEY, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-auth'].secret);
   assert.equal(env('atc-gateway').AUTH_API_KEY, keys('atc-auth', 'AUTH_API_KEYS')['atc-gateway'].secret);
-  assert.equal(env('atc-scheduler').TARGET_KEYS, `atc-flags:${keys('atc-flags', 'FLAGS_API_KEYS')['atc-scheduler'].secret},atc-notify:${keys('atc-notify', 'NOTIFY_API_KEYS')['atc-scheduler'].secret},atc-webhook-out:${keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-scheduler'].secret}${['atc-export', 'atc-queue', 'atc-backup', 'atc-status', 'atc-render', 'atc-payments'].map((id) => `,${id}:${keys(id, ({ 'atc-export': 'EXPORT_API_KEYS', 'atc-queue': 'QUEUE_API_KEYS', 'atc-backup': 'BACKUP_API_KEYS', 'atc-status': 'STATUS_API_KEYS', 'atc-render': 'RENDER_API_KEYS', 'atc-payments': 'PAYMENTS_API_KEYS' })[id])['atc-scheduler'].secret}`).join('')}`);
+  assert.equal(env('atc-scheduler').TARGET_KEYS, `atc-flags:${keys('atc-flags', 'FLAGS_API_KEYS')['atc-scheduler'].secret},atc-notify:${keys('atc-notify', 'NOTIFY_API_KEYS')['atc-scheduler'].secret},atc-webhook-out:${keys('atc-webhook-out', 'WEBHOOK_API_KEYS')['atc-scheduler'].secret}${['atc-export', 'atc-queue', 'atc-backup', 'atc-status', 'atc-render', 'atc-payments'].map((id) => `,${id}:${keys(id, /** @type {Record<string, string>} */ ({ 'atc-export': 'EXPORT_API_KEYS', 'atc-queue': 'QUEUE_API_KEYS', 'atc-backup': 'BACKUP_API_KEYS', 'atc-status': 'STATUS_API_KEYS', 'atc-render': 'RENDER_API_KEYS', 'atc-payments': 'PAYMENTS_API_KEYS' })[id])['atc-scheduler'].secret}`).join('')}`);
   // Local URLs and lax outbound settings.
   assert.equal(env('atc-auth').NOTIFY_URL, 'http://127.0.0.1:3001');
   assert.equal(env('atc-auth').JWT_ISSUER, 'http://127.0.0.1:3000');
@@ -258,4 +258,23 @@ test('MCP config: an atc-mcp key per service with tools, smallest role, re-roled
   } finally {
     rmSync(stackDir, { recursive: true, force: true });
   }
+});
+
+test('keys: list shows holders and roles without secrets; rotate replaces one key on both sides and nothing else', async () => {
+  const { Stack } = await import('../src/stack.js');
+  const stack = new Stack({ root, stackDir: mkdtempSync(join(tmpdir(), 'atc-stack-keys-')), log: () => {}, exec: async () => ({ code: 0, out: '' }) });
+  const list = stack.listKeys();
+  assert.ok(list.some((k) => k.issuer === 'atc-media' && k.holder === 'atc-gateway'));
+  assert.equal(JSON.stringify(list).match(/[0-9a-f]{64}/), null, 'no secrets in the listing');
+  const secretOf = (/** @type {string} */ id, /** @type {string} */ variable, /** @type {string} */ holder) => (EnvFile.load(join(root, id, '.env')).get(variable) ?? '').split(',').map((e) => e.split(':')).find((p) => p[0] === holder)?.[1];
+  const gateway = () => EnvFile.load(join(root, 'atc-gateway', '.env')).get('MEDIA_API_KEY');
+  const before = { media: secretOf('atc-media', 'MEDIA_API_KEYS', 'atc-gateway'), gateway: gateway(), other: secretOf('atc-media', 'MEDIA_API_KEYS', 'atc-render'), audit: secretOf('atc-audit', 'AUDIT_API_KEYS', 'atc-gateway') };
+  assert.equal(before.media, before.gateway);
+  const r = await stack.rotateKey({ issuer: 'atc-media', holder: 'atc-gateway' });
+  assert.deepEqual(r.changed.sort(), ['atc-gateway', 'atc-media']);
+  const after = { media: secretOf('atc-media', 'MEDIA_API_KEYS', 'atc-gateway'), gateway: gateway() };
+  assert.notEqual(after.media, before.media);
+  assert.equal(after.media, after.gateway, 'issuer and holder agree on the new secret');
+  assert.equal(secretOf('atc-audit', 'AUDIT_API_KEYS', 'atc-gateway'), before.audit, 'other keys keep their secret');
+  await assert.rejects(stack.rotateKey({ issuer: 'atc-media', holder: 'nobody' }), /no key for "nobody"/);
 });
