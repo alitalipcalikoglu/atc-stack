@@ -56,8 +56,8 @@ function harness(f, overrides = {}) {
   return { installer, calls, stack };
 }
 
-// Repositories added to the catalog after the supported release; the next release manifest takes
-// them from the catalog (Release.manifest), after which this list is empty again.
+// Repositories that may be missing from the supported release because they were added to the catalog
+// after it; the next release manifest takes them from the catalog (Release.manifest). Empty it after that.
 const UNRELEASED = ['atc-content', 'atc-export', 'atc-render'];
 
 test('canonical catalog contains exactly the 17 official sibling repositories and the release descriptor covers each released one once', () => {
@@ -68,8 +68,11 @@ test('canonical catalog contains exactly the 17 official sibling repositories an
   for (const repository of REPOSITORIES) assert.equal(repository.remote, `https://github.com/alitalipcalikoglu/${repository.id}.git`);
   const release = Installer.releaseManifest();
   assert.equal(release.release, JSON.parse(readFileSync(join(import.meta.dirname, '..', 'package.json'), 'utf8')).version);
-  assert.deepEqual(Object.keys(release.repositories).sort(), REPOSITORIES.map((repository) => repository.id).filter((id) => !UNRELEASED.includes(id)).sort());
-  for (const repository of REPOSITORIES.filter((r) => !UNRELEASED.includes(r.id))) assert.equal(release.repositories[repository.id].repository, repository.remote);
+  const ids = REPOSITORIES.map((repository) => repository.id);
+  assert.deepEqual(Object.keys(release.repositories).filter((id) => !ids.includes(id)), [], 'no repository outside the catalog');
+  const missing = ids.filter((id) => !release.repositories[id]);
+  assert.deepEqual(missing.filter((id) => !UNRELEASED.includes(id)), [], 'only not-yet-released repositories may be missing');
+  for (const repository of REPOSITORIES.filter((r) => release.repositories[r.id])) assert.equal(release.repositories[repository.id].repository, repository.remote);
 });
 
 test('a manifest repository identity cannot disagree with the official catalog', async () => {
