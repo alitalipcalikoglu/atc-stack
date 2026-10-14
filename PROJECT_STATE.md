@@ -1,6 +1,6 @@
 # ATC-WEB Project State
 
-Last source verification: 2026-10-14 (v1.14.2). A concise living handoff of the current state, not a
+Last source verification: 2026-10-14 (v1.15.0). A concise living handoff of the current state, not a
 history log; Git history and tags hold the past.
 
 ## Purpose and update rules
@@ -42,27 +42,27 @@ state update is necessarily newer.
 
 | Repository | Role | Verified development HEAD | Immutable current release | State / note |
 |---|---|---|---|---|
-| atc-audit | HTTP service: append-only audit log | `0bfe8122575927b7a832c77258a42b29a57bc701` | `v1.14.2` → `0bfe8122575927b7a832c77258a42b29a57bc701` | HEAD at release |
-| atc-auth | HTTP service: identity and tokens | `1dd7e9be81853ed9b145ddb1a47e602ce62a63c0` | `v1.14.2` → `1dd7e9be81853ed9b145ddb1a47e602ce62a63c0` | HEAD at release |
-| atc-console | HTTP service: administration UI/API | `5d9f063a3841638be82f4d59bbf7ad56963209ff` | `v1.14.2` → `5d9f063a3841638be82f4d59bbf7ad56963209ff` | SvelteKit; sidebar drawer below 900 px |
-| atc-flags | HTTP service: feature flags/settings | `e9552b3c2aa3a4c68fcd065900cc13101658beba` | `v1.14.2` → `e9552b3c2aa3a4c68fcd065900cc13101658beba` | HEAD at release |
-| atc-gateway | HTTP service: public edge | `ec9e66b4bf4b9e261db219520f145af6b88ea72b` | `v1.14.2` → `ec9e66b4bf4b9e261db219520f145af6b88ea72b` | HEAD at release |
-| atc-geo | HTTP service: geolocation/reference data | `514a74906b4bb9640a27b7dae4f89096ca2b497b` | `v1.14.2` → `514a74906b4bb9640a27b7dae4f89096ca2b497b` | HEAD at release |
-| atc-media | HTTP service: uploads and delivery | `3909dd96e8e038a37b5c2eac5a1488b786f7d604` | `v1.14.2` → `3909dd96e8e038a37b5c2eac5a1488b786f7d604` | HEAD at release |
-| atc-notify | HTTP service: queued notifications | `79b5b86f15f7421700a32db5288bf97ca408f164` | `v1.14.2` → `79b5b86f15f7421700a32db5288bf97ca408f164` | Email only |
-| atc-ratelimit | HTTP service: policies and quotas | `f3da3ed8de3a3f3857374806f94c287c94e31710` | `v1.14.2` → `f3da3ed8de3a3f3857374806f94c287c94e31710` | HEAD at release |
-| atc-scheduler | HTTP service: scheduled HTTP jobs | `78f021a77b89dc243ed37948a3019aac8ed7fb7e` | `v1.14.2` → `78f021a77b89dc243ed37948a3019aac8ed7fb7e` | HEAD at release |
-| atc-search | HTTP service: SQLite FTS search | `e10f877ed1da4b30e11d9639ee41d3a8311c7880` | `v1.14.2` → `e10f877ed1da4b30e11d9639ee41d3a8311c7880` | HEAD at release |
-| atc-service-core | Shared runtime package | `4299455a1c95dc3bf548167bd6c62ccd4d1af29d` | `v1.14.2` → `4299455a1c95dc3bf548167bd6c62ccd4d1af29d` | HEAD at release |
-| atc-shortlink | HTTP service: short links and QR | `c88172c523a4f64638da8dca0de5cf496621ce7e` | `v1.14.2` → `c88172c523a4f64638da8dca0de5cf496621ce7e` | HEAD at release |
-| atc-stack | Installer/orchestrator/release management | `bf6826ecc4b07dec01e934b419aed102ae900adc` | `v1.14.2` → `bf6826ecc4b07dec01e934b419aed102ae900adc` | v1.14.2 published and verified |
-| atc-webhook-out | HTTP service: durable outbound webhooks | `a8c0d7a5118b6471b53b414275deea745e59bd68` | `v1.14.2` → `a8c0d7a5118b6471b53b414275deea745e59bd68` | HEAD at release |
+| atc-audit | HTTP service: append-only audit log | `388b581b80b44e431b1b59371d13d54e283242f7` | `v1.15.0` → `388b581b80b44e431b1b59371d13d54e283242f7` | HEAD at release |
+| atc-auth | HTTP service: identity and tokens | `ac850cafdde10d658ad5a7a7fe4dfd3c86c5e2a3` | `v1.15.0` → `ac850cafdde10d658ad5a7a7fe4dfd3c86c5e2a3` | HEAD at release |
+| atc-console | HTTP service: administration UI/API | `e3ff9f5adf811f6182f34edfad84a3a726350de7` | `v1.15.0` → `e3ff9f5adf811f6182f34edfad84a3a726350de7` | SvelteKit 3; sidebar drawer below 900 px |
+| atc-flags | HTTP service: feature flags/settings | `2e9ad51797e6134f46ab8668ad80c31c2b200f98` | `v1.15.0` → `2e9ad51797e6134f46ab8668ad80c31c2b200f98` | HEAD at release |
+| atc-gateway | HTTP service: public edge | `94819cec14dd04f91439593c32dd2be87ba3d372` | `v1.15.0` → `94819cec14dd04f91439593c32dd2be87ba3d372` | HEAD at release |
+| atc-geo | HTTP service: geolocation/reference data | `870d79cd7911f154d59a8f58f577d374ac6c350c` | `v1.15.0` → `870d79cd7911f154d59a8f58f577d374ac6c350c` | HEAD at release |
+| atc-media | HTTP service: uploads and delivery | `7fe3399d08ab06ab468dbe19e0d1e82e5fb43ba1` | `v1.15.0` → `7fe3399d08ab06ab468dbe19e0d1e82e5fb43ba1` | HEAD at release |
+| atc-notify | HTTP service: queued notifications | `828e751981988b889e6175174b8d46de47732273` | `v1.15.0` → `828e751981988b889e6175174b8d46de47732273` | Email only |
+| atc-ratelimit | HTTP service: policies and quotas | `ca784e6c60a31820c2fc6a6bf3000d859c2314d0` | `v1.15.0` → `ca784e6c60a31820c2fc6a6bf3000d859c2314d0` | HEAD at release |
+| atc-scheduler | HTTP service: scheduled HTTP jobs | `6de60c2ea86cdaa8302dc8f96e10eb0764871577` | `v1.15.0` → `6de60c2ea86cdaa8302dc8f96e10eb0764871577` | HEAD at release |
+| atc-search | HTTP service: SQLite FTS search | `80f6df59a5ba45f0ef0772e818483c7d8a0554fb` | `v1.15.0` → `80f6df59a5ba45f0ef0772e818483c7d8a0554fb` | HEAD at release |
+| atc-service-core | Shared runtime package | `329cf6aaac89d74d87cfe3fb1da2d005af5f2810` | `v1.15.0` → `329cf6aaac89d74d87cfe3fb1da2d005af5f2810` | HEAD at release |
+| atc-shortlink | HTTP service: short links and QR | `b00cd04b502a8d8e4314e2dc72ffa540a0bbd07e` | `v1.15.0` → `b00cd04b502a8d8e4314e2dc72ffa540a0bbd07e` | HEAD at release |
+| atc-stack | Installer/orchestrator/release management | `485e223ff273baa5ca620219f667dd6eec2a331c` | `v1.15.0` → `485e223ff273baa5ca620219f667dd6eec2a331c` | v1.15.0 published and verified |
+| atc-webhook-out | HTTP service: durable outbound webhooks | `bdb197a39a03f78a18bae79110cb42b883f159c9` | `v1.15.0` → `bdb197a39a03f78a18bae79110cb42b883f159c9` | HEAD at release |
 
 ## Current release
 
-- Supported release: all 15 repositories at `v1.14.2`.
-- `atc-stack` `v1.14.2` peels to `bf6826ecc4b07dec01e934b419aed102ae900adc`; `atc-service-core`
-  `v1.14.2` peels to `4299455a1c95dc3bf548167bd6c62ccd4d1af29d`.
+- Supported release: all 15 repositories at `v1.15.0`.
+- `atc-stack` `v1.15.0` peels to `485e223ff273baa5ca620219f667dd6eec2a331c`; `atc-service-core`
+  `v1.15.0` peels to `329cf6aaac89d74d87cfe3fb1da2d005af5f2810`.
 - `installation-manifests/supported.json` selects the install matrix; `releases/` holds the current
   release notes and verification evidence. Tags are never moved.
 
@@ -91,13 +91,15 @@ runs locally. Do not change the supported pointer, manifests or tags as a side e
 
 ## Console architecture
 
-One full-stack SvelteKit 2 application on adapter-node: one Node process, one HTTP framework, one
+One full-stack SvelteKit 3 application on adapter-node 6 (Node 22.17+): one Node process, one HTTP framework, one
 filesystem router, SSR pages and filesystem API/operational endpoints. Root `server.mjs` wraps the
 adapter handler with HTTP/HTTPS, IPC readiness and graceful shutdown. `src/hooks.server.ts` owns the
 request, security and session lifecycle; the process-scoped runtime owns SQLite, maintenance,
 clients, documentation and audit forwarding. All 156 API operations and 34 page patterns live in
 `src/routes/`. The service worker caches only its own static assets and owns only its own
-`atc-console-static-` caches. Navigation is a left sidebar that becomes an off-canvas drawer below
+`atc-console-static-` caches; SvelteKit version polling is off. CSRF is the required
+`X-Console-Request` header on every API mutation (login/TOTP: JSON only); SvelteKit's origin check
+is disabled. Navigation is a left sidebar that becomes an off-canvas drawer below
 900 px, with the signed-in user and sign-out at its bottom. Stack rebuilds the Console at every
 `setup` and starts it through `server.mjs`.
 
@@ -110,9 +112,7 @@ downstream proxy, and extra controller/service/repository layering.
    explicit behavior and security decision.
 2. Media-byte and QR responses receive `Cache-Control: no-store` from the shared API response hook,
    overriding route-local cache directives.
-3. **Development advisory:** SvelteKit 2.70.3 pins `cookie` 0.6.0 (low-severity, development-only);
-   the fix is the deferred SvelteKit 3 upgrade.
-4. **Swagger bundle size:** the local Swagger UI is a 1,425,215-byte lazy chunk, loaded only on
+3. **Swagger bundle size:** the local Swagger UI is a 1,425,215-byte lazy chunk, loaded only on
    `/docs`.
 
 ## Operational constraints
@@ -124,8 +124,7 @@ downstream proxy, and extra controller/service/repository layering.
 
 ## Next controlled stage
 
-None. Future work is ordinary product maintenance. The SvelteKit 3 upgrade is deferred until its
-first patch releases settle.
+None. Future work is ordinary product maintenance.
 
 ## Update checklist
 
