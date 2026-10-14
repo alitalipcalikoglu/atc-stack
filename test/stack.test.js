@@ -29,6 +29,7 @@ const TEMPLATES = /** @type {Record<string, string>} */ ({
   'atc-content': 'PORT=3013\nHOST=0.0.0.0\nCONTENT_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS,web-frontend:REPLACE_WITH_64_HEX_CHARS:read\nCONTENT_PUBLIC_BUNDLES=false\n',
   'atc-export': 'PORT=3014\nHOST=0.0.0.0\nEXPORT_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS\nMEDIA_URL=http://127.0.0.1:3003\nMEDIA_API_KEY=REPLACE_WITH_THE_EXPORT_KEY_FROM_MEDIA_API_KEYS\nNOTIFY_URL=\nNOTIFY_API_KEY=\nSOURCE_AUTH_URL=\nSOURCE_AUTH_API_KEY=\n',
   'atc-render': 'PORT=3015\nHOST=0.0.0.0\nRENDER_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS,billing:REPLACE_WITH_64_HEX_CHARS:read\nMEDIA_URL=\nMEDIA_API_KEY=\n',
+  'atc-queue': 'PORT=3016\nHOST=0.0.0.0\nQUEUE_API_KEYS=atc-console:REPLACE_WITH_64_HEX_CHARS:admin,mailer:REPLACE_WITH_64_HEX_CHARS:write:emails\n',
   'atc-gateway': 'PORT=3000\nHOST=0.0.0.0\nMETRICS_TOKEN=\nAUTH_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_AUTH_API_KEYS\nMEDIA_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_MEDIA_API_KEYS\nNOTIFY_API_KEY=REPLACE_WITH_THE_GATEWAY_KEY_FROM_NOTIFY_API_KEYS\n',
   'atc-console': 'PORT=3004\nHOST=0.0.0.0\nCOOKIE_SECURE=true\nNOTIFY_API_KEY=REPLACE_WITH_THE_CONSOLE_KEY_FROM_NOTIFY_API_KEYS\nAUTH_API_KEY=REPLACE_WITH\nMEDIA_API_KEY=REPLACE_WITH\nGATEWAY_METRICS_TOKEN=REPLACE_WITH\nAUDIT_API_KEY=REPLACE_WITH\nSHORTLINK_API_KEY=REPLACE_WITH\nFLAGS_API_KEY=REPLACE_WITH\nSCHEDULER_API_KEY=REPLACE_WITH\nWEBHOOK_OUT_API_KEY=REPLACE_WITH\nSEARCH_API_KEY=REPLACE_WITH\n',
 });
@@ -80,6 +81,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.equal(env('atc-geo').MMDB_PATH, '', 'operator-owned value kept empty');
   assert.deepEqual([env('atc-render').MEDIA_URL.endsWith(':3003'), env('atc-render').MEDIA_API_KEY, env('atc-console').RENDER_API_KEY, auditKeys['atc-render'].role], [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-render'].secret, keys('atc-render', 'RENDER_API_KEYS')['atc-console'].secret, 'write']);
   assert.deepEqual(Object.keys(keys('atc-render', 'RENDER_API_KEYS')), ['atc-console'], 'template placeholders dropped');
+  assert.deepEqual([keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].role, env('atc-console').QUEUE_API_KEY, Object.keys(keys('atc-queue', 'QUEUE_API_KEYS'))], ['admin', keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].secret, ['atc-console']]);
   const ex = env('atc-export');
   assert.deepEqual([ex.EXPORT_API_KEYS.startsWith('atc-console:'), ex.MEDIA_API_KEY, ex.NOTIFY_API_KEY, ex.SOURCE_AUDIT_API_KEY, auditKeys['atc-export-reader'].role, auditKeys['atc-export'].role, keys('atc-auth', 'AUTH_API_KEYS')['atc-export'].role, keys('atc-flags', 'FLAGS_API_KEYS')['atc-export'].role, keys('atc-content', 'CONTENT_API_KEYS')['atc-export'].role, ex.SOURCE_SHORTLINK_URL.endsWith(':3006')],
     [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-export'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export'].secret, auditKeys['atc-export-reader'].secret, 'read', 'write', 'read', 'read', 'read', true], 'export reads every source with read keys and writes files to media');

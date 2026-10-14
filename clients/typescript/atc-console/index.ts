@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (193 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (204 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -138,6 +138,17 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-notify.messages.retry": (init: FetchOptions<operations["atc-console.atc-notify.messages.retry"]>) => client.POST("/api/services/{sid}/atc-notify/messages/{id}/retry", init),
     "atc-console.atc-notify.messages.send": (init: FetchOptions<operations["atc-console.atc-notify.messages.send"]>) => client.POST("/api/services/{sid}/atc-notify/messages", init),
     "atc-console.atc-notify.templates.list": (init: FetchOptions<operations["atc-console.atc-notify.templates.list"]>) => client.GET("/api/services/{sid}/atc-notify/templates", init),
+    "atc-console.atc-queue.messages.delete": (init: FetchOptions<operations["atc-console.atc-queue.messages.delete"]>) => client.DELETE("/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}", init),
+    "atc-console.atc-queue.messages.enqueue": (init: FetchOptions<operations["atc-console.atc-queue.messages.enqueue"]>) => client.POST("/api/services/{sid}/atc-queue/queues/{id}/messages", init),
+    "atc-console.atc-queue.messages.get": (init: FetchOptions<operations["atc-console.atc-queue.messages.get"]>) => client.GET("/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}", init),
+    "atc-console.atc-queue.messages.list": (init: FetchOptions<operations["atc-console.atc-queue.messages.list"]>) => client.GET("/api/services/{sid}/atc-queue/queues/{id}/messages", init),
+    "atc-console.atc-queue.queues.delete": (init: FetchOptions<operations["atc-console.atc-queue.queues.delete"]>) => client.DELETE("/api/services/{sid}/atc-queue/queues/{id}", init),
+    "atc-console.atc-queue.queues.get": (init: FetchOptions<operations["atc-console.atc-queue.queues.get"]>) => client.GET("/api/services/{sid}/atc-queue/queues/{id}", init),
+    "atc-console.atc-queue.queues.list": (init: FetchOptions<operations["atc-console.atc-queue.queues.list"]>) => client.GET("/api/services/{sid}/atc-queue/queues", init),
+    "atc-console.atc-queue.queues.purge": (init: FetchOptions<operations["atc-console.atc-queue.queues.purge"]>) => client.POST("/api/services/{sid}/atc-queue/queues/{id}/purge", init),
+    "atc-console.atc-queue.queues.redrive": (init: FetchOptions<operations["atc-console.atc-queue.queues.redrive"]>) => client.POST("/api/services/{sid}/atc-queue/queues/{id}/redrive", init),
+    "atc-console.atc-queue.queues.upsert": (init: FetchOptions<operations["atc-console.atc-queue.queues.upsert"]>) => client.PUT("/api/services/{sid}/atc-queue/queues/{id}", init),
+    "atc-console.atc-queue.stats.get": (init: FetchOptions<operations["atc-console.atc-queue.stats.get"]>) => client.GET("/api/services/{sid}/atc-queue/stats", init),
     "atc-console.atc-ratelimit.check.post": (init: FetchOptions<operations["atc-console.atc-ratelimit.check.post"]>) => client.POST("/api/services/{sid}/atc-ratelimit/check", init),
     "atc-console.atc-ratelimit.overrides.delete": (init: FetchOptions<operations["atc-console.atc-ratelimit.overrides.delete"]>) => client.DELETE("/api/services/{sid}/atc-ratelimit/policies/{id}/overrides/{sub}", init),
     "atc-console.atc-ratelimit.overrides.list": (init: FetchOptions<operations["atc-console.atc-ratelimit.overrides.list"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/overrides", init),

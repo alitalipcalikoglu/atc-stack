@@ -13,7 +13,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 // The real, hand-verified mapping from each exposed MCP tool to the operationId(s) its handler
 // calls. atc-stack.status is the one MCP-native aggregate: it calls the 3 operational probes on every
-// one of the 16 services, whatever that service happens to have named them (see
+// one of the 17 services, whatever that service happens to have named them (see
 // src/tools/index.mjs's findOp() comment on the real cross-service naming inconsistency).
 const OPERATIONAL_PROBE_OPIDS = [
   'atc-gateway.health.check', 'atc-gateway.ready.check', 'atc-gateway.info.get',
@@ -32,6 +32,7 @@ const OPERATIONAL_PROBE_OPIDS = [
   'atc-content.health.get', 'atc-content.ready.get', 'atc-content.info.get',
   'atc-export.health.get', 'atc-export.ready.get', 'atc-export.info.get',
   'atc-render.health.get', 'atc-render.ready.get', 'atc-render.info.get',
+  'atc-queue.health.get', 'atc-queue.ready.get', 'atc-queue.info.get',
 ];
 
 export const TOOL_TO_OPERATION_IDS = {

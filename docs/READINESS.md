@@ -22,6 +22,7 @@ section of any service before relying on it for something that matters.
 
 | Service | Ready means | Scaling | Process boundary |
 |---|---|---|---|
+| [queue](../../atc-queue/docs/READINESS.md) | `db.ping()`, cached 10s | **B — single-node stateful**; claims in `BEGIN IMMEDIATE`, lease tokens fence ack/nack/extend, a reaper reclaims expired leases | single process (`instances: 1` pinned) |
 | [gateway](../../atc-gateway/docs/READINESS.md) | every route has at least one upstream passing its own `/health` probe (2s timeout, 15s cache) | **A — stateless, horizontally scalable**; per-instance state not shared: local per-IP limiter, per-instance circuit breaker, geo cache | single process only |
 | [notify](../../atc-notify/docs/READINESS.md) | `db.ping()` and every registered channel's `verify()` (SMTP handshake) | **B — single-node stateful, but "single-node" now means one HOST, not one PROCESS** | API/worker split-capable (`src/api-main.js` + `src/worker-main.js`); message claiming is a single atomic `UPDATE…RETURNING`, proven safe under real cross-connection concurrency |
 | [auth](../../atc-auth/docs/READINESS.md) | `db.ping()` and a live call to notify's `/health` (5s timeout) | **B — single-node stateful**; audit-forwarding buffer and rate limiter are per-instance | single process; uses a durable SQLite **outbox** for audit-forwarding, not the in-memory buffer every other service uses |
@@ -46,4 +47,4 @@ real `src/api-main.js` + `src/worker-main.js` split (confirmed on disk) and `spl
 `Stack#generateSplitEcosystem`, `src/stack.js`). Every other service only ever runs its single
 combined app.
 
-No gaps found: all 16 services that run as their own process have a `docs/READINESS.md`.
+No gaps found: all 17 services that run as their own process have a `docs/READINESS.md`.

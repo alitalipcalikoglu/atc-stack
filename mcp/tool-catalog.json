@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-14",
-  "totalOperations": 466,
+  "totalOperations": 498,
   "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
   "entries": [
     {
@@ -1619,6 +1619,139 @@
       "operationId": "atc-console.atc-notify.templates.list",
       "method": "GET",
       "path": "/api/services/{sid}/atc-notify/templates",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.messages.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.messages.enqueue",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}/messages",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.messages.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.messages.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}/messages",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.queues.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.queues.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.queues.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-queue/queues",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.queues.purge",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}/purge",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.queues.redrive",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}/redrive",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.queues.upsert",
+      "method": "PUT",
+      "path": "/api/services/{sid}/atc-queue/queues/{id}",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-queue.stats.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-queue/stats",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -3981,6 +4114,221 @@
       "operationId": "atc-notify.templates.list",
       "method": "GET",
       "path": "/v1/templates",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.health.get",
+      "method": "GET",
+      "path": "/health",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.info.get",
+      "method": "GET",
+      "path": "/v1/info",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.ack",
+      "method": "POST",
+      "path": "/v1/queues/{name}/messages/{id}/ack",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.delete",
+      "method": "DELETE",
+      "path": "/v1/queues/{name}/messages/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.enqueue",
+      "method": "POST",
+      "path": "/v1/queues/{name}/messages",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.enqueueBatch",
+      "method": "POST",
+      "path": "/v1/queues/{name}/messages/batch",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.extend",
+      "method": "POST",
+      "path": "/v1/queues/{name}/messages/{id}/extend",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.get",
+      "method": "GET",
+      "path": "/v1/queues/{name}/messages/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.list",
+      "method": "GET",
+      "path": "/v1/queues/{name}/messages",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.nack",
+      "method": "POST",
+      "path": "/v1/queues/{name}/messages/{id}/nack",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.messages.pull",
+      "method": "POST",
+      "path": "/v1/queues/{name}/pull",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.metrics.get",
+      "method": "GET",
+      "path": "/metrics",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.openapi",
+      "method": "GET",
+      "path": "/openapi.yaml",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.queues.delete",
+      "method": "DELETE",
+      "path": "/v1/queues/{name}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.queues.get",
+      "method": "GET",
+      "path": "/v1/queues/{name}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.queues.list",
+      "method": "GET",
+      "path": "/v1/queues",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.queues.purge",
+      "method": "POST",
+      "path": "/v1/queues/{name}/purge",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.queues.redrive",
+      "method": "POST",
+      "path": "/v1/queues/{name}/redrive",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.queues.upsert",
+      "method": "PUT",
+      "path": "/v1/queues/{name}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposedInPhase3": false
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.ready.get",
+      "method": "GET",
+      "path": "/ready",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR"
+      ],
+      "exposedInPhase3": true
+    },
+    {
+      "service": "atc-queue",
+      "operationId": "atc-queue.stats.get",
+      "method": "GET",
+      "path": "/v1/stats",
       "flags": [
         "READ_SAFE"
       ],

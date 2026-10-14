@@ -193,7 +193,18 @@
     { "method": "POST", "path": "/api/services/{sid}/atc-render/templates/{id}/versions" },
     { "method": "GET", "path": "/api/services/{sid}/atc-render/templates/{id}/versions/{sub}" },
     { "method": "POST", "path": "/api/services/{sid}/atc-render/preview" },
-    { "method": "PUT", "path": "/api/services/{sid}/atc-media/files" }
+    { "method": "PUT", "path": "/api/services/{sid}/atc-media/files" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-queue/stats" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-queue/queues" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-queue/queues/{id}" },
+    { "method": "PUT", "path": "/api/services/{sid}/atc-queue/queues/{id}" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-queue/queues/{id}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-queue/queues/{id}/purge" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-queue/queues/{id}/redrive" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-queue/queues/{id}/messages" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-queue/queues/{id}/messages" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}" }
   ],
   "exclusions": [
     "GET /* (static asset serving via @fastify/static, wildcard over PUBLIC_DIR) and the SPA fallback in setNotFoundHandler: not an API contract, serves the built Svelte app (index.html) for unmatched non-API GET/HEAD paths."

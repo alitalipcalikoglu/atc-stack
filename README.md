@@ -167,6 +167,7 @@ Options: `--root <dir>` (default: the parent of this checkout), `--admin-usernam
 | atc-content | 3013 | [atc-content](https://github.com/alitalipcalikoglu/atc-content) | Translations and content strings: namespaces, locale fallback chains, placeholder checks, numbered releases, ETag bundles (public through the gateway at `/api/content/v1/bundles/`) | audit |
 | atc-export | 3014 | [atc-export](https://github.com/alitalipcalikoglu/atc-export) | Background data exports: CSV/NDJSON from audit events, users, links, flags, media metadata and translation keys, streamed into private media files by a leased worker; retention | media, notify, audit (events + forwarding), auth, shortlink, flags, content |
 | atc-render | 3015 | [atc-render](https://github.com/alitalipcalikoglu/atc-render) | PDF rendering from versioned JSON layout templates: Unicode fonts, tables across pages, images, QR; streamed or stored in media | media, audit |
+| atc-queue | 3016 | [atc-queue](https://github.com/alitalipcalikoglu/atc-queue) | Durable message queue: delays, priorities, dedupe keys, leased pulls with ack/nack/extend, retries, dead letters with redrive | audit |
 | atc-stack | – | [atc-stack](https://github.com/alitalipcalikoglu/atc-stack) | This installer and runner | – |
 
 Every service is its own repository and deployable alone; "Calls" lists the services it talks to over HTTP when configured (all optional except auth → notify for verification and reset mails). Browsers only ever reach the gateway and the console.
@@ -186,6 +187,7 @@ Every service is its own repository and deployable alone; "Calls" lists the serv
 | | | | atc-content | 3013 |
 | | | | atc-export | 3014 |
 | | | | atc-render | 3015 |
+| | | | atc-queue | 3016 |
 
 ## Adding a service
 
@@ -202,16 +204,16 @@ Every repository shares one version. A release runs locally in three resumable s
 kept in `.release/v<version>.json` (untracked), so a failed step can simply be run again.
 
 1. Write the release notes to `releases/v<version>.md`.
-2. `npm run release:prepare -- <version>`: checks that all 18 repositories are clean and in sync on
+2. `npm run release:prepare -- <version>`: checks that all 19 repositories are clean and in sync on
    `main`; bumps `atc-service-core`, runs its tests, tags and pushes it; bumps every service to that
    tag and runs `npm ci`, tests, typecheck and the production audit; then writes the candidate
    `installation-manifests/v<version>.json`, moves `supported.json`, removes the previous manifest
    and release files and pushes the candidate commit.
 3. `npm run release:verify -- <version>`: integration suite, contracts, client pilots, MCP E2E,
-   every Console smoke, all 16 Docker images (healthy as `node`, exit 0 on SIGTERM), and a fresh
+   every Console smoke, all 17 Docker images (healthy as `node`, exit 0 on SIGTERM), and a fresh
    `install:all --ref main` from GitHub whose commits must match the candidate manifest. Stop the
-   local stack first; the install uses ports 3000-3015.
-4. `npm run release:publish -- <version>`: tags the 16 services and stack at the manifest commits,
+   local stack first; the install uses ports 3000-3016.
+4. `npm run release:publish -- <version>`: tags the 17 services and stack at the manifest commits,
    checks the remote tags, runs a fresh default `install:all` (exact tags, three suites, reuse),
    writes `releases/v<version>.json`, updates `PROJECT_STATE.md` and pushes. Existing tags are never
    moved.

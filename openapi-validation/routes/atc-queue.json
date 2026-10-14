@@ -1,0 +1,27 @@
+{
+  "service": "atc-queue",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/openapi.yaml" },
+    { "method": "GET", "path": "/ready" },
+    { "method": "GET", "path": "/v1/info" },
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/queues" },
+    { "method": "PUT", "path": "/v1/queues/{name}" },
+    { "method": "GET", "path": "/v1/queues/{name}" },
+    { "method": "DELETE", "path": "/v1/queues/{name}" },
+    { "method": "POST", "path": "/v1/queues/{name}/purge" },
+    { "method": "POST", "path": "/v1/queues/{name}/redrive" },
+    { "method": "POST", "path": "/v1/queues/{name}/messages" },
+    { "method": "GET", "path": "/v1/queues/{name}/messages" },
+    { "method": "POST", "path": "/v1/queues/{name}/messages/batch" },
+    { "method": "POST", "path": "/v1/queues/{name}/pull" },
+    { "method": "GET", "path": "/v1/queues/{name}/messages/{id}" },
+    { "method": "DELETE", "path": "/v1/queues/{name}/messages/{id}" },
+    { "method": "POST", "path": "/v1/queues/{name}/messages/{id}/ack" },
+    { "method": "POST", "path": "/v1/queues/{name}/messages/{id}/nack" },
+    { "method": "POST", "path": "/v1/queues/{name}/messages/{id}/extend" },
+    { "method": "GET", "path": "/v1/stats" }
+  ],
+  "exclusions": []
+}

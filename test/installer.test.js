@@ -58,12 +58,12 @@ function harness(f, overrides = {}) {
 
 // Repositories that may be missing from the supported release because they were added to the catalog
 // after it; the next release manifest takes them from the catalog (Release.manifest). Empty it after that.
-const UNRELEASED = /** @type {string[]} */ ([]);
+const UNRELEASED = ['atc-queue'];
 
-test('canonical catalog contains exactly the 17 official sibling repositories and the release descriptor covers each released one once', () => {
+test('canonical catalog contains exactly the 18 official sibling repositories and the release descriptor covers each released one once', () => {
   assert.deepEqual(REPOSITORIES.map((repository) => repository.id), [
     'atc-service-core', 'atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink',
-    'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render',
+    'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue',
   ]);
   for (const repository of REPOSITORIES) assert.equal(repository.remote, `https://github.com/alitalipcalikoglu/${repository.id}.git`);
   const release = Installer.releaseManifest();

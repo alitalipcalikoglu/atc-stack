@@ -68,10 +68,10 @@ state update is necessarily newer.
 
 ## Current suite contract
 
-- 16 canonical `openapi.yaml` files, all OpenAPI 3.1.0. Console: 148 paths, 193 operations. Suite:
-  466 operations (`atc-content`, `atc-export` and `atc-render` joined on `main` after the supported release; they enter the next release manifest).
-- Generated TypeScript clients: 16/16, 466/466 operations, no regeneration drift.
-- MCP: 466-operation candidate catalog, 10 explicitly exposed tools, STDIO transport only.
+- 17 canonical `openapi.yaml` files, all OpenAPI 3.1.0. Console: 155 paths, 204 operations. Suite:
+  498 operations (repositories added on `main` after the supported release enter the next release manifest).
+- Generated TypeScript clients: 17/17, 498/498 operations, no regeneration drift.
+- MCP: 498-operation candidate catalog, 10 explicitly exposed tools, STDIO transport only.
 
 Boundaries:
 

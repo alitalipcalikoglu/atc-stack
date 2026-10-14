@@ -78,7 +78,7 @@ export interface paths {
         };
         /**
          * Service identity and capabilities.
-         * @description The one operational route console takes from the shared `registerInfo` helper, so its shape is identical across all 16 services.
+         * @description The one operational route console takes from the shared `registerInfo` helper, so its shape is identical across all 17 services.
          */
         get: operations["atc-console.info.get"];
         put?: never;
@@ -3746,6 +3746,196 @@ export interface paths {
          */
         post: operations["atc-console.atc-render.preview"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Queue totals.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `GET /v1/stats`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-queue.stats.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/queues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List queues with depth.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `GET /v1/queues`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-queue.queues.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/queues/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one queue with depth and counters.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `GET /v1/queues/{name}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-queue.queues.get"];
+        /**
+         * Create a queue or change its settings.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `PUT /v1/queues/{name}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        put: operations["atc-console.atc-queue.queues.upsert"];
+        post?: never;
+        /**
+         * Delete a queue.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `DELETE /v1/queues/{name}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        delete: operations["atc-console.atc-queue.queues.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/queues/{id}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Purge ready, dead or all messages.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `POST /v1/queues/{name}/purge`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-queue.queues.purge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/queues/{id}/redrive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move dead letters back to ready.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `POST /v1/queues/{name}/redrive`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-queue.queues.redrive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/queues/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Browse messages by state.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `GET /v1/queues/{name}/messages`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-queue.messages.list"];
+        put?: never;
+        /**
+         * Enqueue a message.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `POST /v1/queues/{name}/messages`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-queue.messages.enqueue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-queue/queues/{id}/messages/{sub}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one message.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `GET /v1/queues/{name}/messages/{id}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-queue.messages.get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete one message.
+         * @description Typed pass-through to the **queue** service instance named by `sid` — console relays this to its `DELETE /v1/queues/{name}/messages/{id}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        delete: operations["atc-console.atc-queue.messages.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -11250,6 +11440,397 @@ export interface operations {
                 content: {
                     "application/pdf": string;
                 };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.stats.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the queue service's own `GET /v1/stats` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.queues.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the queue service's own `GET /v1/queues` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.queues.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the queue service's own `GET /v1/queues/{name}` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.queues.upsert": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    description?: string;
+                    visibilitySec?: number;
+                    maxAttempts?: number;
+                    backoffBaseSec?: number;
+                    backoffMaxSec?: number;
+                    paused?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the queue service's own `PUT /v1/queues/{name}` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.queues.delete": {
+        parameters: {
+            query?: {
+                force?: "true" | "false";
+            };
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done. console discards queue's response body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.queues.purge": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    state: "ready" | "dead" | "all";
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the queue service's own `POST /v1/queues/{name}/purge` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.queues.redrive": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ids?: string[];
+                    /** @constant */
+                    all?: true;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the queue service's own `POST /v1/queues/{name}/redrive` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.messages.list": {
+        parameters: {
+            query?: {
+                state?: "ready" | "delayed" | "leased" | "dead";
+                limit?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the queue service's own `GET /v1/queues/{name}/messages` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.messages.enqueue": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: unknown;
+                    delaySec?: number;
+                    priority?: number;
+                    dedupeKey?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the queue service's own `POST /v1/queues/{name}/messages` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.messages.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+                /** @description Second-level downstream resource id (session, environment, document, override, subject, place or variant), passed through URL-encoded. */
+                sub: components["parameters"]["SubParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the queue service's own `GET /v1/queues/{name}/messages/{id}` response body, relayed unchanged. See the queue service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-queue.messages.delete": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+                /** @description Second-level downstream resource id (session, environment, document, override, subject, place or variant), passed through URL-encoded. */
+                sub: components["parameters"]["SubParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done. console discards queue's response body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             400: components["responses"]["ValidationFailed"];
             401: components["responses"]["Unauthenticated"];

@@ -140,6 +140,11 @@ export const SERVICES = [
     console: { type: 'atc-render', label: 'Render', keyEnv: 'RENDER_API_KEY' },
   },
   {
+    id: 'atc-queue', port: 3016, keysVar: 'QUEUE_API_KEYS',
+    env: (c) => ({ ...auditEnv(c, 'atc-queue') }),
+    console: { type: 'atc-queue', label: 'Queues', keyEnv: 'QUEUE_API_KEY' },
+  },
+  {
     id: 'atc-gateway', port: 3000,
     env: (c) => ({
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
@@ -168,4 +173,7 @@ export const SERVICES = [
 ];
 
 /** Roles the console's key needs per service; everything else gets the issuer's default role. */
-export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({ 'atc-audit': 'readwrite' }); // reads events and forwards its own log
+export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({
+  'atc-audit': 'readwrite', // reads events and forwards its own log
+  'atc-queue': 'admin', // manages queues, purges and redrives dead letters
+});
