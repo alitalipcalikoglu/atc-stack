@@ -71,7 +71,7 @@ export class Deps {
     /** @type {string[]} */ const written = [];
     /** @type {string[]} */ const failed = [];
     for (const s of SERVICES) {
-      const r = await this.exec(join(this.root, s.id), ['npm', 'sbom', '--sbom-format', 'cyclonedx', '--omit', 'dev'], { stdio: 'pipe' });
+      const r = await this.exec(join(this.root, s.id), ['npm', 'sbom', '--sbom-format', 'cyclonedx', '--omit', 'dev', '--package-lock-only'], { stdio: 'pipe' });
       const doc = r.code === 0 ? Deps.json(r.out) : null;
       if (!doc) { failed.push(s.id); this.log(`${s.id}: no SBOM (${r.out.trim().split('\n')[0] ?? 'npm sbom failed'})`); continue; }
       const file = join(outDir, `${s.id}.cdx.json`);
