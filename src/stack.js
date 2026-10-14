@@ -52,16 +52,16 @@ export class Stack {
   /**
    * Acquire, verify, install, configure, start, and verify the complete sibling suite.
    * Repository mechanics live in Installer; setup and PM2 supervision remain the existing paths.
-   * @param {{ ref?: string, start?: boolean, splitWorkers?: boolean, dryRun?: boolean, host?: string, local?: boolean, adminEmail?: string, adminPassword?: string, readinessTimeoutMs?: number }} [o]
+   * @param {{ ref?: string, start?: boolean, splitWorkers?: boolean, dryRun?: boolean, host?: string, local?: boolean, adminUsername?: string, adminPassword?: string, readinessTimeoutMs?: number }} [o]
    */
   async installAll(o = {}) {
     return new Installer({ root: this.root, stackDir: this.stackDir, stack: this, exec: this.exec, log: this.log }).install(o);
   }
 
   /**
-   * @param {{ host?: string, local?: boolean, install?: boolean, adminEmail?: string, adminPassword?: string }} [o]
+   * @param {{ host?: string, local?: boolean, install?: boolean, adminUsername?: string, adminPassword?: string }} [o]
    */
-  async setup({ host = '127.0.0.1', local = true, install = false, adminEmail = 'admin@console.local', adminPassword } = {}) {
+  async setup({ host = '127.0.0.1', local = true, install = false, adminUsername = 'admin', adminPassword } = {}) {
     for (const s of SERVICES) {
       const dir = join(this.root, s.id);
       if (!existsSync(join(dir, 'package.json'))) throw new Error(`${s.id}: folder ${dir} is missing; clone github.com/alitalipcalikoglu/${s.id} next to the others`);
@@ -73,7 +73,7 @@ export class Stack {
     const ctx = new SetupContext({ root: this.root, host, local, run: (id, argv) => this.#run(join(this.root, id), argv), log: this.log });
     await ctx.compute();
     ctx.save((path, text) => { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, text); this.log(`wrote ${path.replace(`${this.root}/`, '')}`); });
-    const admin = await this.#firstAdmin(adminEmail, adminPassword);
+    const admin = await this.#firstAdmin(adminUsername, adminPassword);
     return { services: SERVICES.map((s) => ({ id: s.id, url: ctx.url(s.id) })), admin };
   }
 
@@ -380,10 +380,10 @@ export class Stack {
 
   /**
    * Create the console's first administrator when none exists, using the console's own classes.
-   * @param {string} email
+   * @param {string} username
    * @param {string|undefined} password
    */
-  async #firstAdmin(email, password) {
+  async #firstAdmin(username, password) {
     const dir = join(this.root, 'atc-console');
     const env = EnvFile.load(join(dir, '.env'));
     const dbPath = join(dir, env.get('DB_PATH') || './data/console.db');
@@ -395,11 +395,11 @@ export class Stack {
     const db = new Database(dbPath);
     try {
       const admins = new AdminStore(db);
-      if (admins.byEmail(email) || admins.count?.() > 0 || admins.list?.().length) return { email, password: null, created: false };
+      if (admins.byUsername(username) || admins.all().length > 0) return { username, password: null, created: false };
       const generated = password ?? Stack.password();
       const service = new AdminService({ admins, sessions: new SessionStore(db), audit: new AuditStore(db), hasher: new PasswordHasher({ logN: Number(env.get('SCRYPT_LOG_N') || 15) }) });
-      await service.create({ email, name: 'Administrator', password: generated, role: 'admin' }, null, { ip: null, userAgent: 'atc-stack' });
-      return { email, password: generated, created: true };
+      await service.create({ username, name: 'Administrator', password: generated, role: 'admin' }, null, { ip: null, userAgent: 'atc-stack' });
+      return { username, password: generated, created: true };
     } finally {
       db.close();
     }

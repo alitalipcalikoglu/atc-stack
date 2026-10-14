@@ -242,7 +242,7 @@ test('notify: real old-schema (v2) fixture with an existing queued message migra
   });
 });
 
-test('console: real old-schema (v1) fixture with an existing admin migrates through a real process to v2, login still works, totp_seal_state sealed', { skip }, async () => {
+test('console: real old-schema (v1) fixture with an existing admin migrates through a real process to the current schema, the email becomes a username, login still works, totp_seal_state sealed', { skip }, async () => {
   const { PasswordHasher } = await import(pathToFileURL(join(workspaceRoot, 'atc-console', 'src', 'crypto', 'password.js')).href);
   const email = 'admin@example.test';
   const password = 'correct horse battery staple 9';
@@ -265,12 +265,12 @@ test('console: real old-schema (v1) fixture with an existing admin migrates thro
     },
     verify: async ({ proc, dbPath }) => {
       const res = await fetch(`${proc.baseUrl}/api/session/login`, {
-        method: 'POST', headers: { 'content-type': 'application/json', 'x-console-request': '1' }, body: JSON.stringify({ email, password }),
+        method: 'POST', headers: { 'content-type': 'application/json', 'x-console-request': '1' }, body: JSON.stringify({ username: 'admin', password }),
       });
       assert.equal(res.status, 200);
       const body = await res.json();
       assert.equal(body.totpRequired, false, 'admin with no TOTP secret logs straight in, unaffected by the totp_seal_state migration');
-      assert.equal(body.admin.email, email, 'the pre-existing admin row survived the migration');
+      assert.equal(body.admin.username, 'admin', 'the pre-existing admin row survived the migration, renamed to the part of its email before @');
 
       const raw = new DatabaseSync(dbPath, { readOnly: true });
       try {

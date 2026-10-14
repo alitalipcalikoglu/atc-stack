@@ -201,13 +201,13 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   const { createClient } = await import('../../atc-console/index.ts');
 
   const dbPath = join(scratch, 'console.db');
-  const email = 'smoke-admin@example.test';
+  const username = 'smoke-admin';
   const password = 'correct-horse-battery-staple-9';
 
   // Seed the first admin directly against console's own DB file, exactly as `stack setup` does
   // (`Stack#firstAdmin` in atc-stack/src/stack.js) -- reusing console's own classes, not reimplementing
   // password hashing or admin creation by hand.
-  await seedFirstAdmin(dbPath, email, password);
+  await seedFirstAdmin(dbPath, username, password);
 
   const port = await freePort();
   const console_ = new ServiceProcess({
@@ -231,7 +231,7 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   // openapi-fetch doesn't persist cookies across calls on its own in Node (no cookie jar) -- so we
   // capture the real Set-Cookie from login and pass it back explicitly on the next call, exactly as
   // a browser would automatically and exactly as this client's own ClientConfig.headers supports.
-  const login = await client['atc-console.session.login']({ body: { email, password } });
+  const login = await client['atc-console.session.login']({ body: { username, password } });
   assert.equal(login.response.status, 200, `expected 200, got ${login.response.status}: ${JSON.stringify(login.error)}`);
   assert.equal(login.data?.totpRequired, false);
   const setCookie = login.response.headers.get('set-cookie');
@@ -241,15 +241,15 @@ test('console pilot: cookie login -> session read -> expected error, via the gen
   const authedClient = createClient({ baseUrl: console_.baseUrl, headers: { cookie: cookiePair } });
   const session = await authedClient['atc-console.session.get']({});
   assert.equal(session.response.status, 200);
-  assert.equal(session.data?.admin?.email, email);
+  assert.equal(session.data?.admin?.username, username);
 
   // expected error: wrong password -> 401 INVALID_CREDENTIALS.
-  const bad = await client['atc-console.session.login']({ body: { email, password: 'not-the-real-password' } });
+  const bad = await client['atc-console.session.login']({ body: { username, password: 'not-the-real-password' } });
   assert.equal(bad.response.status, 401);
   assert.equal(bad.error?.error?.code, 'INVALID_CREDENTIALS');
 });
 
-async function seedFirstAdmin(dbPath: string, email: string, password: string) {
+async function seedFirstAdmin(dbPath: string, username: string, password: string) {
   mkdirSync(dirname(dbPath), { recursive: true });
   const consoleDir = join(WORKSPACE_ROOT, 'atc-console');
   const mod = (rel: string) => import(pathToFileURL(join(consoleDir, rel)).href);
@@ -261,7 +261,7 @@ async function seedFirstAdmin(dbPath: string, email: string, password: string) {
   try {
     const admins = new AdminStore(db);
     const service = new AdminService({ admins, sessions: new SessionStore(db), audit: new AuditStore(db), hasher: new PasswordHasher({ logN: 14 }) });
-    await service.create({ email, name: 'Smoke Admin', password, role: 'admin' }, null, { ip: null, userAgent: 'smoke-test' });
+    await service.create({ username, name: 'Smoke Admin', password, role: 'admin' }, null, { ip: null, userAgent: 'smoke-test' });
   } finally {
     db.close();
   }

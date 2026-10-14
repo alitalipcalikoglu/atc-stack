@@ -99,8 +99,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * First step of sign-in: email and password.
-         * @description Pre-session: no cookie and no CSRF header are required. Always issues a session cookie on success. When the account has TOTP enabled the response is `{ totpRequired: true, admin: null }` and the new session is *pending* — it resolves on later requests but `requireSession` rejects it with `401 TOTP_REQUIRED` until `POST /api/session/totp` completes it. Rate-limited per client IP before any password work happens. Failures are deliberately indistinguishable between "no such email" and "wrong password" (both `401 INVALID_CREDENTIALS`, both pay the same hashing cost).
+         * First step of sign-in: username and password.
+         * @description Pre-session: no cookie and no CSRF header are required. Always issues a session cookie on success. When the account has TOTP enabled the response is `{ totpRequired: true, admin: null }` and the new session is *pending* — it resolves on later requests but `requireSession` rejects it with `401 TOTP_REQUIRED` until `POST /api/session/totp` completes it. Rate-limited per client IP before any password work happens. Failures are deliberately indistinguishable between "no such username" and "wrong password" (both `401 INVALID_CREDENTIALS`, both pay the same hashing cost).
          */
         post: operations["atc-console.session.login"];
         delete?: never;
@@ -3075,7 +3075,7 @@ export interface components {
     schemas: {
         ErrorEnvelope: {
             error: {
-                /** @description Stable machine-readable code. console domain codes (`ConsoleError.STATUS`): INVALID_CREDENTIALS (401), UNAUTHENTICATED (401), TOTP_REQUIRED (401), INVALID_TOTP (401), TOTP_UNAVAILABLE (503), TOTP_SECRET_CORRUPT (500), ACCOUNT_LOCKED (423), ACCOUNT_DISABLED (403), FORBIDDEN (403), NOT_FOUND (404), EMAIL_TAKEN (409), CONFLICT (409), WEAK_PASSWORD (400), INVALID_ARGUMENT (400), LAST_ADMIN (409), RATE_LIMITED (429). Cross-cutting codes from console's own error handler: VALIDATION_FAILED (400, Ajv schema failure), NOT_FOUND (404, unmatched `/api/*` route), REQUEST_ERROR (other 4xx), INTERNAL_ERROR (500, message never leaked). */
+                /** @description Stable machine-readable code. console domain codes (`ConsoleError.STATUS`): INVALID_CREDENTIALS (401), UNAUTHENTICATED (401), TOTP_REQUIRED (401), INVALID_TOTP (401), TOTP_UNAVAILABLE (503), TOTP_SECRET_CORRUPT (500), ACCOUNT_LOCKED (423), ACCOUNT_DISABLED (403), FORBIDDEN (403), NOT_FOUND (404), USERNAME_TAKEN (409), CONFLICT (409), WEAK_PASSWORD (400), INVALID_ARGUMENT (400), LAST_ADMIN (409), RATE_LIMITED (429). Cross-cutting codes from console's own error handler: VALIDATION_FAILED (400, Ajv schema failure), NOT_FOUND (404, unmatched `/api/*` route), REQUEST_ERROR (other 4xx), INTERNAL_ERROR (500, message never leaked). */
                 code: string;
                 message: string;
                 /** @description Present on Ajv validation failures as `[{ path, message }]` — note console hand-rolls its error handler and, unlike the shared `atc-service-core` helper every backend service uses, omits `params` from those entries. Also present on domain errors that carry structured context: `retryAfterSec` (RATE_LIMITED, ACCOUNT_LOCKED) and `problems` (WEAK_PASSWORD). */
@@ -3126,8 +3126,8 @@ export interface components {
         Admin: {
             /** Format: uuid */
             id: string;
-            /** Format: email */
-            email: string;
+            /** @description Sign-in name, stored trimmed and lower-cased. */
+            username: string;
             name: string | null;
             /** @enum {string} */
             role: "admin" | "viewer";
@@ -3162,7 +3162,7 @@ export interface components {
             id: number;
             /** Format: uuid */
             adminId: string | null;
-            adminEmail: string | null;
+            adminUsername: string | null;
             /** @description e.g. `login.succeeded`, `login.failed`, `password.changed`, `totp.enabled`, `admin.created`, `atc-flags.flag.update`. */
             action: string;
             target: string | null;
@@ -3624,9 +3624,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** Format: email */
-                    email: string;
-                    /** @description Length is only shape-checked here (1-1024). Strength rules (at least 12 characters, no single repeated character, must not contain the local part of the account's email) are enforced in the domain layer and fail with `400 WEAK_PASSWORD` carrying `details.problems`. */
+                    /** @description Matched after trimming and lower-casing. */
+                    username: string;
+                    /** @description Length is only shape-checked here (1-1024). New passwords must be non-empty and at most 256 characters; that is enforced in the domain layer and fails with `400 WEAK_PASSWORD` carrying `details.problems`. There are no other strength rules. */
                     password: string;
                 };
             };
@@ -3648,7 +3648,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["ValidationFailed"];
-            /** @description `INVALID_CREDENTIALS` — unknown email or wrong password. */
+            /** @description `INVALID_CREDENTIALS` — unknown username or wrong password. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3838,9 +3838,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description Length is only shape-checked here (1-1024). Strength rules (at least 12 characters, no single repeated character, must not contain the local part of the account's email) are enforced in the domain layer and fail with `400 WEAK_PASSWORD` carrying `details.problems`. */
+                    /** @description Length is only shape-checked here (1-1024). New passwords must be non-empty and at most 256 characters; that is enforced in the domain layer and fails with `400 WEAK_PASSWORD` carrying `details.problems`. There are no other strength rules. */
                     currentPassword: string;
-                    /** @description Length is only shape-checked here (1-1024). Strength rules (at least 12 characters, no single repeated character, must not contain the local part of the account's email) are enforced in the domain layer and fail with `400 WEAK_PASSWORD` carrying `details.problems`. */
+                    /** @description Length is only shape-checked here (1-1024). New passwords must be non-empty and at most 256 characters; that is enforced in the domain layer and fails with `400 WEAK_PASSWORD` carrying `details.problems`. There are no other strength rules. */
                     newPassword: string;
                 };
             };
@@ -3983,7 +3983,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description Length is only shape-checked here (1-1024). Strength rules (at least 12 characters, no single repeated character, must not contain the local part of the account's email) are enforced in the domain layer and fail with `400 WEAK_PASSWORD` carrying `details.problems`. */
+                    /** @description Length is only shape-checked here (1-1024). New passwords must be non-empty and at most 256 characters; that is enforced in the domain layer and fails with `400 WEAK_PASSWORD` carrying `details.problems`. There are no other strength rules. */
                     password: string;
                     /** @description Six-digit TOTP code. A code is single-use: the verified time step is claimed atomically, so replaying the same code within its window fails. */
                     code: string;
@@ -4065,10 +4065,11 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** Format: email */
-                    email: string;
-                    /** @description Length is only shape-checked here (1-1024). Strength rules (at least 12 characters, no single repeated character, must not contain the local part of the account's email) are enforced in the domain layer and fail with `400 WEAK_PASSWORD` carrying `details.problems`. */
+                    /** @description Trimmed and lower-cased before it is stored; the stored form must match `^[a-z0-9][a-z0-9._-]{0,63}$`. */
+                    username: string;
+                    /** @description Length is only shape-checked here (1-1024). New passwords must be non-empty and at most 256 characters; that is enforced in the domain layer and fails with `400 WEAK_PASSWORD` carrying `details.problems`. There are no other strength rules. */
                     password: string;
+                    /** @description Defaults to the username when empty. */
                     name?: string;
                     /** @enum {string} */
                     role: "admin" | "viewer";
@@ -4087,7 +4088,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description `VALIDATION_FAILED`, `INVALID_ARGUMENT` (email rejected by the domain-level check) or `WEAK_PASSWORD`. */
+            /** @description `VALIDATION_FAILED`, `INVALID_ARGUMENT` (username rejected by the domain-level check) or `WEAK_PASSWORD`. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4098,7 +4099,7 @@ export interface operations {
             };
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["Forbidden"];
-            /** @description `EMAIL_TAKEN` — an account with this email already exists. */
+            /** @description `USERNAME_TAKEN` — an account with this username already exists. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4229,7 +4230,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description Length is only shape-checked here (1-1024). Strength rules (at least 12 characters, no single repeated character, must not contain the local part of the account's email) are enforced in the domain layer and fail with `400 WEAK_PASSWORD` carrying `details.problems`. */
+                    /** @description Length is only shape-checked here (1-1024). New passwords must be non-empty and at most 256 characters; that is enforced in the domain layer and fails with `400 WEAK_PASSWORD` carrying `details.problems`. There are no other strength rules. */
                     password: string;
                 };
             };

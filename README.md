@@ -63,7 +63,7 @@ Options intentionally stay small:
 - `--split-workers`: forward the existing split-worker topology to `stack up`.
 - `--dry-run`: perform read-only prerequisite, remote-ref, and existing-checkout validation and
   print the plan and resolved commits; no clone, fetch, install, setup, or startup occurs.
-- Existing setup options `--host`, `--public`, `--admin-email`, and `--admin-password` are passed to
+- Existing setup options `--host`, `--public`, `--admin-username`, and `--admin-password` are passed to
   the established setup path. `install:all` never prints a password; on a fresh install, supply
   `--admin-password` so the credential is known, or reset the generated credential afterward with
   Console's admin CLI.
@@ -135,7 +135,7 @@ directory — no HTTP route, no new auth system; see [atc-media/README.md](../at
    - every service that issues keys (`*_API_KEYS`) gets an entry per holder: `atc-console` (role `read` for audit, default elsewhere), `atc-gateway` (auth, media, notify), `atc-auth` (notify), `atc-scheduler` (flags `write`, notify, webhook-out `publish`);
    - holders receive the same secret: console `*_API_KEY` variables and `GATEWAY_METRICS_TOKEN`, gateway `AUTH_API_KEY`/`MEDIA_API_KEY`/`NOTIFY_API_KEY`, auth `NOTIFY_API_KEY`, scheduler `TARGET_KEYS`.
 4. **Files**: `atc-gateway/routes.json` (auth, media, JWKS through the gateway) and `atc-console/services.json` (every service with its local URL and key variable).
-5. **First admin**: `admin@console.local` with a generated password, printed once. Nothing is created when an administrator already exists.
+5. **First admin**: username `admin` (or `--admin-username`) with a generated password, printed once. Nothing is created when an administrator already exists.
 
 Running `setup` again is safe: existing secrets, keys and any value you edited by hand are kept; only placeholders and missing entries are filled. Delete a line from a `.env` to get the stack's default back. Console's adapter-node application is rebuilt on every setup boundary so a build artifact left by an older source checkout is never accepted as current.
 
@@ -145,7 +145,7 @@ By default the stack is **local**: `HOST=127.0.0.1`, plain HTTP everywhere, `COO
 
 `npm run setup -- --public --host 10.0.0.5` keeps every security default from the templates (HTTPS-only outbound, secure cookies, allowlists empty until you fill them), uses the given host for service-to-service URLs, keeps `PUBLIC_BASE_URL`s you set, and does not rewrite an existing `atc-gateway/routes.json`. Put a TLS-terminating proxy in front and set `TRUST_PROXY=true` per service.
 
-Options: `--root <dir>` (default: the parent of this checkout), `--admin-email <email>`, `--admin-password <password>` (otherwise generated), `--install`.
+Options: `--root <dir>` (default: the parent of this checkout), `--admin-username <name>` (default `admin`), `--admin-password <password>` (otherwise generated), `--install`.
 
 ## Service list
 

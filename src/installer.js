@@ -54,9 +54,9 @@ export class Installer {
   }
 
   /**
-   * @param {{ ref?: string, start?: boolean, splitWorkers?: boolean, dryRun?: boolean, host?: string, local?: boolean, adminEmail?: string, adminPassword?: string, readinessTimeoutMs?: number }} [o]
+   * @param {{ ref?: string, start?: boolean, splitWorkers?: boolean, dryRun?: boolean, host?: string, local?: boolean, adminUsername?: string, adminPassword?: string, readinessTimeoutMs?: number }} [o]
    */
-  async install({ ref, start = true, splitWorkers = false, dryRun = false, host = '127.0.0.1', local = true, adminEmail, adminPassword, readinessTimeoutMs = 60_000 } = {}) {
+  async install({ ref, start = true, splitWorkers = false, dryRun = false, host = '127.0.0.1', local = true, adminUsername, adminPassword, readinessTimeoutMs = 60_000 } = {}) {
     const mode = ref === undefined ? 'release' : 'development';
     if (ref !== undefined && ref !== 'main') throw new InstallError('PREFLIGHT', 'only the explicit development ref "main" is supported; omit --ref for the supported release');
     await this.#preflight({ start: start && !dryRun });
@@ -86,7 +86,7 @@ export class Installer {
 
     let setup;
     try {
-      setup = await this.stack.setup({ host, local, install: false, adminEmail, adminPassword });
+      setup = await this.stack.setup({ host, local, install: false, adminUsername, adminPassword });
     } catch (error) {
       throw this.#phaseError('SETUP', error);
     }

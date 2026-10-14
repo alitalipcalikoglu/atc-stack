@@ -8,7 +8,7 @@ import { Stack } from '../src/stack.js';
 /**
  * atc-stack <command> [options]
  *   install:all [--ref main] [--no-start] [--split-workers] [--dry-run]
- *   setup    --root <dir> --host <host> --public --install --admin-email <email> --admin-password <pw>
+ *   setup    --root <dir> --host <host> --public --install --admin-username <name> --admin-password <pw>
  *   up [--split-workers] | down [--split-workers] | status [--matrix] | dev   --root <dir>
  *   backup   --root <dir> --dir <snapshot dir>                     (default dir: <root>/backups/<timestamp>)
  *   restore  <snapshot dir> --root <dir> --service <id>             (default: every service the snapshot covers)
@@ -45,7 +45,7 @@ export class Cli {
           ref: flags.ref === undefined ? undefined : String(flags.ref), start: flags['no-start'] !== true,
           splitWorkers: flags['split-workers'] === true, dryRun: flags['dry-run'] === true,
           host: String(flags.host ?? '127.0.0.1'), local: !flags.public,
-          adminEmail: flags['admin-email'] === undefined ? undefined : String(flags['admin-email']),
+          adminUsername: flags['admin-username'] === undefined ? undefined : String(flags['admin-username']),
           adminPassword: flags['admin-password'] === undefined ? undefined : String(flags['admin-password']),
         });
         console.log(`\ninstall:all ${r.dryRun ? 'plan' : 'complete'}`);
@@ -61,10 +61,10 @@ export class Cli {
         return 0;
       }
       case 'setup': {
-        const r = await stack.setup({ host: String(flags.host ?? '127.0.0.1'), local: !flags.public, install: flags.install === true, adminEmail: flags['admin-email'] === undefined ? undefined : String(flags['admin-email']), adminPassword: flags['admin-password'] === undefined ? undefined : String(flags['admin-password']) });
+        const r = await stack.setup({ host: String(flags.host ?? '127.0.0.1'), local: !flags.public, install: flags.install === true, adminUsername: flags['admin-username'] === undefined ? undefined : String(flags['admin-username']), adminPassword: flags['admin-password'] === undefined ? undefined : String(flags['admin-password']) });
         console.log('\nservices:');
         for (const s of r.services) console.log(`  ${s.id.padEnd(Stack.ID_WIDTH)} ${s.url}`);
-        console.log(`\nconsole admin: ${r.admin.email}${r.admin.created ? `\npassword:      ${r.admin.password}   (shown once; change it after the first sign-in)` : '   (already existed, unchanged)'}`);
+        console.log(`\nconsole admin: ${r.admin.username}${r.admin.created ? `\npassword:      ${r.admin.password}   (shown once; change it after the first sign-in)` : '   (already existed, unchanged)'}`);
         console.log('\nnext: "npm run dev" (this terminal) or "npm run up" (PM2)');
         return 0;
       }
@@ -103,7 +103,7 @@ export class Cli {
         return 0;
       }
       default:
-        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-email e] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-email e] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | release:prepare|release:verify|release:publish <version>');
+        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-username u] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-username u] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | release:prepare|release:verify|release:publish <version>');
         return 2;
     }
   }

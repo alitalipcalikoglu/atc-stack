@@ -86,11 +86,11 @@ test('console -> audit: the trace console generates for a real admin request con
   const { Database } = await import(pathToFileURL(join(consoleDir, 'src', 'db.js')).href);
   const { PasswordHasher } = await import(pathToFileURL(join(consoleDir, 'src', 'crypto', 'password.js')).href);
   const { AdminStore } = await import(pathToFileURL(join(consoleDir, 'src', 'store', 'admin-store.js')).href);
-  const email = 'admin@example.test';
+  const username = 'admin';
   const password = 'correct horse battery staple 9';
   const passwordHash = await new PasswordHasher({ logN: 14 }).hash(password);
   const seedDb = new Database(dbPath);
-  new AdminStore(seedDb).create({ email, name: 'Harness Admin', passwordHash, role: 'admin' });
+  new AdminStore(seedDb).create({ username, name: 'Harness Admin', passwordHash, role: 'admin' });
   seedDb.close();
 
   const consoleProc = new ServiceProcess({
@@ -104,7 +104,7 @@ test('console -> audit: the trace console generates for a real admin request con
   await consoleProc.start();
 
   const loginRes = await fetch(`${consoleProc.baseUrl}/api/session/login`, {
-    method: 'POST', headers: { 'content-type': 'application/json', 'x-console-request': '1' }, body: JSON.stringify({ email, password }),
+    method: 'POST', headers: { 'content-type': 'application/json', 'x-console-request': '1' }, body: JSON.stringify({ username, password }),
   });
   assert.equal(loginRes.status, 200, await loginRes.text());
   const setCookie = loginRes.headers.get('set-cookie');
