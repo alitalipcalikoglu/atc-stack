@@ -187,7 +187,7 @@ Default routes are public and change nothing: `/health`, `/.well-known/jwks.json
 
 | Service | Port | Repository | What it does | Calls |
 |---|---|---|---|---|
-| atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, every upstream (auth, media, content, status, payments webhooks) |
+| atc-gateway | 3000 | [atc-gateway](https://github.com/alitalipcalikoglu/atc-gateway) | Public edge: routes, JWT verification, service-key injection, CORS, per-IP limits, central rate limit policies, geo headers | auth (JWKS), ratelimit, geo, audit (refusals, route reloads), every upstream (auth, media, content, status, payments webhooks) |
 | atc-notify | 3001 | [atc-notify](https://github.com/alitalipcalikoglu/atc-notify) | Queued e-mail with templates and retries. API/worker split-capable. | audit |
 | atc-auth | 3002 | [atc-auth](https://github.com/alitalipcalikoglu/atc-auth) | Users, passwords, ES256 JWT + JWKS, refresh tokens, e-mail verification, password reset | notify, webhook-out, audit |
 | atc-media | 3003 | [atc-media](https://github.com/alitalipcalikoglu/atc-media) | Uploads, deduplication, image variants, signed URLs, upload tickets | audit |

@@ -222,6 +222,7 @@ export const SERVICES = [
       // Routes may declare "policy" (central rate limits) and "atc-geo": true (X-Geo-* headers); the keys are issued here so routes.json can use them at once.
       RATELIMIT_URL: c.url('atc-ratelimit'), RATELIMIT_API_KEY: c.issue('atc-ratelimit', 'atc-gateway', 'check'), GEO_URL: c.url('atc-geo'), GEO_API_KEY: c.issue('atc-geo', 'atc-gateway', 'read'),
       CONTENT_API_KEY: c.issue('atc-content', 'atc-gateway', 'read'), // injected on the public content-bundles route
+      ...auditEnv(c, 'atc-gateway'), // 401/413/429 refusals and route reloads
     }),
     files: (c) => ({ 'routes.json': `${JSON.stringify(c.gatewayRoutes(), null, 2)}\n` }),
     console: { type: 'atc-gateway', label: 'Gateway', metricsTokenEnv: 'GATEWAY_METRICS_TOKEN' },

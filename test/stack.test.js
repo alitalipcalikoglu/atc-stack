@@ -96,6 +96,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   const stx = env('atc-status');
   assert.deepEqual([keys('atc-status', 'STATUS_API_KEYS')['atc-console'].role, env('atc-console').STATUS_API_KEY, stx.NOTIFY_API_KEY, stx.ALERT_EMAILS, auditKeys['atc-status'].role], ['admin', keys('atc-status', 'STATUS_API_KEYS')['atc-console'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-status'].secret, 'ops@example.com', 'write']);
   assert.deepEqual([stx.MONITOR_SEEDS.split(',').length, stx.MONITOR_SEEDS.split(',')[0], stx.MONITOR_SEEDS.includes('atc-status=')], [19, 'atc-notify=http://127.0.0.1:3001', false], 'every other service is monitored');
+  assert.deepEqual([env('atc-gateway').AUDIT_API_KEY, auditKeys['atc-gateway'].role], [auditKeys['atc-gateway'].secret, 'write'], 'the gateway reports refusals to audit');
   // Events: every producer publishes with a key that may only publish; webhook-out delivers ops.* to the status alert hub with a shared secret.
   const wk = keys('atc-webhook-out', 'WEBHOOK_API_KEYS');
   for (const id of ['atc-backup', 'atc-queue', 'atc-scheduler', 'atc-flags', 'atc-content', 'atc-auth', 'atc-status', 'atc-audit']) {
