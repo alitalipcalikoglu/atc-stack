@@ -91,21 +91,23 @@ export class SetupContext {
    * @param {string} issuer
    * @param {string} holder
    * @param {string} [role]
+   * @param {string} [scopes]  `+`-separated scope names (services that support key scopes), for example namespaces.
    */
-  issue(issuer, holder, role) {
+  issue(issuer, holder, role, scopes) {
     const service = SetupContext.service(issuer);
     if (!service.keysVar) throw new Error(`${issuer} issues no API keys`);
     const e = this.env(issuer);
     const entries = (e.get(service.keysVar) ?? '').split(',').map((s) => s.trim()).filter((s) => s && !EnvFile.PLACEHOLDER.test(s.split(':')[1] ?? ''));
     const at = entries.findIndex((s) => s.split(':')[0] === holder);
     let entry = at >= 0 ? entries[at] : null;
-    if (entry && (entry.split(':')[2] ?? '') !== (role ?? '')) {
-      // The manifest asks for another role than the one issued earlier: keep the secret, update the role.
-      entry = [holder, entry.split(':')[1], ...(role ? [role] : [])].join(':');
+    const want = (/** @type {string} */ secret) => [holder, secret, ...(role || scopes ? [role ?? ''] : []), ...(scopes ? [scopes] : [])].join(':');
+    if (entry && ((entry.split(':')[2] ?? '') !== (role ?? '') || (entry.split(':')[3] ?? '') !== (scopes ?? ''))) {
+      // The manifest asks for another role or scope than the one issued earlier: keep the secret, update the entry.
+      entry = want(entry.split(':')[1]);
       entries[at] = entry;
       e.set(service.keysVar, entries.join(','));
     } else if (!entry) {
-      entry = [holder, randomBytes(32).toString('hex'), ...(role ? [role] : [])].join(':');
+      entry = want(randomBytes(32).toString('hex'));
       entries.push(entry);
       e.set(service.keysVar, entries.join(','));
     }

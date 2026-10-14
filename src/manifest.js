@@ -225,7 +225,9 @@ export const SERVICES = [
       METRICS_TOKEN: c.secret('atc-gateway', 'METRICS_TOKEN'), AUTH_API_KEY: c.issue('atc-auth', 'atc-gateway'), MEDIA_API_KEY: c.issue('atc-media', 'atc-gateway'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-gateway'),
       // Routes may declare "policy" (central rate limits) and "atc-geo": true (X-Geo-* headers); the keys are issued here so routes.json can use them at once.
       RATELIMIT_URL: c.url('atc-ratelimit'), RATELIMIT_API_KEY: c.issue('atc-ratelimit', 'atc-gateway', 'check'), GEO_URL: c.url('atc-geo'), GEO_API_KEY: c.issue('atc-geo', 'atc-gateway', 'read'),
-      CONTENT_API_KEY: c.issue('atc-content', 'atc-gateway', 'read'), // injected on the public content-bundles route
+      // Injected on the anonymous content-bundles route, so scoped: only the namespaces named here are public (default: one called "public").
+      CONTENT_PUBLIC_NAMESPACES: c.keep('atc-gateway', 'CONTENT_PUBLIC_NAMESPACES', 'public'),
+      CONTENT_API_KEY: c.issue('atc-content', 'atc-gateway', 'read', c.keep('atc-gateway', 'CONTENT_PUBLIC_NAMESPACES', 'public')),
       ...auditEnv(c, 'atc-gateway'), // 401/413/429 refusals and route reloads
     }),
     files: (c) => ({ 'routes.json': `${JSON.stringify(c.gatewayRoutes(), null, 2)}\n` }),
