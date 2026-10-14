@@ -2,6 +2,7 @@
 import './../src/quiet.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { Release } from '../src/release.js';
 import { Stack } from '../src/stack.js';
 
 /**
@@ -12,6 +13,7 @@ import { Stack } from '../src/stack.js';
  *   backup   --root <dir> --dir <snapshot dir>                     (default dir: <root>/backups/<timestamp>)
  *   restore  <snapshot dir> --root <dir> --service <id>             (default: every service the snapshot covers)
  *   maintenance <service>   --root <dir>                            (one-shot; today: media only)
+ *   release:prepare|release:verify|release:publish <version>        (see README, "Releasing")
  * `--root` defaults to the parent folder of this checkout (the workspace with one folder per service).
  */
 export class Cli {
@@ -91,8 +93,17 @@ export class Cli {
         console.log(JSON.stringify(r));
         return r.errors ? 1 : 0;
       }
+      case 'release:prepare':
+      case 'release:verify':
+      case 'release:publish': {
+        if (!positional[0]) { console.error(`usage: atc-stack ${command} <version>`); return 2; }
+        const release = new Release({ root, stackDir, version: positional[0] });
+        const step = /** @type {'prepare'|'verify'|'publish'} */ (command.slice('release:'.length));
+        await release[step]();
+        return 0;
+      }
       default:
-        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-email e] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-email e] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service>');
+        console.log('usage: atc-stack install:all [--ref main] [--no-start] [--split-workers] [--dry-run] [--root dir] [--admin-email e] [--admin-password p] | setup [--root dir] [--host host] [--public] [--install] [--admin-email e] [--admin-password p] | up [--split-workers] | down [--split-workers] | status [--matrix] | dev | backup [--dir dir] | restore <snapshot dir> [--service id] | maintenance <service> | release:prepare|release:verify|release:publish <version>');
         return 2;
     }
   }

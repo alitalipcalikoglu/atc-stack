@@ -190,6 +190,28 @@ A new service is part of the stack from its first release. In the same delivery:
 3. Add the port to the table above and a template line to `test/stack.test.js` so the wiring test covers it.
 4. Run `npm run setup` and `npm run dev`; every service, old and new, must report `ready`.
 
+## Releasing
+
+Every repository shares one version. A release runs locally in three resumable steps; progress is
+kept in `.release/v<version>.json` (untracked), so a failed step can simply be run again.
+
+1. Write the release notes to `releases/v<version>.md`.
+2. `npm run release:prepare -- <version>`: checks that all 15 repositories are clean and in sync on
+   `main`; bumps `atc-service-core`, runs its tests, tags and pushes it; bumps every service to that
+   tag and runs `npm ci`, tests, typecheck and the production audit; then writes the candidate
+   `installation-manifests/v<version>.json`, moves `supported.json`, removes the previous manifest
+   and release files and pushes the candidate commit.
+3. `npm run release:verify -- <version>`: integration suite, contracts, client pilots, MCP E2E,
+   every Console smoke, all 13 Docker images (healthy as `node`, exit 0 on SIGTERM), and a fresh
+   `install:all --ref main` from GitHub whose commits must match the candidate manifest. Stop the
+   local stack first; the install uses ports 3000-3012.
+4. `npm run release:publish -- <version>`: tags the 13 services and stack at the manifest commits,
+   checks the remote tags, runs a fresh default `install:all` (exact tags, three suites, reuse),
+   writes `releases/v<version>.json`, updates `PROJECT_STATE.md` and pushes. Existing tags are never
+   moved.
+
+`test/docs-version.test.js` fails when a document still names an older suite version.
+
 ## Code layout
 
 | Class | File | Role |
@@ -199,6 +221,7 @@ A new service is part of the stack from its first release. In the same delivery:
 | `SetupContext` | `src/setup-context.js` | In-memory envs, secrets, key issuing, routes and services.json, save |
 | `Stack` | `src/stack.js` | `setup`, `up`, `down`, `dev`, `status`, `matrix`, `backup`, `restore`, `maintenance`, first admin |
 | `Snapshot` | `src/snapshot.js` | Whole-workspace backup creation and validated restore |
+| `Release` | `src/release.js` | `release:prepare`, `release:verify`, `release:publish` |
 | `Cli` | `bin/stack.js` | Argument parsing |
 
 ## Documentation
