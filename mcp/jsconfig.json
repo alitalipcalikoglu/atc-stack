@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*.mjs", "bin/**/*.js", "test/**/*.mjs", "tool-catalog.generate.mjs"]
+  "include": ["src/**/*.mjs", "bin/**/*.js", "test/**/*.mjs", "tool-catalog.generate.mjs", "tool-catalog.reconcile.mjs", "tool-policy.mjs", "tools.generate.mjs"]
 }

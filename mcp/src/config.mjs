@@ -5,6 +5,8 @@
 // (see server.mjs's per-service try/catch there). No value here is ever logged, echoed in an
 // error, or included in any tool output -- see redact() below and errors.mjs's translation layer.
 
+import { POLICY } from '../tool-policy.mjs';
+
 /** @typedef {{ timeoutMs: number, services: Record<string, { baseUrl: string|null, apiKey: string|null }> }} Config */
 
 export const SERVICES = [
@@ -12,8 +14,8 @@ export const SERVICES = [
   'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue', 'atc-backup', 'atc-status', 'atc-payments',
 ];
 
-/** Services this phase's explicit tools (beyond atc-stack.status) actually call, and therefore need an API key for. */
-export const API_KEY_SERVICES = ['atc-notify', 'atc-media', 'atc-flags', 'atc-shortlink', 'atc-ratelimit', 'atc-search', 'atc-geo'];
+/** Services some tool (beyond atc-stack.status) calls, and therefore need an API key for: every service tool-policy.mjs gives tools. */
+export const API_KEY_SERVICES = Object.entries(POLICY).filter(([, p]) => p.tools.length > 0).map(([s]) => s);
 
 /** @param {string} service */
 const envKey = (service) => service.replace(/^atc-/, '').toUpperCase().replace(/-/g, '_');

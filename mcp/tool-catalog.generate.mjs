@@ -94,7 +94,7 @@ async function main() {
           method: method.toUpperCase(),
           path: p,
           flags: classify(service, method, op.operationId, p),
-          exposedInPhase3: false, // set to true only for entries mcp/src/tools/index.mjs actually registers -- see reconcile step below.
+          exposed: false, // set by tool-catalog.reconcile.mjs from the real tools in src/tools/.
         });
       }
     }
@@ -104,7 +104,7 @@ async function main() {
   const catalog = {
     generatedAt: new Date().toISOString().slice(0, 10),
     totalOperations: entries.length,
-    note: 'Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.',
+    note: 'Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.',
     entries,
   };
 

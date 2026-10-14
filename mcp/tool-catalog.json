@@ -1,7 +1,7 @@
 {
   "generatedAt": "2026-10-14",
   "totalOperations": 568,
-  "note": "Candidate universe for MCP tool exposure -- NOT the exposed tool list. See mcp/src/tools/index.mjs for the actual, explicit allowlist (mcp/src/tools/index.mjs is the only place a tool is really registered). exposedInPhase3 here is reconciled against that allowlist by mcp/tool-catalog.reconcile.mjs, not hand-edited.",
+  "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
       "service": "atc-audit",
@@ -11,8 +11,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -22,8 +21,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -33,8 +31,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -44,8 +41,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -55,8 +51,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -66,8 +61,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -77,8 +71,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -89,8 +82,7 @@
         "READ_SAFE",
         "BINARY"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -100,8 +92,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -111,8 +102,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -123,8 +113,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -135,8 +124,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -147,8 +135,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -158,8 +145,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-audit",
@@ -170,8 +156,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-audit",
@@ -181,8 +166,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -193,8 +177,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -205,8 +188,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -217,8 +199,7 @@
         "READ_SAFE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -229,8 +210,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -241,8 +221,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -253,8 +232,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -265,8 +243,7 @@
         "READ_SAFE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -277,8 +254,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -289,8 +265,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -301,8 +276,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -313,8 +287,7 @@
         "READ_SAFE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -325,8 +298,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -337,8 +309,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -349,8 +320,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -361,8 +331,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -373,8 +342,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -385,8 +353,7 @@
         "READ_SAFE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -397,8 +364,7 @@
         "DESTRUCTIVE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -409,8 +375,7 @@
         "DESTRUCTIVE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -421,8 +386,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -433,8 +397,7 @@
         "DESTRUCTIVE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-auth",
@@ -445,8 +408,7 @@
         "READ_SAFE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -457,8 +419,7 @@
         "READ_SAFE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-auth",
@@ -469,8 +430,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -480,8 +440,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -491,8 +450,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -502,8 +460,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -513,8 +470,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -524,8 +480,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -535,8 +490,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -547,8 +501,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -559,8 +512,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -571,8 +523,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -582,8 +533,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -594,8 +544,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -605,8 +554,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-backup",
@@ -616,8 +564,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -627,8 +574,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-backup",
@@ -638,8 +584,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-console",
@@ -651,8 +596,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -664,8 +608,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -677,8 +620,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -690,8 +632,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -704,8 +645,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -717,8 +657,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -730,8 +669,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -743,8 +681,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -756,8 +693,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -769,8 +705,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -782,8 +717,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -795,8 +729,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -808,8 +741,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -821,8 +753,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -834,8 +765,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -847,8 +777,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -860,8 +789,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -873,8 +801,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -886,8 +813,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -899,8 +825,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -912,8 +837,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -926,8 +850,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -940,8 +863,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -953,8 +875,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -966,8 +887,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -979,8 +899,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -992,8 +911,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1005,8 +923,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1018,8 +935,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1031,8 +947,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1044,8 +959,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1057,8 +971,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1070,8 +983,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1083,8 +995,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1096,8 +1007,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1109,8 +1019,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1122,8 +1031,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1135,8 +1043,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1148,8 +1055,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1161,8 +1067,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1174,8 +1079,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1187,8 +1091,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1200,8 +1103,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1213,8 +1115,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1226,8 +1127,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1239,8 +1139,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1252,8 +1151,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1265,8 +1163,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1278,8 +1175,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1291,8 +1187,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1304,8 +1199,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1318,8 +1212,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1331,8 +1224,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1344,8 +1236,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1357,8 +1248,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1370,8 +1260,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1383,8 +1272,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1396,8 +1284,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1409,8 +1296,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1422,8 +1308,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1435,8 +1320,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1448,8 +1332,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1461,8 +1344,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1474,8 +1356,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1487,8 +1368,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1500,8 +1380,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1513,8 +1392,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1526,8 +1404,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1539,8 +1416,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1552,8 +1428,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1565,8 +1440,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1578,8 +1452,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1591,8 +1464,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1605,8 +1477,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1618,8 +1489,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1631,8 +1501,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1644,8 +1513,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1657,8 +1525,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1670,8 +1537,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1683,8 +1549,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1696,8 +1561,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1709,8 +1573,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1722,8 +1585,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1735,8 +1597,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1749,8 +1610,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1762,8 +1622,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1775,8 +1634,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1788,8 +1646,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1801,8 +1658,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1814,8 +1670,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1827,8 +1682,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1840,8 +1694,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1853,8 +1706,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1866,8 +1718,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1879,8 +1730,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1892,8 +1742,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1905,8 +1754,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1918,8 +1766,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1931,8 +1778,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1944,8 +1790,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1957,8 +1802,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1970,8 +1814,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1983,8 +1826,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -1996,8 +1838,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2009,8 +1850,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2022,8 +1862,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2035,8 +1874,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2048,8 +1886,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2061,8 +1898,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2075,8 +1911,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2088,8 +1923,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2101,8 +1935,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2114,8 +1947,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2127,8 +1959,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2140,8 +1971,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2153,8 +1983,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2166,8 +1995,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2179,8 +2007,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2192,8 +2019,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2205,8 +2031,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2218,8 +2043,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2231,8 +2055,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2245,8 +2068,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2258,8 +2080,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2271,8 +2092,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2284,8 +2104,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2297,8 +2116,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2310,8 +2128,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2323,8 +2140,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2336,8 +2152,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2349,8 +2164,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2362,8 +2176,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2375,8 +2188,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2388,8 +2200,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2401,8 +2212,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2414,8 +2224,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2427,8 +2236,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2440,8 +2248,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2453,8 +2260,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2467,8 +2273,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2480,8 +2285,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2493,8 +2297,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2506,8 +2309,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2519,8 +2321,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2532,8 +2333,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2545,8 +2345,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2558,8 +2357,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2571,8 +2369,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2584,8 +2381,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2597,8 +2393,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2610,8 +2405,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2623,8 +2417,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2636,8 +2429,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2649,8 +2441,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2662,8 +2453,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2675,8 +2465,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2688,8 +2477,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2702,8 +2490,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2715,8 +2502,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2728,8 +2514,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2741,8 +2526,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2754,8 +2538,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2767,8 +2550,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2780,8 +2562,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2793,8 +2574,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2806,8 +2586,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2819,8 +2598,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2833,8 +2611,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2846,8 +2623,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2859,8 +2635,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2872,8 +2647,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2885,8 +2659,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2898,8 +2671,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2911,8 +2683,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2924,8 +2695,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2937,8 +2707,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2950,8 +2719,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2963,8 +2731,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2976,8 +2743,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -2989,8 +2755,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3002,8 +2767,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3015,8 +2779,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3028,8 +2791,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3041,8 +2803,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3054,8 +2815,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3067,8 +2827,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3080,8 +2839,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3093,8 +2851,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3106,8 +2863,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3119,8 +2875,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3132,8 +2887,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3146,8 +2900,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3159,8 +2912,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3172,8 +2924,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3185,8 +2936,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3198,8 +2948,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3211,8 +2960,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3224,8 +2972,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3237,8 +2984,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3250,8 +2996,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3263,8 +3008,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3276,8 +3020,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3289,8 +3032,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3302,8 +3044,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3316,8 +3057,7 @@
         "POOR_MCP_FIT",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3329,8 +3069,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3342,8 +3081,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3355,8 +3093,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3368,8 +3105,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3380,8 +3116,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-console",
@@ -3392,8 +3127,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-console",
@@ -3405,8 +3139,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3418,8 +3151,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3431,8 +3163,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3444,8 +3175,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3457,8 +3187,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3470,8 +3199,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3483,8 +3211,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3495,8 +3222,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-console",
@@ -3508,8 +3234,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3521,8 +3246,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3534,8 +3258,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3547,8 +3270,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3560,8 +3282,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3573,8 +3294,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3586,8 +3306,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3599,8 +3318,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-console",
@@ -3612,8 +3330,7 @@
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3623,8 +3340,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3635,8 +3351,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3647,8 +3362,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3658,8 +3372,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3669,8 +3382,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3680,8 +3392,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3691,8 +3402,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3702,8 +3412,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3713,8 +3422,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3725,8 +3433,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3736,8 +3443,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3747,8 +3453,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3758,8 +3463,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3769,8 +3473,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3780,8 +3483,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3791,8 +3493,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3803,8 +3504,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3814,8 +3514,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3825,8 +3524,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3836,8 +3534,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3847,8 +3544,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3858,8 +3554,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-content",
@@ -3869,8 +3564,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-content",
@@ -3880,8 +3574,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-export",
@@ -3892,8 +3585,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-export",
@@ -3903,8 +3595,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3914,8 +3605,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-export",
@@ -3925,8 +3615,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3936,8 +3625,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3947,8 +3635,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3958,8 +3645,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3970,8 +3656,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3982,8 +3667,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -3994,8 +3678,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-export",
@@ -4005,8 +3688,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-export",
@@ -4017,8 +3699,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -4028,8 +3709,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-export",
@@ -4039,8 +3719,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4050,8 +3729,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4061,8 +3739,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4072,8 +3749,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4083,8 +3759,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4094,8 +3769,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4105,8 +3779,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4116,8 +3789,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4127,8 +3799,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4138,8 +3809,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4149,8 +3819,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4160,8 +3829,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4171,8 +3839,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4183,8 +3850,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4194,8 +3860,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4206,8 +3871,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4218,8 +3882,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4229,8 +3892,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4241,8 +3903,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-flags",
@@ -4252,8 +3913,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4263,8 +3923,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-gateway",
@@ -4275,8 +3934,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-gateway",
@@ -4287,8 +3945,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-gateway",
@@ -4299,8 +3956,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-gateway",
@@ -4311,8 +3967,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-gateway",
@@ -4323,8 +3978,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4335,8 +3989,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4346,8 +3999,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4357,8 +4009,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4368,8 +4019,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4379,8 +4029,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4390,8 +4039,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4401,8 +4049,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4412,8 +4059,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4423,8 +4069,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4434,8 +4079,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4445,8 +4089,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4457,8 +4100,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4468,8 +4110,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4480,8 +4121,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4492,8 +4132,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4503,8 +4142,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4514,8 +4152,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4525,8 +4162,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4537,8 +4173,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4548,8 +4183,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4559,8 +4193,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4570,8 +4203,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4581,8 +4213,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4592,8 +4223,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4603,8 +4233,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4614,8 +4243,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4625,8 +4253,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4637,8 +4264,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4648,8 +4274,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-geo",
@@ -4659,8 +4284,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-geo",
@@ -4670,8 +4294,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4681,8 +4304,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4694,8 +4316,7 @@
         "BINARY",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4705,8 +4326,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4716,8 +4336,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4727,8 +4346,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4738,8 +4356,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4749,8 +4366,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4761,8 +4377,7 @@
         "MUTATION",
         "BINARY"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4773,8 +4388,7 @@
         "MUTATION",
         "BINARY"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4784,8 +4398,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4796,8 +4409,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4808,8 +4420,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4820,8 +4431,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-media",
@@ -4832,8 +4442,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-media",
@@ -4843,8 +4452,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-notify",
@@ -4855,8 +4463,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-notify",
@@ -4867,8 +4474,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-notify",
@@ -4879,8 +4485,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-notify",
@@ -4891,8 +4496,7 @@
         "READ_SAFE",
         "ASYNC"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-notify",
@@ -4903,8 +4507,7 @@
         "READ_SAFE",
         "ASYNC"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-notify",
@@ -4915,8 +4518,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-notify",
@@ -4927,8 +4529,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-notify",
@@ -4938,8 +4539,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-notify",
@@ -4950,8 +4550,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-notify",
@@ -4961,8 +4560,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -4972,8 +4570,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -4984,8 +4581,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -4996,8 +4592,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5007,8 +4602,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5019,8 +4613,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-payments",
@@ -5030,8 +4623,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-payments",
@@ -5042,8 +4634,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-payments",
@@ -5053,8 +4644,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5064,8 +4654,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5075,8 +4664,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5086,8 +4674,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5098,8 +4685,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5109,8 +4695,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-payments",
@@ -5120,8 +4705,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5131,8 +4715,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5143,8 +4726,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5155,8 +4737,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5166,8 +4747,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5177,8 +4757,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5188,8 +4767,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5199,8 +4777,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5210,8 +4787,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5221,8 +4797,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5232,8 +4807,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5243,8 +4817,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5254,8 +4827,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5266,8 +4838,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5277,8 +4848,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5288,8 +4858,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5299,8 +4868,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5310,8 +4878,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5322,8 +4889,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5333,8 +4899,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-queue",
@@ -5344,8 +4909,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5356,8 +4920,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-queue",
@@ -5367,8 +4930,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5378,8 +4940,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5389,8 +4950,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5401,8 +4961,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5413,8 +4972,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5425,8 +4983,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5436,8 +4993,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5448,8 +5004,7 @@
         "DESTRUCTIVE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5460,8 +5015,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5472,8 +5026,7 @@
         "MUTATION",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5483,8 +5036,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5494,8 +5046,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5505,8 +5056,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5516,8 +5066,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5527,8 +5076,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5538,8 +5086,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5549,8 +5096,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5561,8 +5107,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5572,8 +5117,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-ratelimit",
@@ -5583,8 +5127,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5594,8 +5137,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-ratelimit",
@@ -5606,8 +5148,7 @@
         "DESTRUCTIVE",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-render",
@@ -5618,8 +5159,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5630,8 +5170,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5642,8 +5181,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-render",
@@ -5653,8 +5191,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-render",
@@ -5665,8 +5202,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5676,8 +5212,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5687,8 +5222,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-render",
@@ -5698,8 +5232,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5709,8 +5242,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5720,8 +5252,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-render",
@@ -5731,8 +5262,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5742,8 +5272,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5753,8 +5282,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5764,8 +5292,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-render",
@@ -5775,8 +5302,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5787,8 +5313,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5799,8 +5324,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5810,8 +5334,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5821,8 +5344,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-scheduler",
@@ -5832,8 +5354,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5843,8 +5364,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5854,8 +5374,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5865,8 +5384,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5877,8 +5395,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-scheduler",
@@ -5889,8 +5406,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-scheduler",
@@ -5900,8 +5416,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-scheduler",
@@ -5912,8 +5427,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5925,8 +5439,7 @@
         "HIGH_RISK",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-scheduler",
@@ -5937,8 +5450,7 @@
         "READ_SAFE",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5949,8 +5461,7 @@
         "READ_SAFE",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5960,8 +5471,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5971,8 +5481,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5982,8 +5491,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-scheduler",
@@ -5993,8 +5501,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6004,8 +5511,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6015,8 +5521,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-search",
@@ -6026,8 +5531,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6037,8 +5541,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6049,8 +5552,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-search",
@@ -6060,8 +5562,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6071,8 +5572,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-search",
@@ -6082,8 +5582,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6093,8 +5592,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6104,8 +5602,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6115,8 +5612,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-search",
@@ -6126,8 +5622,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6137,8 +5632,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6148,8 +5642,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6159,8 +5652,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6171,8 +5663,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6183,8 +5674,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-search",
@@ -6195,8 +5685,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-search",
@@ -6207,8 +5696,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6219,8 +5707,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6231,8 +5718,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6242,8 +5728,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6253,8 +5738,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6264,8 +5748,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6276,8 +5759,7 @@
         "READ_SAFE",
         "BINARY"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6287,8 +5769,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6298,8 +5779,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6309,8 +5789,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6321,8 +5800,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6332,8 +5810,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6344,8 +5821,7 @@
         "READ_SAFE",
         "BINARY"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6356,8 +5832,7 @@
         "READ_SAFE",
         "BINARY"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6368,8 +5843,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-shortlink",
@@ -6379,8 +5853,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6390,8 +5863,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-shortlink",
@@ -6401,8 +5873,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6413,8 +5884,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6424,8 +5894,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6435,8 +5904,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6447,8 +5915,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6459,8 +5926,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6470,8 +5936,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6481,8 +5946,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6492,8 +5956,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6503,8 +5966,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6514,8 +5976,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6525,8 +5986,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6536,8 +5996,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6547,8 +6006,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6558,8 +6016,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6570,8 +6027,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-status",
@@ -6581,8 +6037,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6594,8 +6049,7 @@
         "HIGH_RISK",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6606,8 +6060,7 @@
         "READ_SAFE",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6618,8 +6071,7 @@
         "READ_SAFE",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6630,8 +6082,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6641,8 +6092,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6652,8 +6102,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6664,8 +6113,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6675,8 +6123,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6687,8 +6134,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6699,8 +6145,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6711,8 +6156,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6722,8 +6166,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6734,8 +6177,7 @@
         "READ_SAFE",
         "OPERATOR"
       ],
-      "exposedInPhase3": true,
-      "plannedTool": false
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6745,8 +6187,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6756,8 +6197,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6767,8 +6207,7 @@
       "flags": [
         "DESTRUCTIVE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6778,8 +6217,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6789,8 +6227,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6800,8 +6237,7 @@
       "flags": [
         "READ_SAFE"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6811,8 +6247,7 @@
       "flags": [
         "MUTATION"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": true
+      "exposed": true
     },
     {
       "service": "atc-webhook-out",
@@ -6823,8 +6258,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6835,8 +6269,7 @@
         "MUTATION",
         "HIGH_RISK"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6847,8 +6280,7 @@
         "MUTATION",
         "ASYNC"
       ],
-      "exposedInPhase3": false,
-      "plannedTool": false
+      "exposed": false
     }
   ],
   "policy": {

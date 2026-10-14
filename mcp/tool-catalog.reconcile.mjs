@@ -1,82 +1,55 @@
 #!/usr/bin/env node
-// Marks tool-catalog.json entries `exposedInPhase3: true` for exactly the operationIds the real,
-// explicit tool allowlist (mcp/src/tools/index.mjs) actually calls -- nothing else. This is a
-// reconciliation step, not a generator: it never invents a tool from the catalog, it only records,
-// against the real allowlist, which classified operations that allowlist happens to use.
-// Run after tool-catalog.generate.mjs, and again whenever src/tools/index.mjs changes:
+// Writes the exposure decision into tool-catalog.json and checks it against the real tools:
+// - `policy` (per service: tools + one-line reason per excluded write class) is copied from
+//   tool-policy.mjs;
+// - every entry gets `exposed: true` exactly when a registered tool (src/tools/) calls it;
+// - the registered tools must be exactly the policy's tools (plus atc-stack.status's probes), every
+//   named operationId must exist, and every write operation of a service must be either a tool or
+//   listed as excluded with a reason.
+// Run after tool-catalog.generate.mjs, and whenever src/tools/ or tool-policy.mjs changes:
 // `node mcp/tool-catalog.generate.mjs && node mcp/tool-catalog.reconcile.mjs`.
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { POLICY } from './tool-policy.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
-// The real, hand-verified mapping from each exposed MCP tool to the operationId(s) its handler
-// calls. atc-stack.status is the one MCP-native aggregate: it calls the 3 operational probes on every
-// one of the 20 services, whatever that service happens to have named them (see
-// src/tools/index.mjs's findOp() comment on the real cross-service naming inconsistency).
-const OPERATIONAL_PROBE_OPIDS = [
-  'atc-gateway.health.check', 'atc-gateway.ready.check', 'atc-gateway.info.get',
-  'atc-notify.health.get', 'atc-notify.ready.get', 'atc-notify.info.get',
-  'atc-auth.health.get', 'atc-auth.ready.get', 'atc-auth.info.get',
-  'atc-media.ops.health', 'atc-media.ops.ready', 'atc-media.ops.info',
-  'atc-console.health.get', 'atc-console.ready.get', 'atc-console.info.get',
-  'atc-audit.health.get', 'atc-audit.ready.get', 'atc-audit.info.get',
-  'atc-shortlink.health.get', 'atc-shortlink.ready.get', 'atc-shortlink.info.get',
-  'atc-flags.health.get', 'atc-flags.ready.get', 'atc-flags.info.get',
-  'atc-scheduler.health.get', 'atc-scheduler.ready.get', 'atc-scheduler.info.get',
-  'atc-webhook-out.health.get', 'atc-webhook-out.ready.get', 'atc-webhook-out.info.get',
-  'atc-search.system.health', 'atc-search.system.ready', 'atc-search.system.info',
-  'atc-ratelimit.health.check', 'atc-ratelimit.ready.check', 'atc-ratelimit.info.get',
-  'atc-geo.health.check', 'atc-geo.ready.check', 'atc-geo.info.get',
-  'atc-content.health.get', 'atc-content.ready.get', 'atc-content.info.get',
-  'atc-export.health.get', 'atc-export.ready.get', 'atc-export.info.get',
-  'atc-render.health.get', 'atc-render.ready.get', 'atc-render.info.get',
-  'atc-queue.health.get', 'atc-queue.ready.get', 'atc-queue.info.get',
-  'atc-backup.health.get', 'atc-backup.ready.get', 'atc-backup.info.get',
-  'atc-status.health.get', 'atc-status.ready.get', 'atc-status.info.get',
-  'atc-payments.health.get', 'atc-payments.ready.get', 'atc-payments.info.get',
-];
-
-export const TOOL_TO_OPERATION_IDS = {
-  'atc-stack.status': OPERATIONAL_PROBE_OPIDS,
-  'atc-flags.evaluate': ['atc-flags.evaluate.post'],
-  'atc-geo.ip.lookup': ['atc-geo.ip.lookup'],
-  'atc-media.files.get': ['atc-media.files.get'],
-  'atc-notify.messages.list': ['atc-notify.messages.list'],
-  'atc-notify.messages.create': ['atc-notify.messages.create'],
-  'atc-notify.messages.get': ['atc-notify.messages.get'],
-  'atc-shortlink.links.create': ['atc-shortlink.links.create'],
-  'atc-ratelimit.check': ['atc-ratelimit.check'],
-  'atc-search.query': ['atc-search.query.get'],
-};
+/** Problems between policy, tools and catalog; empty when they agree. @param {any} catalog @param {{ name: string, operations: string[] }[]} tools */
+export function check(catalog, tools) {
+  /** @type {string[]} */
+  const problems = [];
+  const ids = new Set(catalog.entries.map((/** @type {any} */ e) => e.operationId));
+  const called = new Set(tools.filter((t) => t.name !== 'atc-stack.status').flatMap((t) => t.operations));
+  const allowed = new Set(Object.values(POLICY).flatMap((p) => p.tools));
+  for (const id of called) if (!allowed.has(id)) problems.push(`tool calls ${id}, which tool-policy.mjs does not allow`);
+  for (const id of allowed) if (!called.has(id)) problems.push(`tool-policy.mjs allows ${id}, but no tool calls it`);
+  for (const [service, p] of Object.entries(POLICY)) {
+    for (const id of [...p.tools, ...p.excluded.flatMap((x) => x.ops)]) if (id !== '*' && !ids.has(id)) problems.push(`${service}: ${id} is not an operationId in any spec`);
+    for (const x of p.excluded) if (!x.reason || x.reason.length < 10) problems.push(`${service}: excluded ${x.ops.join(', ')} has no reason`);
+    if (p.excluded.some((x) => x.ops.includes('*'))) continue;
+    const covered = new Set([...p.tools, ...p.excluded.flatMap((x) => x.ops)]);
+    for (const e of catalog.entries) if (e.service === service && !e.flags.includes('READ_SAFE') && !covered.has(e.operationId)) problems.push(`${service}: write operation ${e.operationId} is neither a tool nor excluded with a reason`);
+  }
+  return problems;
+}
 
 async function main() {
   const { TOOLS } = await import('./src/tools/index.mjs');
-  const toolNames = new Set(TOOLS.map((t) => t.name));
-  const mappedNames = new Set(Object.keys(TOOL_TO_OPERATION_IDS));
-  if (toolNames.size !== mappedNames.size || [...toolNames].some((n) => !mappedNames.has(n))) {
-    throw new Error(
-      `TOOL_TO_OPERATION_IDS in this file is out of sync with src/tools/index.mjs's real allowlist. ` +
-      `Tools: [${[...toolNames].join(', ')}]. Mapped: [${[...mappedNames].join(', ')}]. Update TOOL_TO_OPERATION_IDS.`,
-    );
-  }
-
-  const exposedOpIds = new Set(Object.values(TOOL_TO_OPERATION_IDS).flat());
   const catalogPath = path.join(HERE, 'tool-catalog.json');
   const catalog = JSON.parse(await readFile(catalogPath, 'utf8'));
+  const problems = check(catalog, TOOLS);
+  if (problems.length) throw new Error(`tool policy, tools and catalog disagree:\n- ${problems.join('\n- ')}`);
+  const exposedOpIds = new Set(TOOLS.flatMap((/** @type {{ operations: string[] }} */ t) => t.operations));
   let exposedCount = 0;
   for (const entry of catalog.entries) {
-    entry.exposedInPhase3 = exposedOpIds.has(entry.operationId);
-    if (entry.exposedInPhase3) exposedCount += 1;
+    delete entry.exposedInPhase3;
+    entry.exposed = exposedOpIds.has(entry.operationId);
+    if (entry.exposed) exposedCount += 1;
   }
-  const unmatched = [...exposedOpIds].filter((id) => !catalog.entries.some((e) => e.operationId === id));
-  if (unmatched.length) {
-    throw new Error(`TOOL_TO_OPERATION_IDS names operationId(s) not found in any spec: ${unmatched.join(', ')}`);
-  }
-
+  catalog.policy = POLICY;
   await writeFile(catalogPath, JSON.stringify(catalog, null, 2) + '\n');
-  console.log(`Reconciled: ${exposedCount}/${catalog.totalOperations} canonical operations are used by the ${toolNames.size} exposed MCP tools.`);
+  console.log(`Reconciled: ${exposedCount}/${catalog.totalOperations} canonical operations are used by the ${TOOLS.length} exposed MCP tools.`);
 }
 
-main().catch((err) => { console.error(err.stack || err.message); process.exit(1); });
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) main().catch((err) => { console.error(err.stack || err.message); process.exit(1); });

@@ -11,7 +11,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = path.resolve(HERE, '..', '..', '..');
 const SERVICES = ['atc-gateway', 'atc-notify', 'atc-auth', 'atc-media', 'atc-console', 'atc-audit', 'atc-shortlink', 'atc-flags', 'atc-scheduler', 'atc-webhook-out', 'atc-search', 'atc-ratelimit', 'atc-geo', 'atc-content', 'atc-export', 'atc-render', 'atc-queue', 'atc-backup', 'atc-status', 'atc-payments'];
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
-/** @typedef {{ service: string, operationId: string, method: string, path: string, flags: string[], exposedInPhase3: boolean }} CatalogEntry */
+/** @typedef {{ service: string, operationId: string, method: string, path: string, flags: string[], exposed: boolean }} CatalogEntry */
 /** @type {{ totalOperations: number, entries: CatalogEntry[] }} */
 const catalog = JSON.parse(await readFile(path.join(HERE, '..', 'tool-catalog.json'), 'utf8'));
 
@@ -45,8 +45,8 @@ test('operationIds are globally unique within the catalog (matches Phase 1\'s ow
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('the catalog is a candidate universe, not the exposed tool list: far fewer entries are exposedInPhase3', async () => {
-  const exposedCount = catalog.entries.filter((e) => e.exposedInPhase3).length;
+test('the catalog is not the tool list: only the operations a tool calls are exposed', async () => {
+  const exposedCount = catalog.entries.filter((e) => e.exposed).length;
   const { TOOLS } = await import('../src/tools/index.mjs');
   assert.ok(exposedCount > 0, 'reconcile.mjs has not been run, or found nothing');
   assert.ok(exposedCount < catalog.totalOperations, 'catalog exposure count must not equal the full catalog -- that would mean every operation became a tool');
@@ -55,17 +55,24 @@ test('the catalog is a candidate universe, not the exposed tool list: far fewer 
   assert.notEqual(exposedCount, TOOLS.length, 'exposedCount and tool count coincidentally matching would be worth double-checking by hand');
 });
 
-test('no auth/console business operation is exposedInPhase3 -- only their operational probes (health/ready/info), via atc-stack.status, are', () => {
-  const exposed = catalog.entries.filter((e) => e.exposedInPhase3 && (e.service === 'atc-auth' || e.service === 'atc-console'));
-  for (const e of exposed) {
-    assert.deepEqual(e.flags, ['READ_SAFE', 'OPERATOR'], `${e.service}.${e.operationId} is exposed but is not a plain operational probe (flags: ${e.flags.join(',')})`);
+test('atc-auth exposes read operations only and atc-console only its probes', () => {
+  for (const e of catalog.entries.filter((x) => x.exposed && x.service === 'atc-console')) assert.deepEqual(e.flags, ['READ_SAFE', 'OPERATOR'], `${e.operationId} (${e.flags.join(',')})`);
+  for (const e of catalog.entries.filter((x) => x.exposed && x.service === 'atc-auth')) assert.ok(e.method === 'GET' && e.flags.includes('READ_SAFE'), `${e.operationId} is exposed but not a read`);
+});
+
+test('no DESTRUCTIVE operation is exposed; HIGH_RISK only as an atc-auth read', () => {
+  for (const e of catalog.entries.filter((x) => x.exposed)) {
+    assert.ok(!e.flags.includes('DESTRUCTIVE'), `${e.operationId} is DESTRUCTIVE and must not be exposed`);
+    if (e.flags.includes('HIGH_RISK')) assert.ok(e.service === 'atc-auth' && e.method === 'GET', `${e.operationId} is HIGH_RISK and must not be exposed`);
   }
 });
 
-test('no DESTRUCTIVE or HIGH_RISK operation is exposedInPhase3', () => {
-  const exposed = catalog.entries.filter((e) => e.exposedInPhase3);
-  for (const e of exposed) {
-    assert.ok(!e.flags.includes('DESTRUCTIVE'), `${e.operationId} is DESTRUCTIVE and must not be exposed`);
-    assert.ok(!e.flags.includes('HIGH_RISK'), `${e.operationId} is HIGH_RISK and must not be exposed`);
-  }
+test('policy in the catalog matches tool-policy.mjs and agrees with the tools; every write is a tool or excluded with a reason', async () => {
+  const { POLICY } = await import('../tool-policy.mjs');
+  const { TOOLS } = await import('../src/tools/index.mjs');
+  const { check } = await import('../tool-catalog.reconcile.mjs');
+  assert.deepEqual(/** @type {any} */ (catalog).policy, POLICY, 'run npm run mcp:catalog');
+  assert.deepEqual(check(catalog, TOOLS), []);
+  const exposed = new Set(catalog.entries.filter((e) => e.exposed).map((e) => e.operationId));
+  for (const t of TOOLS) for (const id of t.operations) assert.ok(exposed.has(id), `${id} is called by ${t.name} but not marked exposed`);
 });
