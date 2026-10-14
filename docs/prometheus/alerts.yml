@@ -1,0 +1,88 @@
+# Prometheus alert rules for the atc-web services. Metric names come from each service's /metrics.
+# Load with:  rule_files: [alerts.yml]  in prometheus.yml (scrape jobs: see docs/OBSERVABILITY.md).
+# Scrape job names are assumed to be the service id, e.g. job="atc-queue".
+groups:
+  - name: atc-web-availability
+    rules:
+      - alert: AtcServiceDown
+        expr: up{job=~"atc-.*"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.job }} does not answer /metrics" }
+      - alert: AtcStatusMonitorDown
+        expr: status_monitor_up == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "Monitor {{ $labels.monitor }} has been failing for 5 minutes" }
+      - alert: AtcIncidentOpen
+        expr: status_incident_open > 0
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "A status incident has been open for 10 minutes" }
+
+  - name: atc-web-backups
+    rules:
+      - alert: AtcBackupFailed
+        expr: backup_last_ok == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: "The last backup of {{ $labels.source }} failed" }
+      - alert: AtcBackupStale
+        expr: time() - backup_last_success_timestamp_seconds > 12 * 3600
+        labels: { severity: critical }
+        annotations: { summary: "No successful backup of {{ $labels.source }} for 12 hours (the default interval is 6)" }
+      - alert: AtcRestoreDrillFailed
+        expr: backup_last_drill_ok == 0
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "The restore drill of {{ $labels.source }} failed: the newest backup may not open" }
+
+  - name: atc-web-queues-and-delivery
+    rules:
+      - alert: AtcQueueBacklogOld
+        expr: queue_oldest_ready_seconds > 900
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "Queue {{ $labels.queue }}: the oldest ready message has waited over 15 minutes" }
+      - alert: AtcQueueDeadLetters
+        expr: queue_messages{state="dead"} > 0
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "Queue {{ $labels.queue }} holds dead messages" }
+      - alert: AtcWebhookBacklog
+        expr: webhook_oldest_queued_age_seconds > 600
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "Webhook deliveries wait more than 10 minutes" }
+      - alert: AtcWorkerDown
+        expr: (scheduler_worker_up == 0) or (webhook_worker_up == 0)
+        for: 2m
+        labels: { severity: critical }
+        annotations: { summary: "A background worker is not running" }
+      - alert: AtcPaymentsOutboxStuck
+        expr: payments_outbox_pending > 20
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "Payment events pile up in the outbox" }
+
+  - name: atc-web-pipelines
+    rules:
+      - alert: AtcAuditForwardBacklog
+        expr: audit_forward_pending > 500
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.job }} cannot deliver audit events to atc-audit" }
+      - alert: AtcEventPublishBacklog
+        expr: events_publish_pending > 500
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: "{{ $labels.job }} cannot deliver events to atc-webhook-out" }
+      - alert: AtcAuditSilent
+        expr: audit_events_received_last_hour == 0
+        for: 2h
+        labels: { severity: warning }
+        annotations: { summary: "atc-audit received no events for two hours" }
+      - alert: AtcGeoDatabaseStale
+        expr: geo_database_stale == 1
+        labels: { severity: info }
+        annotations: { summary: "The IP database is older than MMDB_MAX_AGE_DAYS" }

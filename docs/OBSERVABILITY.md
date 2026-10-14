@@ -163,3 +163,32 @@ check of that service's own dependencies (its database, and for a couple of serv
 synchronous upstream — see each service's `docs/READINESS.md`). Neither endpoint should ever have
 a side effect beyond reading current status; Stage 0 fixed one service (`atc-media`) where `/ready` had
 one (see `atc-media/docs/READINESS.md`, "Readiness endpoint").
+
+## Metrics, alert rules and a dashboard
+
+Every service serves Prometheus text on `/metrics` behind a `read` key (`Authorization: Bearer <key>`). One scrape job per service, named after the service id, keeps the rules portable:
+
+```yaml
+scrape_configs:
+  - job_name: atc-queue
+    static_configs: [{ targets: ['127.0.0.1:3016'] }]
+    authorization: { credentials_file: /etc/prometheus/keys/atc-queue }   # the console's key for that service
+```
+
+[`prometheus/alerts.yml`](prometheus/alerts.yml) holds ready rules: service down, status monitor down and open incidents, backup failed / stale / restore drill failed, queue backlog age and dead letters, webhook backlog, stopped workers, payments outbox, audit and event forwarding backlogs, a silent audit service, and a stale IP database. Thresholds are starting points; the 12-hour backup rule assumes the default `BACKUP_INTERVAL_MIN=360`. Check the file with `promtool check rules docs/prometheus/alerts.yml`.
+
+Dashboard panels worth building first (Grafana or any other tool that reads PromQL):
+
+| Panel | Query |
+|---|---|
+| Services up | `up{job=~"atc-.*"}` |
+| Gateway traffic and refusals | `rate(gateway_requests_total[5m])` by status class |
+| Queue depth by state | `queue_messages` by `queue`, `state` |
+| Oldest ready message | `queue_oldest_ready_seconds` |
+| Backup age per source | `time() - backup_last_success_timestamp_seconds` |
+| Monitors failing | `count(status_monitor_up == 0)` |
+| Webhook backlog | `webhook_backlog`, `webhook_oldest_queued_age_seconds` |
+| Audit and event pipelines | `audit_forward_pending`, `events_publish_pending` |
+| Payments outbox | `payments_outbox_pending` |
+
+Logs: every service writes one JSON line per event to stdout (see "Structured log fields"). Under PM2 that lands in `~/.pm2/logs`; under Docker use the `json-file` or `journald` driver, or ship stdout to any collector that parses JSON lines. Join lines of one request across services by `reqId`.
