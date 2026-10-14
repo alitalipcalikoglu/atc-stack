@@ -62,7 +62,7 @@ shortlink    DOWN   ?        ?    ?      ?              (unreachable: connect EC
 Reads `/health`, `/ready` and `/v1/info` per service, entirely independently and entirely
 tolerant of failure — **no service reads another's `/v1/info` at startup, and this command never
 blocks or refuses to run anything**; it is an operator visibility tool, not a runtime coupling
-mechanism (see `IMPLEMENTATION_PLAN.md` Stage 7: "No startup checks"). One unreachable, too-old (no
+mechanism: there are no startup checks. One unreachable, too-old (no
 route yet — reads as a 404) or malformed (non-JSON, or JSON that isn't an object) service never
 aborts the command or throws; that row shows `?`/its error, every other row still reports normally.
 Every optional `/v1/info` field is read defensively — present but wrong-typed, or simply missing

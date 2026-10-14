@@ -1,11 +1,9 @@
 # Backup and restore
 
-What `stack backup`/`stack restore` (`npm run backup` / `npm run restore --` from `stack/`, or the
+What `stack backup`/`stack restore` (`npm run backup` / `npm run restore --` from `atc-stack/`, or the
 installed `atc-stack backup`/`atc-stack restore` binary — all three run the exact same code,
 `bin/stack.js` → `Stack#backup`/`Stack#restore` → `src/snapshot.js`'s `Snapshot` class) actually do,
-today, read from that code. This is the Stage 3 tooling; nothing here is a design intent that later
-shifted without the code catching up — where the plan (`IMPLEMENTATION_PLAN.md`, Stage 3) says
-something slightly different from what shipped, that's called out inline.
+today, read from that code.
 
 ## What a snapshot contains
 
@@ -71,13 +69,6 @@ actual bytes exist in exactly one place in a snapshot: its own file, under that 
 - **Symlinks, anywhere** — `Snapshot.create` throws rather than back up a symlink
   (`snapshot.js:214`, `#copyDir`'s symlink check at `snapshot.js:497`), and `restore()` refuses a
   snapshot entry that turns out to be a symlink (`#assertNoSymlinks`, `snapshot.js:472-476`).
-
-**Plan-vs-code note:** `IMPLEMENTATION_PLAN.md` Stage 3 describes the backup scope as it stood at
-Stage 3 (per-service DB, media objects/variants, atc-auth/keys, gateway routes.json, console
-services.json) — written before audit's anchor feature existed, so it says nothing about audit
-either way. Post-production Phase 3 added audit's anchor key material to `EXTRA_PATHS` without
-touching the Stage 3 scope for any other service; this is an addition to the plan's original scope,
-not a correction of it.
 
 ## Restore flow
 

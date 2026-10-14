@@ -3,8 +3,7 @@
 Generated TypeScript clients for the platform's 13 canonical OpenAPI contracts
 (`<service>/openapi.yaml` in each service's own repo). This directory is the *consumer* of those
 contracts, never the source of truth — the canonical contract always lives in the service's own
-repo, and `openapi.yaml` is what runtime behavior must match (see `atc-stack/docs/API_CONTRACT_AUDIT.md`
-and each repo's `openapi.yaml` itself).
+repo, and `openapi.yaml` is what runtime behavior must match.
 
 Toolchain: [`openapi-typescript`](https://openapi-ts.dev) 7.13.0 (spec → TypeScript types) +
 [`openapi-fetch`](https://openapi-ts.dev/openapi-fetch/) 0.17.0 (a ~6&nbsp;kB, native-`fetch`-based
@@ -109,15 +108,14 @@ stream has already been consumed by that parse — read bytes from `data`, not f
 
 None of that is built in, on purpose. Pass a standard `AbortSignal` via the per-call `init` if you
 need cancellation or a timeout — this is a transport, not a workflow SDK, and retrying a mutating
-call automatically is not safe in general (see `atc-stack/docs/API_CONTRACT_AUDIT.md` §K for which
-services have real state machines where a blind retry would be wrong).
+call automatically is not safe in general (notify, scheduler, webhook-out and media have real state
+machines where a blind retry would be wrong).
 
 ## What's generated vs. hand-written
 
 Every file under `<service>/` (`types.gen.ts`, `index.ts`) is fully generated and carries a
 "GENERATED FILE -- do not edit by hand" banner. Never edit them directly — edit the service's own
-`openapi.yaml` (only if it's genuinely wrong relative to real runtime behavior — see
-`atc-stack/docs/API_CONTRACT_AUDIT.md` §44's rule on this) and regenerate.
+`openapi.yaml` (only if it's genuinely wrong relative to real runtime behavior) and regenerate.
 
 `generate.mjs`, `check.mjs`, `services.mjs`, and everything under `test/` are hand-written tooling,
 not generated output.
@@ -126,8 +124,8 @@ not generated output.
 
 13/13 services have a generated client, one operationId-keyed method per operation, currently 376
 operations derived from the canonical specs. Explicit `any` count: 0. `unknown`/`Record<string, unknown>` is used only where the source
-OpenAPI spec itself has no real schema to offer (mainly console's pass-through proxy responses —
-see `atc-stack/docs/API_CONTRACT_AUDIT.md` §G) — never as a shortcut around a real, knowable shape.
+OpenAPI spec itself has no real schema to offer (mainly console's pass-through proxy responses) —
+never as a shortcut around a real, knowable shape.
 
 No package is published to any registry from this directory. These are repo-internal generated
 artifacts, consumed by cloning this repo — see the Phase 2 report for the reasoning.

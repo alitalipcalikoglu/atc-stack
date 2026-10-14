@@ -7,8 +7,7 @@ import { EnvFile } from './env-file.js';
  * Post-production Phase 4: an operator-triggered, one-shot run of media's real production
  * `Maintenance`/`MediaService#purge()` — never a second purge implementation.
  *
- * Trigger mechanism decision (see `atc-stack/docs/POST_PRODUCTION_PLAN.md` Phase 4 and the Phase 4
- * report): media's own HTTP API has no admin/operator auth tier distinct from its flat, roleless
+ * Trigger mechanism decision: media's own HTTP API has no admin/operator auth tier distinct from its flat, roleless
  * `MEDIA_API_KEYS` (every configured key can already upload/download/delete — see
  * `atc-media/src/http/api-key-auth.js`), so an HTTP endpoint here would either blur that public
  * upload/download boundary with an operator action, or require inventing a whole new auth tier

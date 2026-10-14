@@ -2,7 +2,7 @@
 
 There is no `stack upgrade` command. An upgrade is this documented sequence of existing commands —
 `atc-stack backup`/`restore`/`status`/`up`/`down` (`npm run backup`/`restore`/`status`/`up`/`down`
-from `stack/`, or `git`/`npm ci` per service — see `atc-stack/bin/stack.js:1-13` for the full command
+from `atc-stack/`, or `git`/`npm ci` per service — see `atc-stack/bin/stack.js:1-13` for the full command
 surface). See [BACKUP.md](BACKUP.md) for what a snapshot actually contains and the full restore
 outcome/rollback mechanics; this document only covers the upgrade sequence itself.
 
@@ -13,7 +13,7 @@ outcome/rollback mechanics; this document only covers the upgrade sequence itsel
   `@atc-web/atc-service-core`'s `Database` with its own `static MIGRATIONS` array — see "DB migration
   implications" below) and for any new required env var (`Config.fromEnv` in that service throws
   `ConfigError` at startup if one is missing — see "Config validation" below).
-- `atc-stack status --matrix` (from `stack/`) to record the current `version`/`schemaVersion`/
+- `atc-stack status --matrix` (from `atc-stack/`) to record the current `version`/`schemaVersion`/
   `serviceCore` of every service before you touch anything — this is your rollback reference point,
   and the same command you'll re-run at the end to confirm the upgrade (`atc-stack/src/stack.js:182-255`,
   `Stack#matrix`).
@@ -178,7 +178,7 @@ part of that service's own normal startup — there's nothing additional to run.
 an upgrade of an existing database go through the exact same migration code, so there's no separate
 "first run" path to get out of sync with the upgrade path.
 
-For the whole workspace at once: `atc-stack up [--split-workers]` (`npm run up` from `stack/`) —
+For the whole workspace at once: `atc-stack up [--split-workers]` (`npm run up` from `atc-stack/`) —
 iterates every service in manifest order (`atc-stack/src/manifest.js`) and `pm2 startOrRestart`s it.
 
 ## Readiness verification

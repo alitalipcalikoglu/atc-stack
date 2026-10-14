@@ -295,8 +295,7 @@ export const TOOLS = [
   // ---------------------------------------------------------------------------------------------
   // atc-search.query -- authenticated read, offset-based pagination (deliberately different pagination
   // style from atc-notify.messages.list's cursor style -- both are real, neither is normalized to
-  // match the other; see atc-stack/docs/API_CONTRACT_AUDIT.md §H on the platform's real field-naming
-  // inconsistency across services, left as-is per that doc's own deferred-policy note).
+  // match the other).
   // atc-search/openapi.yaml operationId atc-search.query.get, path {name}, query {q?, limit?, offset?, ...}.
   // ---------------------------------------------------------------------------------------------
   {

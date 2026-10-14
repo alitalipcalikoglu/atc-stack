@@ -1,44 +1,37 @@
 # ATC-WEB Project State
 
-Last source verification: 2026-10-14 (v1.14.1). This is a concise living handoff, not a specification or
-history log.
+Last source verification: 2026-10-14 (v1.14.1). A concise living handoff of the current state, not a
+history log; Git history and tags hold the past.
 
 ## Purpose and update rules
 
-Use this document to establish the current suite baseline before changing any repository. It does
-not replace source, tests, OpenAPI, installation manifests, release manifests, or immutable tags.
+Read this file before changing any repository, then verify the facts you rely on in source. It does
+not replace source, tests, OpenAPI, installation manifests or tags.
 
-- Read this file before implementation work, then verify affected facts in authoritative source.
-- Future implementation prompts must explicitly require reading this file before changes.
-- Update it when a migration stage or product phase is formally closed, including verified
-  development HEADs, material architecture decisions, accepted debt/deltas, and the next stage.
-- Remove debt only when its resolution is implemented and validated. Never mark a phase closed
-  before its acceptance gates pass.
-- Never rewrite immutable release history. Keep this document brief enough to read at session
-  start; link to canonical material instead of copying it.
-- If this document conflicts with current repository source, source wins and this file must be
-  corrected.
+- Update it when a release or product phase closes: verified HEADs, material decisions, debt.
+- Remove debt only when its resolution is implemented and validated.
+- If this document conflicts with repository source, source wins and this file is corrected.
+- Keep it short: current state only, no copied registries, secrets, local paths or transcripts.
 
 ## Workspace topology
 
-The workspace root is local-only and is not a Git repository. It contains 15 independent sibling
-repositories (all named `atc-<name>` since `v1.14.0`): 13 independently deployable HTTP services, `atc-service-core` (shared runtime package),
-and `atc-stack` (suite installer, orchestrator, and release-management repository). There is no
-monorepo-level commit or branch.
+The workspace root is local-only and is not a Git repository. It holds 15 independent repositories,
+all named `atc-<name>`: 13 independently deployable HTTP services, `atc-service-core` (shared runtime
+package) and `atc-stack` (installer, orchestrator and release management). Every repository,
+folder, package (`@atc-web/atc-<name>`), service id, PM2 name, operationId prefix and audit action
+prefix uses the `atc-` name. Environment variable names, database file names, error codes, metric
+names, gateway public routes and Console browser-storage keys use plain names.
 
 ## Source-of-truth hierarchy
 
-Consult these in order before trusting a summary here:
-
-1. Repository source, configuration, and tests.
+1. Repository source, configuration and tests.
 2. Each HTTP service's canonical root `openapi.yaml`.
-3. Authoritative `atc-stack/installation-manifests/` release-selection data and other stack manifests.
-4. Immutable Git tags and their peeled commits; `atc-stack/releases/` is historical validation
-   evidence, not installer input.
-5. This living handoff summary.
+3. `atc-stack/installation-manifests/`: the supported release pointer and its manifest.
+4. Annotated Git tags and their peeled commits.
+5. This summary.
 
 No production runtime may derive a second OpenAPI source of truth or depend on a hand-maintained
-route registry introduced for documentation.
+route registry.
 
 ## Current repository state
 
@@ -65,401 +58,78 @@ state update is necessarily newer.
 | atc-stack | Installer/orchestrator/release management | `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a` | `v1.14.1` → `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a` | v1.14.1 published and verified; pre-current-update baseline |
 | atc-webhook-out | HTTP service: durable outbound webhooks | `c7083127db8db21efb1d374f5074e6a4fdd2c46f` | `v1.14.1` → `c7083127db8db21efb1d374f5074e6a4fdd2c46f` | HEAD at release; subscription audit meta redacted |
 
-## Immutable releases
+## Current release
 
-- Supported production suite: all 15 repositories at `v1.14.1`, every one named `atc-<name>`.
-- `atc-stack` `v1.14.1` peels to `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a`;
-  `atc-service-core` `v1.14.1` peels to `d0ad58dfcea072cabc070e21833a3c01392655ff`.
-- Historical suite tags `v1.0.0` to `v1.14.0` and `atc-service-core` tags `v1.11.1` to `v1.13.0` remain
-  immutable; their manifests use the pre-rename names, which GitHub redirects.
-- The authoritative install matrix is `installation-manifests/v1.14.1.json`, selected by
-  `installation-manifests/supported.json`. Historical manifests are immutable. Never move tags.
+- Supported release: all 15 repositories at `v1.14.1`.
+- `atc-stack` `v1.14.1` peels to `a0bd32211a26e58c4fed6b9b670a31dba87fbd1a`; `atc-service-core`
+  `v1.14.1` peels to `d0ad58dfcea072cabc070e21833a3c01392655ff`.
+- `installation-manifests/supported.json` selects the install matrix; `releases/` holds the current
+  release notes and verification evidence. Tags are never moved.
 
 ## Current suite contract
 
-- 13 canonical `openapi.yaml` files, all OpenAPI 3.1.0.
-- Console: 122 paths and 156 operations. Suite: 376 canonical operations.
-- Generated TypeScript clients: 13/13, with 376/376 operation coverage and no regeneration drift.
-- MCP candidate catalog: 376 operations. Explicit exposure remains frozen at 10 tools.
-- MCP transport is STDIO only; there is no remote transport or automatic spec-to-tool exposure.
+- 13 canonical `openapi.yaml` files, all OpenAPI 3.1.0. Console: 122 paths, 156 operations. Suite:
+  376 operations.
+- Generated TypeScript clients: 13/13, 376/376 operations, no regeneration drift.
+- MCP: 376-operation candidate catalog, 10 explicitly exposed tools, STDIO transport only.
 
-Preserve these boundaries:
+Boundaries:
 
-- Canonical OpenAPI remains the API source of truth; tests may derive oracles but runtime code must
-  not gain a duplicate contract registry.
-- Service API keys stay server-side. Console sessions remain opaque and server-side.
-- Preserve SQLite compatibility and long-lived process-owned database connections; do not regress
-  to request-per-connection database access.
-- There is no generic downstream proxy. Large upload/download/export paths must remain streaming.
-- Authenticated APIs and session-aware HTML must never enter a service-worker cache.
-- The public stack command contract and immutable release tags must remain stable.
+- Canonical OpenAPI is the API source of truth; tests may derive oracles, runtime code must not
+  gain a duplicate contract registry.
+- Service API keys stay server-side. Console sessions are opaque and server-side.
+- Long-lived process-owned SQLite connections; no request-per-connection database access.
+- No generic downstream proxy. Large upload, download and export paths stream.
+- Authenticated APIs and session-aware HTML never enter a service-worker cache.
 
-## Installer and release constraints
+## Installer and release
 
-The established public workflow includes `stack install:all`, `stack setup`, `stack dev`,
-`stack up`, `stack down`, and `stack status`. `install:all` defaults to the supported immutable release;
-`--ref main` is an explicit moving development selection. GitHub supplies source, commits, and
-immutable tags. GitHub Actions/CI are intentionally absent; release validation runs locally.
+The public workflow is `stack install:all`, `stack setup`, `stack dev`, `stack up`, `stack down`
+and `stack status`. `install:all` installs the supported release; `--ref main` is the explicit
+moving development selection. GitHub supplies source and tags. There is no CI; release validation
+runs locally. Do not change the supported pointer, manifests or tags as a side effect of other work.
 
-Installation manifests under `installation-manifests/` are authoritative installer input.
-Historical `releases/` reports do not override them. Do not change release selection, installation
-manifests, tags, or release manifests as a side effect of unrelated work.
+## Console architecture
 
-## Architecture decisions
+One full-stack SvelteKit 2 application on adapter-node: one Node process, one HTTP framework, one
+filesystem router, SSR pages and filesystem API/operational endpoints. Root `server.mjs` wraps the
+adapter handler with HTTP/HTTPS, IPC readiness and graceful shutdown. `src/hooks.server.ts` owns the
+request, security and session lifecycle; the process-scoped runtime owns SQLite, maintenance,
+clients, documentation and audit forwarding. All 156 API operations and 34 page patterns live in
+`src/routes/`. The service worker caches only its own static assets and owns only its own
+`atc-console-static-` caches. Navigation is a left sidebar that becomes an off-canvas drawer below
+900 px, with the signed-in user and sign-out at its bottom. Stack rebuilds the Console at every
+`setup` and starts it through `server.mjs`.
 
-### Console current architecture
+Excluded by design: Fastify, a separate SPA or BFF, a custom router, `adapter-static`, a generic
+downstream proxy, and extra controller/service/repository layering.
 
-Console is now one full-stack SvelteKit 2 application on adapter-node: one Node process, one HTTP
-framework, one filesystem router, SSR-enabled pages, and explicit filesystem API/operational
-endpoints. Root `server.mjs` is the thin HTTP/HTTPS, IPC-readiness, and graceful-shutdown wrapper
-around the generated adapter handler. `src/hooks.server.ts` owns the request/security/session
-lifecycle, while the process-scoped runtime preserves the existing SQLite, maintenance, client,
-documentation, and audit primitives. All 156 API operations and all 34 browser patterns are owned
-directly by `src/routes/`. `/docs`, the local lazy Swagger UI, PWA lifecycle, theme, i18n, and toast
-host remain canonical SvelteKit integrations.
+## Known debt
 
-M8 removed the Fastify application, compatibility route copies, legacy `ui/` SPA, custom router,
-`App.svelte`, SPA fallback, legacy Vite build, and legacy service worker source. The canonical
-worker retains bounded cleanup for old Console cache names so deployed browsers upgrade safely.
-Stack records Console's `server.mjs` entry explicitly, rebuilds the adapter-node output at every
-setup boundary so an old `build/handler.js` cannot masquerade as current, and uses that metadata
-for `stack dev`; sibling services retain `src/index.js`. There is no selectable legacy Console
-runtime or compatibility entry file.
-
-### Console target architecture
-
-The approved target is a **full-stack SvelteKit Node application**:
-
-- one SvelteKit application, one HTTP framework, one filesystem router, and one Node process;
-- Svelte 5, TypeScript, `@sveltejs/adapter-node`, and SSR enabled;
-- backend endpoints under `src/routes/api/**/+server.ts` and operational filesystem routes;
-- frontend under `src/routes/**/+page.svelte` and layouts;
-- lifecycle via `src/hooks.server.ts`; small reusable server-only helpers under
-  `src/lib/server/**` are allowed.
-
-This is settled, not an open design question. The final architecture explicitly excludes Fastify,
-a Fastify/SvelteKit hybrid, a separate BFF, a separate `ui/` SPA, a custom frontend router, a
-central custom backend router, `adapter-static`, a generic downstream proxy, and gratuitous
-controller/application-service/domain-service/repository/adapter layering.
-
-## Console migration status
-
-| Stage | State | Scope |
-|---|---|---|
-| M0 | **CLOSED** | Contract freeze and migration safety net |
-| M1 | **CLOSED** | SvelteKit + adapter-node + TypeScript skeleton |
-| M2 | **CLOSED** | Runtime singleton, config, DB, maintenance, operational endpoints, wrapper |
-| M3 | **CLOSED** | Hooks, trace, session, auth, TOTP, roles, CSRF, logout CSRF correction |
-| M4 | **CLOSED** | JSON API filesystem endpoints |
-| M5 | **CLOSED** | Streaming and binary special paths |
-| M6 | **CLOSED** | Filesystem frontend routes, layouts, SSR |
-| M7 | **CLOSED** | API Docs, PWA, theme, i18n, toast |
-| M8 | **CLOSED** | Remove Fastify, old layers, `ui/`, custom router, SPA fallback; cut Stack consumers over |
-| M9 | **CLOSED** | Final Docker, PM2, admin CLI, and canonical-main Stack production integration |
-| M10 | **CLOSED** | Full parity/E2E/security/browser/stream/runtime audit and immutable v1.1.2 release |
-
-The Console SvelteKit migration is complete. There is no M11 or further migration stage.
-
-## Closed work
-
-Console M0 is closed at `5a806e41ea782ace48b6b67cdedd76e2af3f06bf`
-(`test: freeze console migration contracts`), whose parent is the immutable Console v1.1.0 commit
-`367790d8a1e5d560c93140b4efaaf8724bb4d69a`. Framework-neutral oracles live under
-`atc-console/test/migration/`; they are tests, not production configuration or an API registry.
-
-M0 closure evidence: Console 122 paths / 156 operations, suite 376 operations, frontend 34 URL
-patterns, 112/112 Console tests, typecheck with 0 errors/warnings, successful production build,
-156/156 route parity, 13/13 generated clients, 376 generated operations, 6/6 client tests, MCP
-catalog 376, 10 exposed tools, and 17/17 MCP tests.
-
-Console M1 is closed at `71c4191753371bb7383db1371cc8c39d3adb7f54`
-(`build: establish SvelteKit migration foundation`). It adds SvelteKit 2.70.3, adapter-node 5.5.7,
-strict TypeScript configuration, one SSR filesystem page, an interactive hydration proof, and an
-explicit server-only module boundary. The adapter-node and legacy production paths remain
-independent; no API or legacy page was migrated.
-
-M1 closure evidence: clean `npm ci`; 114/114 Console tests; legacy and SvelteKit typechecks with
-0 errors/warnings; adapter-node SSR build/runtime smoke; server-only client-bundle exclusion;
-successful unchanged legacy production build; 156/156 Console route parity; 13/13 generated
-clients with no drift; suite catalog 376 operations; and MCP exposure unchanged at 10 tools.
-
-Console M2 is closed at `dc851b24eed4908f5fff80558d56fbbcd137c4cc`
-(`feat: establish SvelteKit runtime foundation`). The SvelteKit migration runtime now owns one
-process-scoped resolved configuration, SQLite connection, maintenance timer, explicit readiness
-and idempotent shutdown lifecycle, and direct filesystem implementations of the four operational
-routes. Root `server.mjs` wraps only adapter-node's handler and Node HTTP/HTTPS process concerns.
-
-M2 closure evidence: clean `npm ci`; 118/118 Console tests; all legacy and SvelteKit typechecks
-with 0 errors/warnings; adapter-node SSR and runtime smoke; real HTTP and native HTTPS/HSTS;
-correct IPC readiness and graceful double-SIGTERM shutdown; byte-identical canonical OpenAPI;
-156/156 derived legacy-plus-SvelteKit route parity; successful legacy production build; 13/13
-generated clients without drift; suite catalog 376 operations; and MCP exposure unchanged at 10.
-
-Console M3 is closed at `5c81b347d72f94f205fc37e95c7b98aae30c376c`
-(`feat: migrate console auth lifecycle to SvelteKit`). `src/hooks.server.ts` now owns request IDs,
-trace context, trusted client IP, safe locals, process-scoped session resolution, the explicit CSRF
-boundary, and common security headers. Ten canonical filesystem operations now own login,
-pre-session TOTP, session state/logout, session listing/revocation, password change, and TOTP
-enrolment/confirmation/disable. Existing DB, token, password, TOTP, role, expiry, revocation, audit,
-and cookie primitives remain unchanged. Authenticated logout now requires
-`x-console-request: 1`; the legacy M0 assertion remains as history and M3 black-box coverage proves
-the corrected SvelteKit behavior. The canonical OpenAPI and generated Console client describe that
-approved delta without changing an operation identity or count.
-
-M3 closure evidence: 120/120 Console tests; legacy and SvelteKit typechecks with 0 errors/warnings;
-successful legacy production build; adapter-node SSR/hydration/server-only, HTTP/HTTPS, singleton,
-IPC and shutdown smokes; full M3 auth/session/TOTP/CSRF/cookie/trace/proxy black-box smoke; 14
-SvelteKit-owned plus 142 remaining Fastify-owned operations for exact 156/156 parity; 13/13
-generated clients and 376/376 generated operations without drift; MCP catalog 376, explicit tools
-unchanged at 10, and 17/17 MCP tests. Production dependency audit is clean; the existing three
-low-severity development-only `cookie` advisories remain as recorded below.
-
-Console M4 is closed at `6fca9bba4cee6f0519948ff6a80d6b93c440b32c`
-(`feat: migrate JSON API routes to SvelteKit`). All 138 ordinary JSON operations across local
-administration/audit, documentation, service overview/settings/status, and the notify, auth,
-media, audit, shortlink, flags, scheduler, webhook-out, search, ratelimit, and geo service families
-now have explicit `src/routes/api/**/+server.ts` owners. Existing validation schemas were extracted
-for reuse; a thin server-only helper supplies AJV validation and shared mechanics, while the
-process singleton owns the fixed downstream registry, clients, documentation loader, and audit
-forwarder. There is no central route-dispatch registry, generic proxy, or catch-all. API
-documentation work in M4 is backend-only; the frontend remains deferred to M7.
-
-M4 deliberately leaves exactly four Fastify-owned operations for M5:
-
-- `PUT /api/services/{sid}/media/files`
-- `GET /api/services/{sid}/media/files/{id}/bytes/{sub}`
-- `GET /api/services/{sid}/audit/events/export`
-- `GET /api/services/{sid}/shortlink/links/{id}/qr.png`
-
-M4 closure evidence: 120/120 Console tests; legacy and SvelteKit typechecks with 0 errors/warnings;
-successful legacy production build and adapter-node build; M1–M3 runtime/auth smokes and the M4
-adapter-node black-box smoke; 152 SvelteKit-owned plus four Fastify-owned operations for exact
-156/156 parity; Console 122 paths / 156 operations and suite 376 operations; 13/13 generated
-clients, 376/376 generated operations without drift, and 6/6 client tests; MCP catalog 376,
-explicit exposure unchanged at 10 tools, and 17/17 MCP tests. Production dependency audit is
-clean; the existing three low-severity development-only advisories remain unchanged.
-
-Console M5 is closed at `087204e887cb8250f89b0137dcb9aa1a743486a7`
-(`feat: migrate streaming routes to SvelteKit`). The media upload, media-byte download, audit
-export, and shortlink QR PNG operations now have explicit filesystem owners. Uploads stream with
-backpressure and actual-byte counting under the exact 512 MiB limit; the downstream request keeps
-its 300-second timeout and propagates cancellation. Media bytes and audit exports stream without
-read-all buffering; QR preserves its small buffered PNG contract. The established binary-header
-filter, hostile-SVG neutralization with byte identity, effective API `no-store`, and intentional
-non-forwarding of inbound `Range` are unchanged.
-
-M5 closure evidence: 124/124 Console tests; legacy and SvelteKit typechecks with 0 errors/warnings;
-successful legacy and adapter-node builds; M1–M4 smokes plus a real adapter-node M5 black-box smoke
-covering synchronized upload backpressure, declared and streamed size enforcement, byte/header
-identity, abort propagation, and graceful shutdown during an active export. Derivational parity is
-156 SvelteKit-owned plus zero Fastify migration-owned operations for exact 156/156 coverage.
-Console remains at 122 paths / 156 operations and the suite at 376 operations; 13/13 generated
-clients have 376/376 coverage without drift, while MCP remains 376 catalog operations, 10 exposed
-tools, and 17/17 tests. Production dependency audit is clean; the existing three low-severity
-development-only advisories remain unchanged.
-
-Console M6 is closed at `2b81ffb7a489a4cacfa387430b614108a5381d0a` across implementation
-commit `4c387fd774c2ffd6f1de08eb15491d68cd0afa9b` and parity-evidence commit
-`c5932bfd84144842b45ec6cdb8d78dd68e6a589e`, followed by runtime-smoke refresh commit
-`2b81ffb7a489a4cacfa387430b614108a5381d0a`. All 34 frozen browser URL patterns now have native
-`src/routes/**/+page.svelte` owners under public and authenticated route groups. Root server data
-contains only the safe principal summary and TOTP-pending flag; authenticated and admin-only
-guards execute before protected SSR HTML is rendered. The shared shell, login/TOTP UI, same-origin
-API client, URL query state, polling lifecycle, assets, global styles, and existing page/component
-behavior are canonical under `src/`. The custom router, `App.svelte` route switch, direct history
-machinery, and SPA fallback are not imported or required by the canonical frontend.
-
-M6 closure evidence: 126/126 Console tests; both legacy and canonical Svelte checks with 0 errors
-and 0 warnings; successful legacy and adapter-node production builds; derivational 34/34 filesystem
-route proof and real adapter-node direct-load checks for public/authenticated/admin classifications;
-anonymous, admin, viewer, logout/invalidation, dynamic/query, browser/API 404, and M5 binary UI
-contracts. Real Chrome verified hydration, client navigation, back/forward, refresh/deep links,
-role navigation, logout, and zero unexpected console errors; the established overflow probe passed
-at 1440×900 and 375×812. Client bundle and representative SSR HTML secret scans were clean.
-Backend ownership remains 156 SvelteKit and zero Fastify migration operations; Console remains 122
-paths / 156 operations and the suite 376. All 13 specs validate, generated clients remain 13/13 and
-376/376 without drift, and MCP remains 376 catalog entries with 10 exposed tools. Production audit
-is clean; the three existing low-severity development-only advisories are unchanged.
-
-Console M7 is closed at `2fa62941bb1057765e9926097b2e6527de80e1e6`
-(`feat: complete SvelteKit frontend integrations`). Authenticated `/docs` uses the server-owned
-13-service catalog and same-origin documentation endpoints; Swagger assets are local, dynamically
-loaded only on the docs route, request execution/Try-it-out and authorization persistence are
-disabled, and no service credential reaches browser requests, DOM, or storage. The canonical
-SvelteKit service worker uses a build-versioned owned cache, precaches only manifest/icons/robots,
-caches generated build assets on demand, and bypasses all navigation, non-GET, cross-origin, and
-`/api` requests. Activation removes only canonical/legacy Console caches, preserves unrelated
-origin caches, and safely supersedes the legacy worker. Manifest and icon references were
-validated; real Chrome registered and activated the worker.
-
-M7 closure evidence: 131/131 Console tests; both legacy and canonical Svelte checks with 0 errors
-and 0 warnings; successful legacy and adapter-node production builds; all M1–M7 runtime smokes;
-real Chrome coverage for anonymous/admin/viewer docs, two service selections, local rendering,
-external-network isolation, theme light/dark/system, Turkish/English persistence, singleton toast
-lifecycle, legacy-worker migration, cache inspection, narrow viewport, and logout/offline protected
-content. Frontend remains 34/34 filesystem routes and backend 156/156 SvelteKit operations, including
-M5 streaming/binary bypass. All 13 specs validate, generated clients remain 13/13 and 376/376
-without drift, and MCP remains 376 catalog entries with 10 exposed tools. Production audit and
-client/SSR/service-worker/browser-storage secret scans are clean. The known local lazy Swagger
-chunk remains 1,425,215 bytes, and the three existing low-severity development advisories remain.
-
-Console M8 is closed at `fdd530a8c2566f790c5879254371694c32c2a03b`
-(`refactor: complete SvelteKit runtime cutover`). The legacy Fastify entry/application/session/API
-layers, all compatibility route copies, `ui/`, custom router, `App.svelte`, SPA fallback, legacy
-Vite configuration, and legacy worker source are physically removed. Direct `fastify` and
-`@fastify/static` dependencies are gone; `fastify@5.12.4` remains only as service-core's optional
-peer resolution and is neither imported nor executed by Console. Canonical `start`, build, test,
-PM2, and container entrypoints now use adapter-node and `server.mjs`.
-
-M8 closure evidence: clean `npm ci`; 128/128 Console tests; typecheck/Svelte check with 0 errors
-and 0 warnings; HTTP/HTTPS, IPC, graceful shutdown, auth, M4 JSON, M5 streaming/binary, M6 route,
-M7 integration/security, and real-Chrome smokes; direct 156/156 SvelteKit API parity and 34/34
-filesystem frontend routing. Stack's obsolete `src/index.js` and `public/index.html` Console
-assumptions are removed from runtime, preparation, ecosystem checks, integration/migration tests,
-and generated-client smoke. Real Console→Audit and old-schema process tests pass through
-`server.mjs`; generated-client pilots pass 3/3. Stack's full suite passes 92/92 with
-`STACK_INTEGRATION=1` (the default run passes 62 and explicitly skips 30 process tests). All 13 specs
-remain at 376 operations, clients are 13/13 without drift with 6/6 tests, and MCP remains 376
-catalog entries, 10 exposed tools, and 17/17 tests. Production audit is clean; the accepted lazy
-Swagger bundle and three low-severity full-tree advisories remain. M9 still owns the broader final
-Docker, PM2, admin CLI, and end-to-end stack deployment audit; M8 performed only the required
-consumer cutover.
-
-Console M9 is closed at `c7951f68c72699c5166c073a4d1f38147084342b`
-(`feat: finalize production runtime integration`), with Stack integration at
-`18ee802f10945f485484d016fc14ba669cb0acbb` and the clean-clone Geo reference-data packaging fix at
-`da43d4c84f8e93c412f09e3f62b09963e48b9cf6`. Docker builds the adapter-node application and runs
-the one canonical `server.mjs` process as unprivileged `node`; its healthcheck follows configured
-`PORT`, runtime contents exclude route/client/test tooling, and `/data` plus `/config` remain the
-persistent/configuration contract. PM2 remains one fork-mode process with IPC readiness and the
-35-second shutdown window. The admin CLI shares canonical Config/DB/store/auth primitives and now
-accepts injected container environment without requiring a physical `.env` file.
-
-M9 closure evidence: deterministic image build; real non-root HTTP/custom-port and native HTTPS
-containers; health/readiness, HSTS, SSR/deep links, local docs/static/PWA assets, persistent
-SQLite/WAL/SHM, restart/reopen/integrity, fail-closed config, admin creation plus canonical login,
-and clean shutdown. Real isolated PM2 start/readiness/restart/stop/delete and foreground Stack dev
-shutdown passed without duplicate Console processes or leaked ports. Console passes 131/131 tests,
-typecheck/Svelte check with 0 errors and 0 warnings, all M4–M7/runtime/auth/browser smokes, 156/156
-API parity and 34/34 frontend routes. Stack passes 92/92 with `STACK_INTEGRATION=1`; setup now always
-refreshes Console's build. A fresh isolated `install:all --ref main` cloned 14 official repos, ran
-14 lockfile installs, configured and built the canonical Console; repeated final remote-main runs
-reused 14/14 safely, and start mode reached 13/13 ready before clean `down`. Geo's documented
-249-country source table is now tracked so a clean clone matches its runtime contract; API/DB
-semantics are unchanged. All 13 specs remain at 376 operations, clients are 13/13 and 376/376
-without drift, and MCP remains 376 catalog entries with 10 exposed tools. Production audit is zero;
-the accepted lazy Swagger bundle and three low-severity full-tree development advisories remain.
-Direct Fastify dependencies/imports remain absent; `fastify@5.12.4` is still only service-core's
-transitive optional peer. No API/OpenAPI, schema, auth/session, service-core, workflow, tag, release,
-supported pointer, or historical installation manifest changed.
-
-Console M10 is closed by immutable suite `v1.1.2`, with Console at
-`8c18bf0d35cf01982a4d08c5e76553b459eb7200`, Gateway at
-`c40fa55b279d110f194c6298c01fde6140282fa8`, and the Stack tag at
-`4747229ea30511f9fde6e44d7a9d6e5b2198355b`. The patch corrects stale current-version test
-oracles using package metadata read through independent test paths; it does not change runtime
-behavior or public contracts. Every suite package was versioned `1.1.2` before the complete final
-test gate. `atc-service-core` remains independently at `v1.12.0`.
-
-M10 closure evidence: all version-bumped repositories passed their full suites after the final
-version change (Console 131/131, Gateway 52/52, Stack 92/92 with integration and zero skips; exact
-counts for every repository are in `releases/v1.1.2.json`). Console check reported zero errors and
-warnings; parity remained 156/156 API and 34/34 frontend; the suite remained 13 specs and 376
-operations. Clients remained 13/13 and 376/376 with 6/6 unit tests and 3/3 real pilots. MCP remained
-376 catalog operations, 10 explicit tools, and 17/17 tests. Docker, non-loopback host publication,
-PM2, foreground dev, real Chrome, streaming, auth/security, persistence, TLS, shutdown, and failure
-gates passed. Production audit remained zero; the three accepted low development advisories remain.
-
-Pre-publication `install:all --ref main` matched the candidate manifest 14/14 and reached 13/13
-ready. After remote annotated tags and the supported pointer were published, a completely fresh
-official default `install:all` selected `1.1.2`, cloned 14/14 immutable refs, ran 14 deterministic
-installs and setup, built the canonical Console, and reached 13/13 ready. The immutable installed
-Console and Gateway suites passed 131/131 and 52/52. Installed identities, architecture, parity,
-Docs/PWA/downstream/trace/logout integration, generated-client pilots, 14/14 reuse, and dirty/
-wrong-origin/wrong-SHA fail-closed behavior passed. `v1.1.1` and all earlier tags were verified
-unchanged; no installer bypass or legacy fallback was introduced.
-
-Security patch `v1.1.3` is published and verified (`releases/v1.1.3.json`). Auth
-`DELETE /v1/users/{id}/sessions` and `.../sessions/{sid}` now require the `write` role, with a
-documented `403`. Media audits upload tickets by SHA-256 hash. Scheduler and webhook-out audit meta
-keep header names only, and scheduler drops the job target body. Fastify moved to `5.12.5` in
-every service and `atc-service-core` `v1.12.1`; Console `devalue` moved to `5.9.4`. Console declares
-`fastify` as a dev-only dependency plus `types: ["node"]` so `atc-service-core` JSDoc types resolve.
-Evidence: all 15 suites green after `npm ci`, Stack 92/92 with integration, all Console smokes
-including real Chrome, contracts unchanged at 376 operations, production audit zero, candidate
-`--ref main` and fresh default installs 14/14 exact and 13/13 ready, 14/14 reuse, historical tags
-unchanged. Docker and foreground-dev gates were not re-run for this patch.
-
-Release `v1.13.0` is published and verified (`releases/v1.13.0.json`). It unifies versioning across
-all 15 repositories and ships the auth enumeration fix: `verify-email/resend` and `password/forgot`
-always return `202`, and `ALREADY_VERIFIED`/`TOO_MANY_REQUESTS` are removed. No dependency changed.
-Candidate and fresh default installs matched 14/14 and reached 13/13 ready with 14/14 reuse;
-`v1.1.3` tags were verified unchanged. SvelteKit 3 is deliberately deferred.
-
-Release `v1.14.0` is published and verified (`releases/v1.14.0.json`). Every repository, workspace
-folder and service identity now carries the `atc-` prefix: package names, PM2 names, Stack and
-Console ids and types, `/v1/info` `service`, API key holder ids (audit `source`), all 376
-operationIds, audit action names, MCP tool names, generated client folders and Console URLs
-(`/atc-<type>/<sid>`, `/api/services/<sid>/atc-<type>/...`). Environment variable names, database
-file names, error codes, metric names, gateway public routes and Console browser-storage keys are
-deliberately unchanged. Audit accepts a hyphen in the first action segment. `sharp` `0.35.5` and
-MCP SDK `1.32.1` close two high advisories. Candidate and fresh default installs matched 14/14 and
-reached 13/13 ready with 14/14 reuse; `v1.13.0` tags were verified unchanged.
-
-Release `v1.14.1` is published and verified (`releases/v1.14.1.json`). It completes the rename
-(`/v1/info` schema ids, Console type/docs enums and tags, docs, examples, Docker names) and fixes
-Console icons, an update-toast effect loop after redeploys, ranked-list overflow and action
-wrapping, plus Stack output column widths. The layout probe lives at
-`atc-console/scripts/overflow-probe.js`. Verification covered every suite, all smokes, an 18-page
-visual check at 1280/375 px, workspace `setup`/`dev` (second setup byte-identical), 13/13 Docker
-images healthy as non-root with clean SIGTERM exits, and candidate/default installs at 14/14 and
-13/13 ready.
-
-## Known debt and deliberate migration deltas
-
-1. **Range:** the current media-byte path does not forward inbound `Range` downstream. M0 freezes
-   that behavior; any change requires an explicit behavior/security decision.
-2. Current media-byte and QR responses effectively receive `Cache-Control: no-store` from the
-   shared API response hook, overriding route-local cache directives. Treat the observable header
-   as the migration oracle unless deliberately changed and reviewed.
-3. **M1 development-tooling advisory:** production dependencies audit clean. The latest selected
-   SvelteKit 2.70.3 transitively pins `cookie` 0.6.0, which npm reports under a low-severity cookie
-   attribute validation advisory. No compatible fixed SvelteKit release is currently available;
-   monitor upstream rather than applying npm's breaking downgrade suggestion.
-4. **Swagger bundle size:** local Swagger UI remains a 1,425,215-byte lazy production chunk. It is
-   not an application entry, is not eagerly downloaded on ordinary pages, and remains accepted
-   until a separately justified optimization.
-5. **Console narrow-screen navigation:** below 768 px the Console uses a scrollable bottom bar whose
-   last label can be cut off; the workspace admin-panel rule asks for an off-canvas sidebar drawer.
-   Not changed in `v1.14.1`.
+1. **Range:** the media-byte path does not forward inbound `Range` downstream. Changing it needs an
+   explicit behavior and security decision.
+2. Media-byte and QR responses receive `Cache-Control: no-store` from the shared API response hook,
+   overriding route-local cache directives.
+3. **Development advisory:** SvelteKit 2.70.3 pins `cookie` 0.6.0 (low-severity, development-only);
+   the fix is the deferred SvelteKit 3 upgrade.
+4. **Swagger bundle size:** the local Swagger UI is a 1,425,215-byte lazy chunk, loaded only on
+   `/docs`.
 
 ## Operational constraints
 
-- No GitHub workflow files are used. Validation, tagging, and release checks remain local.
-- Do not modify production behavior while establishing migration scaffolding unless the active
-  stage explicitly authorizes a named delta.
-- Preserve server-side credentials, opaque sessions, schema compatibility, streaming behavior,
-  graceful shutdown, native TLS/proxy semantics, and PM2 readiness/shutdown contracts.
-- Do not create, move, replace, or delete immutable tags; do not infer release authorization from
-  completion of a migration stage.
+- No GitHub workflow files. Validation, tagging and release checks stay local.
+- Preserve server-side credentials, opaque sessions, schema compatibility, streaming, graceful
+  shutdown, native TLS/proxy semantics and PM2 readiness/shutdown contracts.
+- Never create, move or delete tags without an explicit release.
 
 ## Next controlled stage
 
-None. The Console SvelteKit migration is complete at the verified immutable `v1.1.2` suite. Do not
-create M11 or another migration stage. Future work is ordinary product maintenance and must preserve
-the canonical architecture, immutable release history, and accepted debt unless explicitly scoped.
+None. Future work is ordinary product maintenance. The SvelteKit 3 upgrade is deferred until its
+first patch releases settle.
 
 ## Update checklist
 
-When formally closing future work:
-
-1. Re-read authoritative source and verify all 15 repository branches, remotes, HEADs, and trees.
-2. Update the repository table, immutable release section only when a real release occurs, and the
-   current contract counts from canonical specs/tooling.
-3. Record the closed stage, acceptance evidence, material architecture decisions, and resulting
-   debt/deltas; mark exactly one next controlled stage.
-4. Resolve or remove debt entries only with validated evidence.
-5. Confirm this remains summary-only: no copied route registry, secrets, credentials, local paths,
-   machine details, or conversation transcript.
-6. Validate the affected repositories locally, inspect the documentation diff, then make a focused
-   commit without changing unrelated repositories or immutable release history.
+1. Verify all 15 repositories: branch, remote, HEAD, clean tree.
+2. Update the repository table, the current release and the contract counts from source.
+3. Record decisions and debt; remove debt only with validated evidence.
+4. Validate affected repositories locally, inspect the diff, then commit focused changes.

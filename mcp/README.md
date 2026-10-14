@@ -23,8 +23,7 @@ future edit that reintroduces one of these is a failing test, not a design doc n
 
 ## One server, small tool set, default deny
 
-This is **not** an API mirror. Of the platform's 376 canonical operations
-(`atc-stack/docs/API_CONTRACT_AUDIT.md`), exactly **10 tools** are exposed — see "Available tools"
+This is **not** an API mirror. Of the platform's 376 canonical operations, exactly **10 tools** are exposed — see "Available tools"
 below. `mcp/tool-catalog.json` classifies all 376 operations (service, method, path,
 `READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`)
 as a **candidate universe** for future phases — it is not the exposed list. The exposed list is
@@ -115,7 +114,7 @@ scheme, no API-path-shaped names like `notify_post_v1_messages`.
 
 `atc-notify.messages.list` returns `{items, nextCursor}`; `atc-search.query` returns
 `{hits, total, limit, offset}`. This is a **real, existing** platform inconsistency
-(`atc-stack/docs/API_CONTRACT_AUDIT.md` §H flags it as a deferred policy question), not something this
+(a deliberate open policy question), not something this
 package invented or should silently paper over. Each tool's output uses that operation's own real
 field names.
 
@@ -147,7 +146,7 @@ Every successful tool result: `{ content: [{type:'text', text: <short summary>}]
 { status, data, requestId? } }`. `data` is the real, typed response body. `requestId` is the
 service's own `X-Request-Id` when present (safe, useful for correlating with that service's logs);
 no other header is ever included — everything else on this platform is either routine or
-documented as internal-only propagation (`atc-stack/docs/API_CONTRACT_AUDIT.md`'s tracing section).
+documented as internal-only propagation in `atc-stack/docs/OBSERVABILITY.md`.
 
 ## Error translation
 
@@ -196,11 +195,10 @@ unreachable-service transport error, and STDIO purity / secret non-leakage.
 
 ## Adding a future tool
 
-1. The operation must already exist in that service's canonical `openapi.yaml`
-   ([Phase 1](../../docs/API_CONTRACT_AUDIT.md)).
-2. Regenerate/confirm the typed client is current: `npm run clients:check` from `stack/` must be
+1. The operation must already exist in that service's canonical `openapi.yaml`.
+2. Regenerate/confirm the typed client is current: `npm run clients:check` from `atc-stack/` must be
    green (a stale client is not a base to build a tool on).
-3. Classify it: re-run `npm run mcp:catalog` from `stack/` if the source spec changed, and look at
+3. Classify it: re-run `npm run mcp:catalog` from `atc-stack/` if the source spec changed, and look at
    its entry in `mcp/tool-catalog.json`.
 4. Make an explicit allowlist decision. `DESTRUCTIVE`/`HIGH_RISK` operations default deny; adding
    one requires a deliberate, reviewed policy change to this README and the allowlist tests, not

@@ -40,20 +40,10 @@ The default is the current supported **production release** (`1.14.1`): every si
 against the immutable tag and exact commit recorded in
 [`installation-manifests/v1.14.1.json`](installation-manifests/v1.14.1.json), selected by the explicit
 [`installation-manifests/supported.json`](installation-manifests/supported.json) pointer.
-From `1.13.0` on, every repository shares one version; `1.14.1` resolves `v1.14.1` everywhere. From
-`1.14.0` on, every repository, folder and service id carries the `atc-` prefix (`atc-notify`,
-`atc-service-core`, …). Releases before `1.14.0` use the old names and are installed with the
-Stack checkout of their own tag.
-The installation manifest is the source of truth. The immutable
-[`installation-manifests/v1.0.0.json`](installation-manifests/v1.0.0.json) and
-[`installation-manifests/v1.1.0.json`](installation-manifests/v1.1.0.json),
-[`installation-manifests/v1.1.1.json`](installation-manifests/v1.1.1.json),
-[`installation-manifests/v1.1.2.json`](installation-manifests/v1.1.2.json),
-[`installation-manifests/v1.1.3.json`](installation-manifests/v1.1.3.json),
-[`installation-manifests/v1.13.0.json`](installation-manifests/v1.13.0.json) and
-[`installation-manifests/v1.14.0.json`](installation-manifests/v1.14.0.json) descriptors remain
-available as immutable release history; release-validation reports under [`releases/`](releases/)
-are evidence and are deliberately not consumed by the installer.
+Every repository shares one version, and every repository, folder and service id carries the
+`atc-` prefix (`atc-notify`, `atc-service-core`, …). The installation manifest is the source of
+truth; the release notes under [`releases/`](releases/) are evidence and are deliberately not
+consumed by the installer.
 
 Explicit development installation resolves every sibling—including `atc-service-core`—to the current
 official `main` branch and reports the exact resolved commits. It is moving and non-immutable:
@@ -213,8 +203,6 @@ A new service is part of the stack from its first release. In the same delivery:
 
 ## Documentation
 
-- [docs/ARCHITECTURE_AUDIT.md](docs/ARCHITECTURE_AUDIT.md) — the platform-wide architecture review: what exists, what's missing, severity, proposed changes.
-- [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — the staged plan carrying that review out.
 - [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) — the request-id/`traceparent` propagation rules and structured-log field vocabulary every service is measured against.
 - [docs/UPGRADE.md](docs/UPGRADE.md) — how migrations apply on upgrade, what `backup`/`restore` cover, restore's validation and atomicity, and rollback.
 - [docs/READINESS_TEMPLATE.md](docs/READINESS_TEMPLATE.md) — the 19-section production-readiness contract; every service has its own filled copy at `<service>/docs/READINESS.md`.
