@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "channel": "release",
+  "release": "1.16.0",
+  "note": "Authoritative source of truth for stack install:all release-mode sibling repository resolution. Every entry binds the official repository, immutable annotated tag, and peeled commit.",
+  "repositories": {
+    "atc-service-core": { "repository": "https://github.com/alitalipcalikoglu/atc-service-core.git", "tag": "v1.16.0", "commit": "c2b5552cd69d3d9f6e115187c00a9e34c6d814b7" },
+    "atc-gateway": { "repository": "https://github.com/alitalipcalikoglu/atc-gateway.git", "tag": "v1.16.0", "commit": "24b2fd68912d7e2b89870593ad1e698488d2ccec" },
+    "atc-notify": { "repository": "https://github.com/alitalipcalikoglu/atc-notify.git", "tag": "v1.16.0", "commit": "03c633445f4e7a4636fadb05b0e9bc9c9bd27d5a" },
+    "atc-auth": { "repository": "https://github.com/alitalipcalikoglu/atc-auth.git", "tag": "v1.16.0", "commit": "440bc88a92ea85801a8c22b32da4f5bec94740f6" },
+    "atc-media": { "repository": "https://github.com/alitalipcalikoglu/atc-media.git", "tag": "v1.16.0", "commit": "7dec4e8efb92e5f7e14233acc82104898491b6a8" },
+    "atc-console": { "repository": "https://github.com/alitalipcalikoglu/atc-console.git", "tag": "v1.16.0", "commit": "9f7b31972aa715f2fd5e5cc1fcf92269f4b40d51" },
+    "atc-audit": { "repository": "https://github.com/alitalipcalikoglu/atc-audit.git", "tag": "v1.16.0", "commit": "b78d17693e61a4173c60b1b1cd6967d74b6a37d5" },
+    "atc-shortlink": { "repository": "https://github.com/alitalipcalikoglu/atc-shortlink.git", "tag": "v1.16.0", "commit": "3c4bddee0bcffef9c5e9dacdfcfda23252ef4062" },
+    "atc-flags": { "repository": "https://github.com/alitalipcalikoglu/atc-flags.git", "tag": "v1.16.0", "commit": "c3554cdb516e331ef7c963fe2ee0706def487349" },
+    "atc-scheduler": { "repository": "https://github.com/alitalipcalikoglu/atc-scheduler.git", "tag": "v1.16.0", "commit": "9909e02fb2863a3c2443db4cd40c0c58d1046054" },
+    "atc-webhook-out": { "repository": "https://github.com/alitalipcalikoglu/atc-webhook-out.git", "tag": "v1.16.0", "commit": "ab87d7146d461d6f335f015fbd29ac1b786244c0" },
+    "atc-search": { "repository": "https://github.com/alitalipcalikoglu/atc-search.git", "tag": "v1.16.0", "commit": "cfd2079a391b8cae4b8a1e9544a4b3b449fd0a7f" },
+    "atc-ratelimit": { "repository": "https://github.com/alitalipcalikoglu/atc-ratelimit.git", "tag": "v1.16.0", "commit": "b8e01cd4792cd738b49a4135ab89f18712b00651" },
+    "atc-geo": { "repository": "https://github.com/alitalipcalikoglu/atc-geo.git", "tag": "v1.16.0", "commit": "cab488690685481c1b7b9f2f4e4810855e166060" }
+  }
+}
