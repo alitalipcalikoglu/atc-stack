@@ -23,7 +23,7 @@ future edit that reintroduces one of these is a failing test, not a design doc n
 
 ## One server, explicit tool list, default deny
 
-This is **not** an API mirror. Of the platform's 595 canonical operations, **155 tools** are exposed (see "Available tools"). The scope, decided for the `1.26.0` suite:
+This is **not** an API mirror. Of the platform's 595 canonical operations, **155 tools** are exposed (see "Available tools"). The scope, decided for the `1.27.0` suite:
 
 - **Every service gets read tools plus safe writes**: create and update, enqueue, publish, start an export, render a stored document, create a monitor, create a payment intent, and similar calls that either can be undone by another safe call or only queue/start work.
 - **Nothing destructive or irreversible**: no delete, purge, clear, refund, cancel, restore, revoke, rotate, reset, key or role changes, dead-letter purge, and nothing that re-sends mail or deliveries. Every tool declares `destructiveHint: false`.
