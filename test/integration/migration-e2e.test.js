@@ -197,7 +197,7 @@ async function futureSchemaRefusalE2E({ serviceId, entry, seed, env, assertSenti
 // Positive E2E
 // ==================================================================================================
 
-test('notify: real old-schema (v2) fixture with an existing queued message migrates through a real process to v3, /ready, /v1/info, message still there, backup verified', { skip }, async () => {
+test('notify: real one-migration-behind fixture with an existing queued message migrates through a real process, /ready, /v1/info, message still there, backup verified', { skip }, async () => {
   /** @type {string} */ let sentinelId;
   const apiKey = randomSecret();
   await positiveMigrationE2E({
@@ -226,8 +226,8 @@ test('notify: real old-schema (v2) fixture with an existing queued message migra
       const raw = new DatabaseSync(dbPath, { readOnly: true });
       try {
         const row = /** @type {any} */ (raw.prepare('SELECT call_started_at FROM messages WHERE id = ?').get(seeded));
-        assert.equal(row.call_started_at, null, 'v3\'s new call_started_at column backfills to NULL for a pre-existing row, not some other default');
-        const backups = readdirSync(dirname(dbPath)).filter((f) => f.includes('.pre-v2-'));
+        assert.equal(row.call_started_at, null, 'call_started_at stays NULL for a pre-existing row');
+        const backups = readdirSync(dirname(dbPath)).filter((f) => /\.pre-v\d+-/.test(f));
         const backupRaw = new DatabaseSync(join(dirname(dbPath), backups[0]), { readOnly: true });
         try {
           const backupRow = /** @type {any} */ (backupRaw.prepare('SELECT status FROM messages WHERE id = ?').get(seeded));

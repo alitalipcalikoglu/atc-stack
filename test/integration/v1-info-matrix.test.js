@@ -76,7 +76,7 @@ test('notify\'s real /v1/info advertises exactly its email channel, templates an
   const res = await fetch(`${notify.baseUrl}/v1/info`);
   const body = await res.json();
   assert.equal(body.service, 'atc-notify');
-  assert.deepEqual(body.capabilities, ['email', 'templates', 'idempotency']);
+  assert.deepEqual(body.capabilities, ['email', 'templates', 'idempotency', 'suppressions', 'send-quotas']);
 });
 
 test('Stack#matrix(), pointed at these real running services (not a mock), parses their actual responses correctly', { skip }, async () => {
@@ -90,7 +90,7 @@ test('Stack#matrix(), pointed at these real running services (not a mock), parse
 
   assert.equal(byId['atc-notify'].ok, true);
   assert.equal(byId['atc-notify'].infoOk, true);
-  assert.deepEqual(byId['atc-notify'].capabilities, ['email', 'templates', 'idempotency']);
+  assert.deepEqual(byId['atc-notify'].capabilities, ['email', 'templates', 'idempotency', 'suppressions', 'send-quotas']);
 
   // The other 11 manifest entries point at closed ports and read as plain unreachable rows — the
   // command still completed and printed a full matrix rather than throwing over any of them.
