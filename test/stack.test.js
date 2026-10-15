@@ -104,7 +104,8 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   for (const id of ['atc-backup', 'atc-queue', 'atc-scheduler', 'atc-flags', 'atc-content', 'atc-auth', 'atc-status', 'atc-audit']) {
     assert.deepEqual([env(id).WEBHOOK_OUT_API_KEY, wk[id]?.role, env(id).WEBHOOK_OUT_URL.endsWith(':3009')], [wk[id]?.secret, 'publish', true], `${id} publishes events`);
   }
-  assert.equal(env('atc-webhook-out').SUBSCRIPTION_SEEDS, `alert-hub|http://127.0.0.1:3018/v1/hooks/webhook-out|ops.*|${env('atc-status').ALERT_HOOK_SECRET}`, 'ops.* events reach the alert hub');
+  assert.equal(env('atc-webhook-out').SUBSCRIPTION_SEEDS, `alert-hub|http://127.0.0.1:3018/v1/hooks/webhook-out|ops.*|${env('atc-status').ALERT_HOOK_SECRET},search-content|http://127.0.0.1:3010/v1/hooks/webhook-out|content.release.*|${env('atc-search').SYNC_HOOK_SECRET}`, 'ops.* events reach the alert hub, content releases the search mirror');
+  assert.deepEqual([env('atc-search').CONTENT_URL, env('atc-search').CONTENT_API_KEY === keys('atc-content', 'CONTENT_API_KEYS')['atc-search']?.secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export-reader']?.role, env('atc-export').SOURCE_NOTIFY_API_KEY === keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export-reader']?.secret], ['http://127.0.0.1:3013', true, 'admin', true]);
   assert.match(env('atc-status').ALERT_HOOK_SECRET, /^[0-9a-f]{64}$/);
   // The scheduler can call the services a job typically needs, each with the least role; export reads more sources.
   const tk = Object.fromEntries(env('atc-scheduler').TARGET_KEYS.split(',').map((e) => e.split(':')));
@@ -252,7 +253,7 @@ test('MCP config: an atc-mcp key per service with tools, smallest role, re-roled
     assert.ok(ro.changed.includes('atc-queue') && !ro.changed.includes('atc-audit'), 'only re-roled services change');
     assert.deepEqual([keyOf('atc-queue')?.role, keyOf('atc-queue')?.secret, keyOf('atc-payments')?.role], ['read', queueSecret, 'read'], 'same secret, read role');
     const roEnv = EnvFile.load(join(stackDir, 'mcp.env')).toObject();
-    assert.deepEqual([roEnv.STACK_MCP_NOTIFY_API_KEY, roEnv.STACK_MCP_MEDIA_API_KEY, roEnv.STACK_MCP_READ_ONLY], [undefined, undefined, 'true'], 'role-less services get no key in read-only mode');
+    assert.deepEqual([roEnv.STACK_MCP_NOTIFY_API_KEY === keyOf('atc-notify')?.secret, keyOf('atc-notify')?.role, roEnv.STACK_MCP_MEDIA_API_KEY, roEnv.STACK_MCP_READ_ONLY], [true, 'read', undefined, 'true'], 'notify gets a read key; role-less media gets none in read-only mode');
     assert.equal(stack.mcpConfig().readOnly, true, 'the saved mode is kept');
     assert.equal(stack.mcpConfig({ readOnly: false }).readOnly, false);
     assert.equal(keyOf('atc-queue')?.role, 'admin');

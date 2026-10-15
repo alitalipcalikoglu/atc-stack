@@ -236,7 +236,10 @@
     { "method": "POST", "path": "/api/services/{sid}/atc-payments/reconciliation" },
     { "method": "GET", "path": "/api/services/{sid}/atc-auth/users/{id}/export" },
     { "method": "POST", "path": "/api/services/{sid}/atc-auth/users/{id}/anonymize" },
-    { "method": "DELETE", "path": "/api/services/{sid}/atc-auth/users/{id}/mfa" }
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-auth/users/{id}/mfa" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-notify/suppressions" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-notify/suppressions" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-notify/suppressions/{email}" }
   ],
   "exclusions": [
     "GET /* (static asset serving via @fastify/static, wildcard over PUBLIC_DIR) and the SPA fallback in setNotFoundHandler: not an API contract, serves the built Svelte app (index.html) for unmatched non-API GET/HEAD paths."

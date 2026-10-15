@@ -30,7 +30,7 @@ export class McpConfig {
     'atc-flags': { full: 'readwrite', read: 'read' },
     'atc-geo': { full: 'readwrite', read: 'read' },
     'atc-media': { full: undefined, read: null },
-    'atc-notify': { full: undefined, read: null },
+    'atc-notify': { full: 'admin', read: 'read' }, // suppressions.list needs admin
     'atc-payments': { full: 'write', read: 'read' },
     'atc-queue': { full: 'admin', read: 'read' }, // queues.upsert needs admin
     'atc-ratelimit': { full: 'readwrite', read: 'read' },

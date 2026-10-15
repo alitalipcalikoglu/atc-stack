@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-15",
-  "totalOperations": 595,
+  "totalOperations": 608,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -2040,6 +2040,42 @@
       "path": "/api/services/{sid}/atc-notify/messages",
       "flags": [
         "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.suppressions.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-notify/suppressions",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.suppressions.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-notify/suppressions/{email}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-notify.suppressions.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-notify/suppressions",
+      "flags": [
+        "READ_SAFE",
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
@@ -4694,6 +4730,16 @@
     },
     {
       "service": "atc-notify",
+      "operationId": "atc-notify.hooks.bounces",
+      "method": "POST",
+      "path": "/v1/hooks/bounces",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-notify",
       "operationId": "atc-notify.info.get",
       "method": "GET",
       "path": "/v1/info",
@@ -4781,6 +4827,56 @@
     },
     {
       "service": "atc-notify",
+      "operationId": "atc-notify.suppressions.create",
+      "method": "POST",
+      "path": "/v1/suppressions",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-notify",
+      "operationId": "atc-notify.suppressions.delete",
+      "method": "DELETE",
+      "path": "/v1/suppressions/{email}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-notify",
+      "operationId": "atc-notify.suppressions.get",
+      "method": "GET",
+      "path": "/v1/suppressions/{email}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-notify",
+      "operationId": "atc-notify.suppressions.list",
+      "method": "GET",
+      "path": "/v1/suppressions",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-notify",
+      "operationId": "atc-notify.suppressions.report",
+      "method": "POST",
+      "path": "/v1/suppressions/events",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-notify",
       "operationId": "atc-notify.templates.list",
       "method": "GET",
       "path": "/v1/templates",
@@ -4788,6 +4884,26 @@
         "READ_SAFE"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-notify",
+      "operationId": "atc-notify.unsubscribe.confirm",
+      "method": "POST",
+      "path": "/v1/unsubscribe/{token}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-notify",
+      "operationId": "atc-notify.unsubscribe.page",
+      "method": "GET",
+      "path": "/v1/unsubscribe/{token}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-payments",
@@ -5752,6 +5868,16 @@
     },
     {
       "service": "atc-search",
+      "operationId": "atc-search.contentSync.run",
+      "method": "POST",
+      "path": "/v1/sync/content/{namespace}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-search",
       "operationId": "atc-search.documents.browse",
       "method": "GET",
       "path": "/v1/indexes/{name}/documents",
@@ -5789,6 +5915,16 @@
         "MUTATION"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-search",
+      "operationId": "atc-search.hooks.webhookOut",
+      "method": "POST",
+      "path": "/v1/hooks/webhook-out",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-search",
@@ -6907,7 +7043,9 @@
         "atc-notify.messages.list",
         "atc-notify.messages.create",
         "atc-notify.messages.get",
-        "atc-notify.templates.list"
+        "atc-notify.templates.list",
+        "atc-notify.suppressions.list",
+        "atc-notify.suppressions.get"
       ],
       "excluded": [
         {
@@ -6915,6 +7053,22 @@
             "atc-notify.messages.retry"
           ],
           "reason": "Sends an e-mail again to a real recipient."
+        },
+        {
+          "ops": [
+            "atc-notify.suppressions.create",
+            "atc-notify.suppressions.delete",
+            "atc-notify.suppressions.report"
+          ],
+          "reason": "Who may get mail is an operator decision; removing a suppression can mail someone who complained."
+        },
+        {
+          "ops": [
+            "atc-notify.hooks.bounces",
+            "atc-notify.unsubscribe.page",
+            "atc-notify.unsubscribe.confirm"
+          ],
+          "reason": "Provider and recipient endpoints, not an API for agents."
         }
       ]
     },
@@ -7108,6 +7262,18 @@
             "atc-search.documents.delete"
           ],
           "reason": "Irreversible."
+        },
+        {
+          "ops": [
+            "atc-search.contentSync.run"
+          ],
+          "reason": "Replaces every document of a mirror index; the content events keep it current."
+        },
+        {
+          "ops": [
+            "atc-search.hooks.webhookOut"
+          ],
+          "reason": "Signed delivery endpoint for atc-webhook-out."
         }
       ]
     },

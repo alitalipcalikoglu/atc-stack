@@ -92,8 +92,9 @@ export const TOOLS = [
       description: z.string().max(500).optional(),
       weights: z.object({ title: z.number().optional(), body: z.number().optional(), tags: z.number().optional() }).strict().describe("Partial weights; omitted fields keep their current value (create: the service default `{ title: 5, body: 1, tags: 3 }`). Each given value must be between 0 and…").optional(),
       facets: z.array(z.string().min(1).max(64)).max(20).describe("Attribute keys the console offers as filter groups. At most 20.").optional(),
+      language: z.enum(["none", "tr"]).describe("`tr` stems Turkish suffixes (case, possessive, plural) when indexing and searching; changing it reindexes the index in place. Default `none`.").optional(),
     },
-    map: {"body":"flat","bodyFields":["name","description","weights","facets"]},
+    map: {"body":"flat","bodyFields":["name","description","weights","facets","language"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -105,8 +106,9 @@ export const TOOLS = [
       description: z.string().max(500).optional(),
       weights: z.object({ title: z.number().optional(), body: z.number().optional(), tags: z.number().optional() }).strict().describe("Partial weights; omitted fields keep their current value (create: the service default `{ title: 5, body: 1, tags: 3 }`). Each given value must be between 0 and…").optional(),
       facets: z.array(z.string().min(1).max(64)).max(20).describe("Attribute keys the console offers as filter groups. At most 20.").optional(),
+      language: z.enum(["none", "tr"]).describe("`tr` stems Turkish suffixes (case, possessive, plural) when indexing and searching; changing it reindexes the index in place. Default `none`.").optional(),
     },
-    map: {"path":{"name":"name"},"body":"flat","bodyFields":["description","weights","facets"]},
+    map: {"path":{"name":"name"},"body":"flat","bodyFields":["description","weights","facets","language"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({

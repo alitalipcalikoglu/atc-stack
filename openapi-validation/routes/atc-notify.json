@@ -10,7 +10,15 @@
     { "method": "GET", "path": "/v1/messages/{id}" },
     { "method": "POST", "path": "/v1/messages/{id}/retry" },
     { "method": "GET", "path": "/v1/templates" },
-    { "method": "GET", "path": "/metrics" }
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/suppressions" },
+    { "method": "POST", "path": "/v1/suppressions" },
+    { "method": "GET", "path": "/v1/suppressions/{email}" },
+    { "method": "DELETE", "path": "/v1/suppressions/{email}" },
+    { "method": "POST", "path": "/v1/suppressions/events" },
+    { "method": "POST", "path": "/v1/hooks/bounces" },
+    { "method": "GET", "path": "/v1/unsubscribe/{token}" },
+    { "method": "POST", "path": "/v1/unsubscribe/{token}" }
   ],
   "exclusions": []
 }

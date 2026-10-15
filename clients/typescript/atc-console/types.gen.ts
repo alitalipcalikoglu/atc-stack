@@ -4633,6 +4633,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/services/{sid}/atc-notify/suppressions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List suppressed addresses
+         * @description Typed pass-through to the **notify** service instance named by `sid` — console relays this to its `GET /v1/suppressions`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-notify.suppressions.list"];
+        put?: never;
+        /**
+         * Suppress an address
+         * @description Typed pass-through to the **notify** service instance named by `sid` — console relays this to its `POST /v1/suppressions`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-notify.suppressions.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-notify/suppressions/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Allow mail to an address again
+         * @description Typed pass-through to the **notify** service instance named by `sid` — console relays this to its `DELETE /v1/suppressions/{email}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        delete: operations["atc-console.atc-notify.suppressions.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5078,6 +5132,8 @@ export interface components {
         SidParam: string;
         /** @description Downstream resource id, passed through URL-encoded. */
         IdParam: string;
+        /** @description An e-mail address, URL-encoded. */
+        EmailParam: string;
         /** @description Second-level downstream resource id (session, environment, document, override, subject, place or variant), passed through URL-encoded. */
         SubParam: string;
         /** @description Console administrator id (UUID). */
@@ -13609,6 +13665,112 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Done. console discards auth's response body. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-notify.suppressions.list": {
+        parameters: {
+            query?: {
+                limit?: string;
+                cursor?: string;
+                q?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the notify service's own `GET /v1/suppressions` response body, relayed unchanged. See the notify service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-notify.suppressions.create": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: email */
+                    email: string;
+                    /** @enum {string} */
+                    reason?: "hard_bounce" | "complaint" | "soft_bounce" | "unsubscribe" | "manual";
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the notify service's own `POST /v1/suppressions` response body, relayed unchanged. See the notify service's own OpenAPI document for the authoritative body. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-notify.suppressions.delete": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description An e-mail address, URL-encoded. */
+                email: components["parameters"]["EmailParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done. console discards notify's response body. */
             204: {
                 headers: {
                     [name: string]: unknown;

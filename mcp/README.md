@@ -23,7 +23,7 @@ future edit that reintroduces one of these is a failing test, not a design doc n
 
 ## One server, explicit tool list, default deny
 
-This is **not** an API mirror. Of the platform's 595 canonical operations, **155 tools** are exposed (see "Available tools"). The scope, decided for the `1.27.0` suite:
+This is **not** an API mirror. Of the platform's 608 canonical operations, **157 tools** are exposed (see "Available tools"). The scope, decided for the `1.27.0` suite:
 
 - **Every service gets read tools plus safe writes**: create and update, enqueue, publish, start an export, render a stored document, create a monitor, create a payment intent, and similar calls that either can be undone by another safe call or only queue/start work.
 - **Nothing destructive or irreversible**: no delete, purge, clear, refund, cancel, restore, revoke, rotate, reset, key or role changes, dead-letter purge, and nothing that re-sends mail or deliveries. Every tool declares `destructiveHint: false`.
@@ -36,7 +36,7 @@ How a tool comes to exist:
 - `tool-policy.mjs` names, per service, the operations that are tools and gives a one-line reason for every class of write operation that is not.
 - `tools.generate.mjs` turns those operations into explicit, committed definitions under `src/tools/services/<service>.mjs`: each tool is named after its `operationId`, and its input schema copies the operation's own path, query, header and body contract from its `openapi.yaml`. Nothing reads a spec at runtime.
 - `src/tools/hand-written.mjs` keeps `atc-stack.status` and the first ten tools as they were; `src/tools/overrides.mjs` holds the few deliberate tweaks (secret filtering, render always stored, extra descriptions).
-- `tool-catalog.json` classifies all 595 operations (`READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`), marks the ones a tool calls as `exposed`, and carries the policy. `tool-catalog.reconcile.mjs` fails when policy, tools and catalog disagree, or when a write operation is neither a tool nor excluded with a reason.
+- `tool-catalog.json` classifies all 608 operations (`READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`), marks the ones a tool calls as `exposed`, and carries the policy. `tool-catalog.reconcile.mjs` fails when policy, tools and catalog disagree, or when a write operation is neither a tool nor excluded with a reason.
 
 ## Install / build / configure / run
 
@@ -257,6 +257,8 @@ Not exposed:
 | `atc-notify.messages.create` | safe write, external |
 | `atc-notify.messages.get` | read |
 | `atc-notify.templates.list` | read |
+| `atc-notify.suppressions.list` | read (admin key) |
+| `atc-notify.suppressions.get` | read (admin key) |
 
 Not exposed:
 - `messages.retry`: Sends an e-mail again to a real recipient.

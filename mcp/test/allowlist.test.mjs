@@ -23,7 +23,7 @@ const HAND_TOOL_NAMES = [
 ];
 // Every other tool is named after the operation it calls, exactly as tool-policy.mjs lists it.
 const EXPECTED_TOOL_NAMES = [...HAND_TOOL_NAMES, ...Object.values(POLICY).flatMap((p) => p.tools).filter((id) => !HAND_WRITTEN_OPERATIONS.has(id))].sort();
-const EXPECTED_COUNT = 155;
+const EXPECTED_COUNT = 157;
 
 test('exposed tools are exactly the hand-written ones plus the policy\'s operations (count pinned)', () => {
   const actual = TOOLS.map((t) => t.name).sort();

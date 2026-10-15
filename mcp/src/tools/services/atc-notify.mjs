@@ -13,4 +13,26 @@ export const TOOLS = [
     map: {"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
+  operationTool({
+    service: "atc-notify",
+    operation: "atc-notify.suppressions.list",
+    description: "List suppressed addresses (admin key). Read-only.",
+    input: {
+      limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).optional(),
+      cursor: z.string().max(512).optional(),
+      q: z.string().max(254).describe("Part of the address.").optional(),
+    },
+    map: {"query":{"limit":"limit","cursor":"cursor","q":"q"},"body":"none"},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }),
+  operationTool({
+    service: "atc-notify",
+    operation: "atc-notify.suppressions.get",
+    description: "Is this address suppressed? (admin key). Read-only.",
+    input: {
+      email: z.string(),
+    },
+    map: {"path":{"email":"email"},"body":"none"},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }),
 ];

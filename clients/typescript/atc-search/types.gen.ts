@@ -309,6 +309,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/sync/content/{namespace}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mirror the newest published release of an atc-content namespace now
+         * @description Requires a `write`-role key whose scope covers `<CONTENT_INDEX_PREFIX><namespace>`. Fetches the newest release from atc-content and makes that index hold exactly its strings: one document per key and locale (`<locale>:<key>`), the text as title, the key's description as body, `namespace`/`locale`/`key` as attributes, `locale` as facet. The index is created on first use with `CONTENT_INDEX_LANGUAGE`. `503 SYNC_DISABLED` while `CONTENT_URL` is not set.
+         */
+        post: operations["atc-search.contentSync.run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hooks/webhook-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Content release events from atc-webhook-out (signed, no API key)
+         * @description A subscription on atc-webhook-out for `content.release.published` and `content.release.rolled_back` points here with `SYNC_HOOK_SECRET` as its secret. The delivery's `x-webhook-signature` is verified over the raw body; a release event syncs its namespace like `POST /v1/sync/content/{namespace}`, other event types are ignored. A failed sync answers with an error, so atc-webhook-out retries it.
+         */
+        post: operations["atc-search.hooks.webhookOut"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -349,6 +389,11 @@ export interface components {
             description: string;
             weights: components["schemas"]["Weights"];
             facets: string[];
+            /**
+             * @description `tr` stems Turkish suffixes (case, possessive, plural) when indexing and searching; changing it reindexes the index in place. Default `none`.
+             * @enum {string}
+             */
+            language: "none" | "tr";
             /** @description Live document count. */
             documents: number;
             /** Format: date-time */
@@ -373,11 +418,28 @@ export interface components {
             description?: string;
             weights?: components["schemas"]["WeightsInput"];
             facets?: components["schemas"]["FacetKeys"];
+            /**
+             * @description `tr` stems Turkish suffixes (case, possessive, plural) when indexing and searching; changing it reindexes the index in place. Default `none`.
+             * @enum {string}
+             */
+            language?: "none" | "tr";
         };
         PatchIndexRequest: {
             description?: string;
             weights?: components["schemas"]["WeightsInput"];
             facets?: components["schemas"]["FacetKeys"];
+            /**
+             * @description `tr` stems Turkish suffixes (case, possessive, plural) when indexing and searching; changing it reindexes the index in place. Default `none`.
+             * @enum {string}
+             */
+            language?: "none" | "tr";
+        };
+        ContentSyncResult: {
+            index: string;
+            release: number;
+            /** @description Documents of the previous release. */
+            removed: number;
+            indexed: number;
         };
         ClearResult: {
             /** @description Number of documents deleted. */
@@ -1170,6 +1232,108 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-search.contentSync.run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                namespace: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Synced. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentSyncResult"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description NAMESPACE_NOT_FOUND (atc-content does not know it). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description UPSTREAM_FAILED (atc-content answered with an error). */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description SYNC_DISABLED. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-search.hooks.webhookOut": {
+        parameters: {
+            query?: never;
+            header: {
+                "x-webhook-signature": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Synced, or ignored for other event types. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        outcome: "synced" | "ignored";
+                        index?: string;
+                        release?: number;
+                        removed?: number;
+                        indexed?: number;
+                    };
+                };
+            };
+            /** @description INVALID_SIGNATURE. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description SYNC_DISABLED or HOOK_DISABLED (no `SYNC_HOOK_SECRET`). */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
         };
     };
 }

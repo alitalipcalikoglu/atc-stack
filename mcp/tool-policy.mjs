@@ -84,8 +84,12 @@ export const POLICY = {
     ],
   },
   'atc-notify': {
-    tools: ['atc-notify.messages.list', 'atc-notify.messages.create', 'atc-notify.messages.get', 'atc-notify.templates.list'],
-    excluded: [{ ops: ['atc-notify.messages.retry'], reason: 'Sends an e-mail again to a real recipient.' }],
+    tools: ['atc-notify.messages.list', 'atc-notify.messages.create', 'atc-notify.messages.get', 'atc-notify.templates.list', 'atc-notify.suppressions.list', 'atc-notify.suppressions.get'],
+    excluded: [
+      { ops: ['atc-notify.messages.retry'], reason: 'Sends an e-mail again to a real recipient.' },
+      { ops: ['atc-notify.suppressions.create', 'atc-notify.suppressions.delete', 'atc-notify.suppressions.report'], reason: 'Who may get mail is an operator decision; removing a suppression can mail someone who complained.' },
+      { ops: ['atc-notify.hooks.bounces', 'atc-notify.unsubscribe.page', 'atc-notify.unsubscribe.confirm'], reason: 'Provider and recipient endpoints, not an API for agents.' },
+    ],
   },
   'atc-payments': {
     tools: ['atc-payments.payments.list', 'atc-payments.payments.get', 'atc-payments.ledger.list', 'atc-payments.events.list', 'atc-payments.stats.get', 'atc-payments.payments.create', 'atc-payments.payments.sync'],
@@ -128,7 +132,11 @@ export const POLICY = {
   },
   'atc-search': {
     tools: ['atc-search.indexes.list', 'atc-search.indexes.get', 'atc-search.query.get', 'atc-search.query.post', 'atc-search.suggest', 'atc-search.documents.get', 'atc-search.documents.browse', 'atc-search.stats.get', 'atc-search.indexes.create', 'atc-search.indexes.patch', 'atc-search.documents.upsert'],
-    excluded: [{ ops: ['atc-search.indexes.delete', 'atc-search.indexes.clear', 'atc-search.documents.delete'], reason: 'Irreversible.' }],
+    excluded: [
+      { ops: ['atc-search.indexes.delete', 'atc-search.indexes.clear', 'atc-search.documents.delete'], reason: 'Irreversible.' },
+      { ops: ['atc-search.contentSync.run'], reason: 'Replaces every document of a mirror index; the content events keep it current.' },
+      { ops: ['atc-search.hooks.webhookOut'], reason: 'Signed delivery endpoint for atc-webhook-out.' },
+    ],
   },
   'atc-shortlink': {
     tools: ['atc-shortlink.links.list', 'atc-shortlink.links.get', 'atc-shortlink.links.getStats', 'atc-shortlink.stats.get', 'atc-shortlink.links.create', 'atc-shortlink.links.patch'],

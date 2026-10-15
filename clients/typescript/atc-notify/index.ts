@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-notify's openapi.yaml (10 total).
+ * One operationId-keyed method per operation in atc-notify's openapi.yaml (18 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -40,6 +40,7 @@ export function createClient(config: ClientConfig) {
   });
   return {
     "atc-notify.health.get": (init: FetchOptions<operations["atc-notify.health.get"]>) => client.GET("/health", init),
+    "atc-notify.hooks.bounces": (init: FetchOptions<operations["atc-notify.hooks.bounces"]>) => client.POST("/v1/hooks/bounces", init),
     "atc-notify.info.get": (init: FetchOptions<operations["atc-notify.info.get"]>) => client.GET("/v1/info", init),
     "atc-notify.messages.create": (init: FetchOptions<operations["atc-notify.messages.create"]>) => client.POST("/v1/messages", init),
     "atc-notify.messages.get": (init: FetchOptions<operations["atc-notify.messages.get"]>) => client.GET("/v1/messages/{id}", init),
@@ -48,7 +49,14 @@ export function createClient(config: ClientConfig) {
     "atc-notify.metrics.get": (init: FetchOptions<operations["atc-notify.metrics.get"]>) => client.GET("/metrics", init),
     "atc-notify.openapi": (init: FetchOptions<operations["atc-notify.openapi"]>) => client.GET("/openapi.yaml", init),
     "atc-notify.ready.get": (init: FetchOptions<operations["atc-notify.ready.get"]>) => client.GET("/ready", init),
+    "atc-notify.suppressions.create": (init: FetchOptions<operations["atc-notify.suppressions.create"]>) => client.POST("/v1/suppressions", init),
+    "atc-notify.suppressions.delete": (init: FetchOptions<operations["atc-notify.suppressions.delete"]>) => client.DELETE("/v1/suppressions/{email}", init),
+    "atc-notify.suppressions.get": (init: FetchOptions<operations["atc-notify.suppressions.get"]>) => client.GET("/v1/suppressions/{email}", init),
+    "atc-notify.suppressions.list": (init: FetchOptions<operations["atc-notify.suppressions.list"]>) => client.GET("/v1/suppressions", init),
+    "atc-notify.suppressions.report": (init: FetchOptions<operations["atc-notify.suppressions.report"]>) => client.POST("/v1/suppressions/events", init),
     "atc-notify.templates.list": (init: FetchOptions<operations["atc-notify.templates.list"]>) => client.GET("/v1/templates", init),
+    "atc-notify.unsubscribe.confirm": (init: FetchOptions<operations["atc-notify.unsubscribe.confirm"]>) => client.POST("/v1/unsubscribe/{token}", init),
+    "atc-notify.unsubscribe.page": (init: FetchOptions<operations["atc-notify.unsubscribe.page"]>) => client.GET("/v1/unsubscribe/{token}", init),
   } as const;
 }
 

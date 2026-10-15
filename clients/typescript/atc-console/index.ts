@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (236 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (239 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -150,6 +150,9 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-notify.messages.list": (init: FetchOptions<operations["atc-console.atc-notify.messages.list"]>) => client.GET("/api/services/{sid}/atc-notify/messages", init),
     "atc-console.atc-notify.messages.retry": (init: FetchOptions<operations["atc-console.atc-notify.messages.retry"]>) => client.POST("/api/services/{sid}/atc-notify/messages/{id}/retry", init),
     "atc-console.atc-notify.messages.send": (init: FetchOptions<operations["atc-console.atc-notify.messages.send"]>) => client.POST("/api/services/{sid}/atc-notify/messages", init),
+    "atc-console.atc-notify.suppressions.create": (init: FetchOptions<operations["atc-console.atc-notify.suppressions.create"]>) => client.POST("/api/services/{sid}/atc-notify/suppressions", init),
+    "atc-console.atc-notify.suppressions.delete": (init: FetchOptions<operations["atc-console.atc-notify.suppressions.delete"]>) => client.DELETE("/api/services/{sid}/atc-notify/suppressions/{email}", init),
+    "atc-console.atc-notify.suppressions.list": (init: FetchOptions<operations["atc-console.atc-notify.suppressions.list"]>) => client.GET("/api/services/{sid}/atc-notify/suppressions", init),
     "atc-console.atc-notify.templates.list": (init: FetchOptions<operations["atc-console.atc-notify.templates.list"]>) => client.GET("/api/services/{sid}/atc-notify/templates", init),
     "atc-console.atc-payments.events.list": (init: FetchOptions<operations["atc-console.atc-payments.events.list"]>) => client.GET("/api/services/{sid}/atc-payments/provider-events", init),
     "atc-console.atc-payments.payments.anonymize": (init: FetchOptions<operations["atc-console.atc-payments.payments.anonymize"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/anonymize", init),

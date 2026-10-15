@@ -15,7 +15,7 @@ const read = (/** @type {string} */ p) => readFileSync(join(workspace, p), 'utf8
 test('consistency: every MCP role is one the service accepts (its own GRANTS, else the shared read/readwrite/admin)', { skip }, () => {
   for (const [id, r] of Object.entries(McpConfig.ROLES)) {
     if (r.full === undefined) continue; // keys without roles
-    const auth = read(`${id}/src/http/api-key-auth.js`);
+    const auth = existsSync(join(workspace, id, 'src/http/api-key-auth.js')) ? read(`${id}/src/http/api-key-auth.js`) : read(`${id}/src/auth.js`);
     const grants = /GRANTS = Object\.freeze\(\{([^)]*)\}\)/.exec(auth);
     const allowed = new Set(grants ? [...grants[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]) : ['read', 'readwrite', 'admin']);
     for (const role of [r.full, r.read]) if (role) assert.ok(allowed.has(role), `${id}: MCP role "${role}" is not accepted by the service (${[...allowed].join(', ')})`);

@@ -122,13 +122,17 @@ export const SERVICES = [
     env: (c) => ({
       ...auditEnv(c, 'atc-webhook-out'), SECRETS_KEY: c.secret('atc-webhook-out', 'SECRETS_KEY'), ...c.outbound('atc-webhook-out'),
       // The alert hub: every ops.* event is delivered, signed, to atc-status, which e-mails and lists it.
-      SUBSCRIPTION_SEEDS: `alert-hub|${c.url('atc-status')}/v1/hooks/webhook-out|ops.*|${c.secret('atc-status', 'ALERT_HOOK_SECRET')}`,
+      SUBSCRIPTION_SEEDS: `alert-hub|${c.url('atc-status')}/v1/hooks/webhook-out|ops.*|${c.secret('atc-status', 'ALERT_HOOK_SECRET')},search-content|${c.url('atc-search')}/v1/hooks/webhook-out|content.release.*|${c.secret('atc-search', 'SYNC_HOOK_SECRET')}`,
     }),
     console: { type: 'atc-webhook-out', label: 'Webhooks', keyEnv: 'WEBHOOK_OUT_API_KEY' },
   },
   {
     id: 'atc-search', port: 3010, keysVar: 'SEARCH_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-search'),}),
+    env: (c) => ({
+      ...auditEnv(c, 'atc-search'),
+      // Published atc-content releases are mirrored into content-<namespace> indexes (events through webhook-out).
+      CONTENT_URL: c.url('atc-content'), CONTENT_API_KEY: c.issue('atc-content', 'atc-search', 'read'), SYNC_HOOK_SECRET: c.secret('atc-search', 'SYNC_HOOK_SECRET'),
+    }),
     console: { type: 'atc-search', label: 'Search', keyEnv: 'SEARCH_API_KEY' },
   },
   {
@@ -158,6 +162,8 @@ export const SERVICES = [
       NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-export'),
       // Read keys on every source service; each export pages through that service's own list API.
       SOURCE_AUDIT_URL: c.url('atc-audit'), SOURCE_AUDIT_API_KEY: c.issue('atc-audit', 'atc-export-reader', 'read'),
+      // notify: every sender's messages and the suppression list need an admin key (a separate holder from the sending key above).
+      SOURCE_NOTIFY_URL: c.url('atc-notify'), SOURCE_NOTIFY_API_KEY: c.issue('atc-notify', 'atc-export-reader', 'admin'),
       SOURCE_AUTH_URL: c.url('atc-auth'), SOURCE_AUTH_API_KEY: c.issue('atc-auth', 'atc-export', 'read'),
       SOURCE_SHORTLINK_URL: c.url('atc-shortlink'), SOURCE_SHORTLINK_API_KEY: c.issue('atc-shortlink', 'atc-export', 'read'),
       SOURCE_FLAGS_URL: c.url('atc-flags'), SOURCE_FLAGS_API_KEY: c.issue('atc-flags', 'atc-export', 'read'),

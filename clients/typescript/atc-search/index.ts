@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-search's openapi.yaml (19 total).
+ * One operationId-keyed method per operation in atc-search's openapi.yaml (21 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -39,10 +39,12 @@ export function createClient(config: ClientConfig) {
     credentials: config.credentials,
   });
   return {
+    "atc-search.contentSync.run": (init: FetchOptions<operations["atc-search.contentSync.run"]>) => client.POST("/v1/sync/content/{namespace}", init),
     "atc-search.documents.browse": (init: FetchOptions<operations["atc-search.documents.browse"]>) => client.GET("/v1/indexes/{name}/documents", init),
     "atc-search.documents.delete": (init: FetchOptions<operations["atc-search.documents.delete"]>) => client.DELETE("/v1/indexes/{name}/documents/{id}", init),
     "atc-search.documents.get": (init: FetchOptions<operations["atc-search.documents.get"]>) => client.GET("/v1/indexes/{name}/documents/{id}", init),
     "atc-search.documents.upsert": (init: FetchOptions<operations["atc-search.documents.upsert"]>) => client.PUT("/v1/indexes/{name}/documents", init),
+    "atc-search.hooks.webhookOut": (init: FetchOptions<operations["atc-search.hooks.webhookOut"]>) => client.POST("/v1/hooks/webhook-out", init),
     "atc-search.indexes.clear": (init: FetchOptions<operations["atc-search.indexes.clear"]>) => client.POST("/v1/indexes/{name}/clear", init),
     "atc-search.indexes.create": (init: FetchOptions<operations["atc-search.indexes.create"]>) => client.POST("/v1/indexes", init),
     "atc-search.indexes.delete": (init: FetchOptions<operations["atc-search.indexes.delete"]>) => client.DELETE("/v1/indexes/{name}", init),

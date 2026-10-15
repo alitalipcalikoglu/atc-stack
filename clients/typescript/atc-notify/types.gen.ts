@@ -127,6 +127,8 @@ export interface paths {
          * @description Inserts the message and returns immediately (`202` for a newly-created message, `200` when the request replays an existing `idempotencyKey`); actual delivery happens later, out of band, via the worker process. `channel` is always `email`; the body's `data` is additionally validated, at request time, against the named template's own JSON Schema (`GET /v1/templates` lists the templates this instance ships with, each with its schema).
          *     **Idempotency**: `idempotencyKey`, when given, scopes one logical send per API key. Reusing a key with the identical channel and payload replays the original row (`200`); reusing it with a different channel or payload is a conflict (`409 IDEMPOTENCY_CONFLICT`) — the key is not a slot to overwrite.
          *     **State machine**: `queued -> processing -> sent | failed`. A `failed` message is retryable exactly once per call via `POST /v1/messages/{id}/retry` (full attempt-budget reset, not automatic); there is no cancel/abort endpoint. Automatic retries use exponential backoff with jitter (`BACKOFF_BASE_MS`, default 5000ms; `BACKOFF_CAP_MS`, default 3600000ms) up to `MAX_ATTEMPTS` attempts (default 8) before a message is settled as `failed`.
+         *     **Suppressions**: suppressed addresses are removed from `to`/`cc`/`bcc` and listed in the response's `suppressed`; when no `to` address is left the answer is `422 RECIPIENTS_SUPPRESSED`. The worker checks again right before sending.
+         *     **Quotas**: `DAILY_SEND_LIMIT` / `KEY_DAILY_LIMIT` (recipients per key per UTC day) and `RECIPIENT_HOURLY_LIMIT` (mails per address per hour, default 20) answer `429 QUOTA_EXCEEDED` with `retry-after` and `details[0].scope` (`key` or `recipient`). Idempotent replays do not count.
          */
         post: operations["atc-notify.messages.create"];
         delete?: never;
@@ -169,6 +171,107 @@ export interface paths {
          * @description Only a message in `failed` status can be retried. On success, resets `attempts` to 0 and `status` to `queued` for an immediate delivery attempt (a full attempt-budget reset against the same `maxAttempts` the message was created with) — this is not itself counted as a delivery attempt. Scoped to the caller's own API key.
          */
         post: operations["atc-notify.messages.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/suppressions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List suppressed addresses (admin key) */
+        get: operations["atc-notify.suppressions.list"];
+        put?: never;
+        /** Suppress an address (admin key) */
+        post: operations["atc-notify.suppressions.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/suppressions/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        /** Is this address suppressed? (admin key) */
+        get: operations["atc-notify.suppressions.get"];
+        put?: never;
+        post?: never;
+        /** Allow mail to an address again (admin key) */
+        delete: operations["atc-notify.suppressions.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/suppressions/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report bounces and complaints (admin key)
+         * @description The same input as the signed hook, for a relay that holds an admin key. Hard bounces and complaints suppress at once; soft bounces after `SOFT_BOUNCE_LIMIT` (default 3).
+         */
+        post: operations["atc-notify.suppressions.report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/hooks/bounces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Signed bounce and complaint hook (no API key)
+         * @description For a mail provider, or a small relay that translates its format. Header `X-Notify-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256 of "<t>.<raw body>" with BOUNCE_WEBHOOK_SECRET>`, at most five minutes old. `404` while `BOUNCE_WEBHOOK_SECRET` is not set.
+         */
+        post: operations["atc-notify.hooks.bounces"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/unsubscribe/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * Unsubscribe page behind the List-Unsubscribe link (no API key)
+         * @description Shows a confirmation form and changes nothing, so link scanners cannot unsubscribe anyone.
+         */
+        get: operations["atc-notify.unsubscribe.page"];
+        put?: never;
+        /** One-click unsubscribe (RFC 8058; no API key) */
+        post: operations["atc-notify.unsubscribe.confirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -290,6 +393,34 @@ export interface components {
             updatedAt: string;
             /** Format: date-time */
             sentAt: string | null;
+            /** @description Only on `POST /v1/messages`, when suppressed addresses were left out. */
+            suppressed?: string[];
+        };
+        Suppression: {
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            reason: "hard_bounce" | "complaint" | "soft_bounce" | "unsubscribe" | "manual";
+            /** @description `key:<id>` for API calls, `hook` for the signed bounce hook, `link` for unsubscribes. */
+            source: string;
+            note: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        BounceEvents: {
+            events: {
+                /** @enum {string} */
+                type: "bounce" | "complaint";
+                /** Format: email */
+                email: string;
+                /** @description Hard bounce (default true). A soft bounce suppresses after `SOFT_BOUNCE_LIMIT`. */
+                permanent?: boolean;
+                detail?: string;
+            }[];
+        };
+        BounceResult: {
+            received: number;
+            suppressed: number;
         };
         MessageList: {
             items: components["schemas"]["Message"][];
@@ -309,6 +440,8 @@ export interface components {
             bcc?: components["schemas"]["EmailList"];
             /** Format: email */
             replyTo?: string;
+            /** @description Add one-click `List-Unsubscribe` headers (RFC 8058). Needs `PUBLIC_BASE_URL` + `UNSUBSCRIBE_SECRET`, exactly one `to` and no cc/bcc (`400` otherwise). Use for newsletters, not for account mail. */
+            unsubscribe?: boolean;
             /** @description Validated server-side against the named template's own JSON Schema (see the `if`/`then` branches below, one per template, and `GET /v1/templates` for the same schemas at runtime). `locale` defaults to `tr` when omitted on every template. */
             data: Record<string, never>;
             idempotencyKey?: components["schemas"]["IdempotencyKey"];
@@ -591,6 +724,15 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` — a `read` key. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             /** @description `IDEMPOTENCY_CONFLICT` — `idempotencyKey` was already used by this API key with a different channel or payload. */
             409: {
                 headers: {
@@ -602,6 +744,15 @@ export interface operations {
             };
             /** @description Request body exceeded `BODY_LIMIT` (default 65536 bytes). Raised by Fastify's own content-type parser before route validation runs (`FST_ERR_CTP_BODY_TOO_LARGE`), so the envelope carries that code rather than a notify-defined one. */
             413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `RECIPIENTS_SUPPRESSED` — every `to` address is on the suppression list; `details[].email` names them. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -696,6 +847,319 @@ export interface operations {
             };
             429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    "atc-notify.suppressions.list": {
+        parameters: {
+            query?: {
+                limit?: string;
+                cursor?: string;
+                /** @description Part of the address. */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Newest first, with the totals per reason. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Suppression"][];
+                        nextCursor: string | null;
+                        counts: {
+                            [key: string]: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` — not an admin key. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-notify.suppressions.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: email */
+                    email: string;
+                    /**
+                     * @description Default `manual`.
+                     * @enum {string}
+                     */
+                    reason?: "hard_bounce" | "complaint" | "soft_bounce" | "unsubscribe" | "manual";
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Suppressed (an existing entry is replaced). */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        suppression: components["schemas"]["Suppression"];
+                    };
+                };
+            };
+            /** @description VALIDATION_FAILED. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` — not an admin key. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-notify.suppressions.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suppressed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        suppression: components["schemas"]["Suppression"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` — not an admin key. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-notify.suppressions.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` — not an admin key. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-notify.suppressions.report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BounceEvents"];
+            };
+        };
+        responses: {
+            /** @description How many events arrived and how many suppressed an address. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BounceResult"];
+                };
+            };
+            /** @description VALIDATION_FAILED. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` — not an admin key. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-notify.hooks.bounces": {
+        parameters: {
+            query?: never;
+            header: {
+                "x-notify-signature": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BounceEvents"];
+            };
+        };
+        responses: {
+            /** @description Processed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BounceResult"];
+                };
+            };
+            /** @description VALIDATION_FAILED. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description INVALID_SIGNATURE. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-notify.unsubscribe.page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; the token was not issued here. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "atc-notify.unsubscribe.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML page; the address is suppressed with reason `unsubscribe`. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; the token was not issued here. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
         };
     };
     "atc-notify.templates.list": {
