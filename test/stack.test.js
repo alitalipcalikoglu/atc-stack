@@ -93,6 +93,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual([bk.BACKUP_TREES, bk.BACKUP_ENCRYPTION_KEY], ['atc-media-files=../atc-media/data/files,atc-auth-keys=../atc-auth/keys,atc-audit-keys=../atc-audit/keys', ''], 'blobs and signing keys are archived; encryption is the operator\'s choice');
   assert.deepEqual([keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].role, env('atc-console').BACKUP_API_KEY, bk.MEDIA_API_KEY, bk.ALLOW_LIVE_RESTORE, auditKeys['atc-backup'].role], ['admin', keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].secret, keys('atc-media', 'MEDIA_API_KEYS')['atc-backup'].secret, 'false', 'write']);
   assert.deepEqual(bk.BACKUP_SOURCES.split(',').slice(0, 2), ['atc-notify=../atc-notify/data/notify.db', 'atc-auth=../atc-auth/data/auth.db']);
+  assert.match(EnvFile.load(join(root, 'atc-auth', '.env')).get('MFA_SECRETS_KEY') ?? '', /^[0-9a-f]{64}$/, 'auth gets a key for end-user MFA');
   assert.equal(bk.BACKUP_SOURCES.split(',').length, 18, 'every service with a database, console included');
   const stx = env('atc-status');
   assert.deepEqual([keys('atc-status', 'STATUS_API_KEYS')['atc-console'].role, env('atc-console').STATUS_API_KEY, stx.NOTIFY_API_KEY, stx.ALERT_EMAILS, auditKeys['atc-status'].role], ['admin', keys('atc-status', 'STATUS_API_KEYS')['atc-console'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-status'].secret, 'ops@example.com', 'write']);

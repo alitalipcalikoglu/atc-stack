@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (235 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (236 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -62,6 +62,7 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-auth.users.list": (init: FetchOptions<operations["atc-console.atc-auth.users.list"]>) => client.GET("/api/services/{sid}/atc-auth/users", init),
     "atc-console.atc-auth.users.passwordResetEmail": (init: FetchOptions<operations["atc-console.atc-auth.users.passwordResetEmail"]>) => client.POST("/api/services/{sid}/atc-auth/users/{id}/password-reset-email", init),
     "atc-console.atc-auth.users.resendVerification": (init: FetchOptions<operations["atc-console.atc-auth.users.resendVerification"]>) => client.POST("/api/services/{sid}/atc-auth/users/{id}/resend-verification", init),
+    "atc-console.atc-auth.users.resetMfa": (init: FetchOptions<operations["atc-console.atc-auth.users.resetMfa"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/mfa", init),
     "atc-console.atc-auth.users.revokeAllSessions": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeAllSessions"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions", init),
     "atc-console.atc-auth.users.revokeSession": (init: FetchOptions<operations["atc-console.atc-auth.users.revokeSession"]>) => client.DELETE("/api/services/{sid}/atc-auth/users/{id}/sessions/{sub}", init),
     "atc-console.atc-auth.users.update": (init: FetchOptions<operations["atc-console.atc-auth.users.update"]>) => client.PATCH("/api/services/{sid}/atc-auth/users/{id}", init),

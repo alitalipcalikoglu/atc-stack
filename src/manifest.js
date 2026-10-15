@@ -70,6 +70,7 @@ export const SERVICES = [
     env: (c) => ({
       ...auditEnv(c, 'atc-auth'), ...eventsEnv(c, 'atc-auth'),
       NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-auth'), JWT_ISSUER: c.url('atc-gateway'), JWT_AUDIENCE: c.keep('atc-auth', 'JWT_AUDIENCE', 'app'),
+      MFA_SECRETS_KEY: c.secret('atc-auth', 'MFA_SECRETS_KEY'), // seals end-user TOTP secrets
       APP_NAME: c.keep('atc-auth', 'APP_NAME', 'atc-web'), // Links in verification mails point at your web app, which auth insists is https; a local stack has no app yet.
       VERIFY_URL_TEMPLATE: c.keep('atc-auth', 'VERIFY_URL_TEMPLATE', `https://${c.host}/verify-email?token={token}`), RESET_URL_TEMPLATE: c.keep('atc-auth', 'RESET_URL_TEMPLATE', `https://${c.host}/reset-password?token={token}`),
     }),

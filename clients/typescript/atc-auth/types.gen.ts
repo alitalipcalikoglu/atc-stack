@@ -513,6 +513,123 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/login/mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish a sign-in with a TOTP or recovery code
+         * @description Second step after `MFA_REQUIRED`. A six-digit code from the authenticator app (each code once) or one unused recovery code (`XXXXX-XXXXX`, case and dash ignored). Wrong codes count toward the same lockout as wrong passwords; the challenge is spent after five wrong codes or at its expiry.
+         */
+        post: operations["atc-auth.login.mfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start MFA enrolment for the signed-in user
+         * @description Needs the end user's access token in `X-Access-Token`. Answers a new TOTP secret and its `otpauth://` URL (show it as a QR code); MFA stays off until `POST /v1/auth/mfa/enable` gets a code from the app. Calling it again before enabling replaces the secret. `409 MFA_ALREADY_ENABLED` when MFA is on, `503 MFA_UNAVAILABLE` when the server has no `MFA_SECRETS_KEY`.
+         */
+        post: operations["atc-auth.mfa.setup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Turn MFA on with a first code; answers the recovery codes once */
+        post: operations["atc-auth.mfa.enable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Turn MFA off with the password and a code
+         * @description The password goes through the same lockout as sign-in; the code may be a recovery code. The user is mailed.
+         */
+        post: operations["atc-auth.mfa.disable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/mfa/recovery-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Replace the recovery codes (confirmed with a current code) */
+        post: operations["atc-auth.mfa.recoveryCodes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/users/{id}/mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id. */
+                id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a user's MFA (lost device)
+         * @description Requires an API key with the `write` role. Secret, recovery codes and open challenges are removed; the user is mailed and can enrol again after signing in.
+         */
+        delete: operations["atc-auth.users.resetMfa"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -546,6 +663,9 @@ export interface components {
             lockedUntil: string | null;
             /** Format: date-time */
             passwordChangedAt: string;
+            mfaEnabled: boolean;
+            /** Format: date-time */
+            mfaEnabledAt: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -668,6 +788,21 @@ export interface components {
         };
         UserResponse: {
             user: components["schemas"]["User"];
+        };
+        LoginMfaRequest: {
+            mfaToken: string;
+            /** @description Six digits from the app */
+            code: string;
+        };
+        MfaCodeRequest: {
+            code: string;
+        };
+        MfaDisableRequest: {
+            password: string;
+            code: string;
+        };
+        RecoveryCodesResponse: {
+            recoveryCodes: string[];
         };
         LoginResponse: {
             user: components["schemas"]["User"];
@@ -1065,7 +1200,7 @@ export interface operations {
                     "application/json": components["schemas"]["CreateUserResponse"];
                 };
             };
-            /** @description VALIDATION_FAILED (malformed body) or WEAK_PASSWORD (policy rejected). */
+            /** @description VALIDATION_FAILED (malformed body) or WEAK_PASSWORD (policy, one of the last PASSWORD_HISTORY passwords, or a known breached password when PASSWORD_BREACH_CHECK is on). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1335,12 +1470,24 @@ export interface operations {
                 };
             };
             400: components["responses"]["ValidationFailed"];
-            /** @description UNAUTHORIZED (missing/invalid API key) or INVALID_CREDENTIALS (email or password is incorrect — the same message and status whether the email is unknown or the password is wrong, and the password hasher runs a dummy hash for an unknown email so response time does not reveal which). */
+            /** @description UNAUTHORIZED (missing/invalid API key) or INVALID_CREDENTIALS (email or password is incorrect — the same message and status whether the email is unknown or the password is wrong, and the password hasher runs a dummy hash for an unknown email so response time does not reveal which). MFA_REQUIRED when the password is right and the user has MFA on: `details.mfaToken` (valid `MFA_CHALLENGE_TTL_SEC`, five tries) goes to `POST /v1/auth/login/mfa` with a code. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "MFA_REQUIRED",
+                     *         "message": "enter the code from your authenticator app or a recovery code",
+                     *         "details": {
+                     *           "mfaToken": "q3V…",
+                     *           "mfaTokenExpiresAt": "2026-10-16T10:05:00.000Z"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
@@ -1584,7 +1731,7 @@ export interface operations {
                     "application/json": components["schemas"]["UserResponse"];
                 };
             };
-            /** @description VALIDATION_FAILED (malformed body) or WEAK_PASSWORD (policy rejected). */
+            /** @description VALIDATION_FAILED (malformed body) or WEAK_PASSWORD (policy, one of the last PASSWORD_HISTORY passwords, or a known breached password when PASSWORD_BREACH_CHECK is on). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1620,7 +1767,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description VALIDATION_FAILED (malformed body) or WEAK_PASSWORD (policy rejected). */
+            /** @description VALIDATION_FAILED (malformed body) or WEAK_PASSWORD (policy, one of the last PASSWORD_HISTORY passwords, or a known breached password when PASSWORD_BREACH_CHECK is on). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1747,6 +1894,302 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             /** @description EMAIL_TAKEN. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.login.mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginMfaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            /** @description INVALID_TOKEN (challenge unknown, used, expired or spent) or INVALID_MFA_CODE. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description ACCOUNT_DISABLED. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description ACCOUNT_LOCKED. */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.mfa.setup": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The end user's own JWT access token (not the API key). Checked manually by the handler via `introspect()`; a missing or invalid value yields `401 INVALID_TOKEN`, not a schema-level 400. */
+                "X-Access-Token": components["parameters"]["XAccessToken"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        secret: string;
+                        otpauthUrl: string;
+                    };
+                };
+            };
+            401: components["responses"]["InvalidToken"];
+            /** @description MFA_ALREADY_ENABLED. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            /** @description MFA_UNAVAILABLE. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-auth.mfa.enable": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The end user's own JWT access token (not the API key). Checked manually by the handler via `introspect()`; a missing or invalid value yields `401 INVALID_TOKEN`, not a schema-level 400. */
+                "X-Access-Token": components["parameters"]["XAccessToken"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description MFA is on. Ten one-time recovery codes, never shown again. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecoveryCodesResponse"];
+                };
+            };
+            /** @description INVALID_TOKEN or INVALID_MFA_CODE. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description MFA_ALREADY_ENABLED or MFA_SETUP_REQUIRED. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            /** @description MFA_UNAVAILABLE. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-auth.mfa.disable": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The end user's own JWT access token (not the API key). Checked manually by the handler via `introspect()`; a missing or invalid value yields `401 INVALID_TOKEN`, not a schema-level 400. */
+                "X-Access-Token": components["parameters"]["XAccessToken"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaDisableRequest"];
+            };
+        };
+        responses: {
+            /** @description MFA is off. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description INVALID_TOKEN, INVALID_CREDENTIALS or INVALID_MFA_CODE. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description MFA_NOT_ENABLED. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description ACCOUNT_LOCKED. */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-auth.mfa.recoveryCodes": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The end user's own JWT access token (not the API key). Checked manually by the handler via `introspect()`; a missing or invalid value yields `401 INVALID_TOKEN`, not a schema-level 400. */
+                "X-Access-Token": components["parameters"]["XAccessToken"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description New codes; the old ones stop working. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecoveryCodesResponse"];
+                };
+            };
+            /** @description INVALID_TOKEN or INVALID_MFA_CODE. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description MFA_NOT_ENABLED. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            /** @description MFA_UNAVAILABLE. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-auth.users.resetMfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User id. */
+                id: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description MFA removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["UserNotFound"];
+            /** @description MFA_NOT_ENABLED. */
             409: {
                 headers: {
                     [name: string]: unknown;

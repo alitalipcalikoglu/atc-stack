@@ -16,6 +16,11 @@
     { "method": "GET", "path": "/v1/monitors/{id}/checks" },
     { "method": "GET", "path": "/v1/incidents" },
     { "method": "GET", "path": "/v1/incidents/{id}" },
-    { "method": "GET", "path": "/v1/stats" }
+    { "method": "GET", "path": "/v1/stats" },
+    { "method": "POST", "path": "/v1/hooks/webhook-out" },
+    { "method": "GET", "path": "/v1/alerts" },
+    { "method": "POST", "path": "/v1/alerts/{id}/ack" },
+    { "method": "POST", "path": "/v1/ping/{id}/{token}" },
+    { "method": "GET", "path": "/v1/ping/{id}/{token}" }
   ]
 }

@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-auth's openapi.yaml (28 total).
+ * One operationId-keyed method per operation in atc-auth's openapi.yaml (34 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -49,8 +49,13 @@ export function createClient(config: ClientConfig) {
     "atc-auth.introspect": (init: FetchOptions<operations["atc-auth.introspect"]>) => client.POST("/v1/auth/introspect", init),
     "atc-auth.jwks.get": (init: FetchOptions<operations["atc-auth.jwks.get"]>) => client.GET("/.well-known/jwks.json", init),
     "atc-auth.login": (init: FetchOptions<operations["atc-auth.login"]>) => client.POST("/v1/auth/login", init),
+    "atc-auth.login.mfa": (init: FetchOptions<operations["atc-auth.login.mfa"]>) => client.POST("/v1/auth/login/mfa", init),
     "atc-auth.logout": (init: FetchOptions<operations["atc-auth.logout"]>) => client.POST("/v1/auth/logout", init),
     "atc-auth.metrics.get": (init: FetchOptions<operations["atc-auth.metrics.get"]>) => client.GET("/metrics", init),
+    "atc-auth.mfa.disable": (init: FetchOptions<operations["atc-auth.mfa.disable"]>) => client.POST("/v1/auth/mfa/disable", init),
+    "atc-auth.mfa.enable": (init: FetchOptions<operations["atc-auth.mfa.enable"]>) => client.POST("/v1/auth/mfa/enable", init),
+    "atc-auth.mfa.recoveryCodes": (init: FetchOptions<operations["atc-auth.mfa.recoveryCodes"]>) => client.POST("/v1/auth/mfa/recovery-codes", init),
+    "atc-auth.mfa.setup": (init: FetchOptions<operations["atc-auth.mfa.setup"]>) => client.POST("/v1/auth/mfa/setup", init),
     "atc-auth.openapi": (init: FetchOptions<operations["atc-auth.openapi"]>) => client.GET("/openapi.yaml", init),
     "atc-auth.password.change": (init: FetchOptions<operations["atc-auth.password.change"]>) => client.POST("/v1/auth/password/change", init),
     "atc-auth.password.forgot": (init: FetchOptions<operations["atc-auth.password.forgot"]>) => client.POST("/v1/auth/password/forgot", init),
@@ -67,6 +72,7 @@ export function createClient(config: ClientConfig) {
     "atc-auth.users.get": (init: FetchOptions<operations["atc-auth.users.get"]>) => client.GET("/v1/users/{id}", init),
     "atc-auth.users.list": (init: FetchOptions<operations["atc-auth.users.list"]>) => client.GET("/v1/users", init),
     "atc-auth.users.patch": (init: FetchOptions<operations["atc-auth.users.patch"]>) => client.PATCH("/v1/users/{id}", init),
+    "atc-auth.users.resetMfa": (init: FetchOptions<operations["atc-auth.users.resetMfa"]>) => client.DELETE("/v1/users/{id}/mfa", init),
   } as const;
 }
 

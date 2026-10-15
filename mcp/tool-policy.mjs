@@ -32,6 +32,8 @@ export const POLICY = {
       { ops: ['atc-auth.sessions.revokeAll', 'atc-auth.sessions.revokeOne', 'atc-auth.logout'], reason: 'Revoking sessions signs people out and cannot be undone.' },
       { ops: ['atc-auth.users.export'], reason: 'Everything stored about one person (addresses included): a data-subject request for a human.' },
       { ops: ['atc-auth.email.change', 'atc-auth.email.confirm'], reason: 'End-user flows: the first takes a password, the second a mailed token.' },
+      { ops: ['atc-auth.login.mfa', 'atc-auth.mfa.setup', 'atc-auth.mfa.enable', 'atc-auth.mfa.disable', 'atc-auth.mfa.recoveryCodes'], reason: 'End-user MFA flows: they need the user\'s own token or code and return secrets.' },
+      { ops: ['atc-auth.users.resetMfa'], reason: 'Removing a second factor weakens an account; an administrator decides that in the console.' },
       { ops: ['atc-auth.login', 'atc-auth.refresh', 'atc-auth.introspect'], reason: 'End-user credential flows: they take passwords or tokens and mint secrets.' },
       { ops: ['atc-auth.password.change', 'atc-auth.password.forgot', 'atc-auth.password.reset', 'atc-auth.emailVerification.resend', 'atc-auth.emailVerification.verify'], reason: 'Password and verification flows act for an end user and send mail; forgot/resend must stay enumeration-resistant.' },
     ],
