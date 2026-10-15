@@ -9346,6 +9346,8 @@ export interface operations {
                         tags?: number;
                     };
                     facets?: string[];
+                    /** @enum {string} */
+                    language?: "none" | "tr";
                 };
             };
         };
@@ -9454,6 +9456,8 @@ export interface operations {
                         tags?: number;
                     };
                     facets?: string[];
+                    /** @enum {string} */
+                    language?: "none" | "tr";
                 };
             };
         };
