@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "release": "1.27.0",
+  "releasedAt": "2026-10-15",
+  "status": "verified",
+  "supersedes": "1.26.0",
+  "releasePolicy": "annotated Git tags; no GitHub Release object and no GitHub Actions",
+  "releaseMatrix": [
+    {
+      "repo": "atc-audit",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "3140aedecfb6f7ec2ebeaa3db2423eeae2600ebe",
+      "commit": "d3eb14de4e9b7a7213eab4160fc8a79744cc05ef"
+    },
+    {
+      "repo": "atc-auth",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "4988eca75b411a30280105d69a7f0e06f3c8a0ce",
+      "commit": "f3f4e68ac9b126021201506375d9d78f7086c14a"
+    },
+    {
+      "repo": "atc-backup",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "68e57a5aa705fdd1e9b0c7e69098df45e5f62f5d",
+      "commit": "cdeff3bc6ab3bd53208868cdc7bec0a8ccf56a34"
+    },
+    {
+      "repo": "atc-console",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "0500366dcbff270b64d3d86023bbce9b57bf1514",
+      "commit": "7ce731a10675aa90f7d59692d557d09ef38073e1"
+    },
+    {
+      "repo": "atc-content",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "2d69973823cf0542300dca97045e470023f68af8",
+      "commit": "a12f46d26488e557d0710badfef3d0819f548846"
+    },
+    {
+      "repo": "atc-export",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "e214a58b195aeac52f9ded392b877b7cd1ce6ebc",
+      "commit": "cc0f181c4ace37f391b549def7ebc64ca50dfa74"
+    },
+    {
+      "repo": "atc-flags",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "96fc42006ada2c1c6feb3dc617f5cbde225a7abe",
+      "commit": "6aa626e252993a7e94db278b4751e91233eda38f"
+    },
+    {
+      "repo": "atc-gateway",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "f79e37d8f4e4ea55f0d8a7eae801e72b7b60caec",
+      "commit": "f6b4dd64eaa1148a3d2a6386fea27b10133461ff"
+    },
+    {
+      "repo": "atc-geo",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "948a3ebcdbb6e1ec0d46c4a0ad7601554c428a7c",
+      "commit": "9ac4ab808223c2d868715ac6278b007220457112"
+    },
+    {
+      "repo": "atc-media",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "c9ce6ddc60e4d6ef081f568a9757c47c2139796e",
+      "commit": "219e9090d3e721b29789f14f8a760477eea0149f"
+    },
+    {
+      "repo": "atc-notify",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "85d7e1685cf0e58e0e4206d8cef5ed4e623790bf",
+      "commit": "2641aadd11ebdb7e6e7999cdb6b88f1f7a3c1bec"
+    },
+    {
+      "repo": "atc-payments",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "1b6b5c542aa6f1b8c963029aa4e6bf36e394dbdd",
+      "commit": "4739680b6c99d5f3bc81a67a2c406aefeff542d3"
+    },
+    {
+      "repo": "atc-queue",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "181784c5d544640f9710ec51ee4aeea104e60312",
+      "commit": "ec576650fc9f4d788acfb85da6ff6cfd844cdb74"
+    },
+    {
+      "repo": "atc-ratelimit",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "9c0af9fb8aba2a66b0facff62902974d89aa36a4",
+      "commit": "2a2021c2e2a5a1230e05db78a90d91c3878c2e5f"
+    },
+    {
+      "repo": "atc-render",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "b967b3ce1e03d9db71343a47c9d66d6195c6248f",
+      "commit": "0b4ce59caf00595f2cb450227e49a266067185e6"
+    },
+    {
+      "repo": "atc-scheduler",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "9b2eded6596a2f764f4ec4b28f70e2c076ff3e36",
+      "commit": "f9738b715fd0797f37e2e993706d54e55f6ebde4"
+    },
+    {
+      "repo": "atc-search",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "84913b15810bd09bbc88f0687ca5d78c1863033f",
+      "commit": "b6e5f11c75a6823db7cb3684f5f746fec875424d"
+    },
+    {
+      "repo": "atc-service-core",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "e57051daa189966fd41930da189e6d2426c7295f",
+      "commit": "013e76e567d6b4674fbd7cc0fc3079d7a761e683"
+    },
+    {
+      "repo": "atc-shortlink",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "06b735afd4532b1ee04977abe7eb6b9ee19c8ac0",
+      "commit": "636baa69422fc00205cf71fb3de881fdb083a39a"
+    },
+    {
+      "repo": "atc-stack",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "cf3fefc9845807a72c8b6842ef22fef0b27ab796",
+      "commit": "6cff282f77dfb67b01935b2fdd30cdf7e889cbd8"
+    },
+    {
+      "repo": "atc-status",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "b751369ad952f374d9209617fb183ec052297c8f",
+      "commit": "b9b440c28be84d3c525af762216b516d0d0438c3"
+    },
+    {
+      "repo": "atc-webhook-out",
+      "version": "1.27.0",
+      "tag": "v1.27.0",
+      "tagObject": "6b9f261648997068ba0e1bec3978f9dfdfe4c43d",
+      "commit": "54429ccbe394ac75a2263531e90f6d4cdb2f1b97"
+    }
+  ],
+  "publication": {
+    "manifest": "installation-manifests/v1.27.0.json",
+    "supportedRelease": "1.27.0",
+    "stackTagCommit": "6cff282f77dfb67b01935b2fdd30cdf7e889cbd8",
+    "remoteTagsVerified": 22,
+    "forcePushUsed": false,
+    "historicalTagsMoved": false
+  },
+  "tests": {
+    "repositoryTestsPassed": {
+      "atc-audit": 52,
+      "atc-auth": 62,
+      "atc-backup": 30,
+      "atc-console": 145,
+      "atc-content": 28,
+      "atc-export": 22,
+      "atc-flags": 27,
+      "atc-gateway": 58,
+      "atc-geo": 46,
+      "atc-media": 86,
+      "atc-notify": 52,
+      "atc-payments": 31,
+      "atc-queue": 21,
+      "atc-ratelimit": 36,
+      "atc-render": 20,
+      "atc-scheduler": 52,
+      "atc-search": 16,
+      "atc-service-core": 100,
+      "atc-shortlink": 27,
+      "atc-stack": 118,
+      "atc-status": 32,
+      "atc-webhook-out": 49
+    },
+    "clientsSmoke": 3,
+    "mcpE2e": 18,
+    "consoleSmokes": [
+      "build",
+      "runtime",
+      "auth",
+      "m4",
+      "m5",
+      "m6",
+      "m7",
+      "m7-browser"
+    ],
+    "docker": "20/20 healthy as non-root node, SIGTERM exit 0",
+    "productionAudit": 0
+  },
+  "candidateInstall": {
+    "mode": "--ref main",
+    "readiness": "20/20",
+    "manifestMatch": "21/21"
+  },
+  "defaultInstall": {
+    "mode": "release",
+    "readiness": "20/20",
+    "manifestMatch": "21/21",
+    "exactTags": "22/22 clean",
+    "installedSuites": {
+      "atc-console": 145,
+      "atc-notify": 52,
+      "atc-gateway": 58
+    },
+    "reuse": "0 clone, 21 reuse, 20/20 ready"
+  }
+}
