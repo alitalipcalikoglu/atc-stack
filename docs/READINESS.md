@@ -2,11 +2,11 @@
 
 Each service in this workspace keeps its own `docs/READINESS.md`, filled from
 [READINESS_TEMPLATE.md](READINESS_TEMPLATE.md) — the 19-section production-readiness contract this
-platform holds every service to. This page is only an index into those 13 documents, with one real
+platform holds every service to. This page is only an index into those 20 documents, with one real
 line pulled from each. It is not itself a readiness claim.
 
 `atc-stack` (this repo) and `atc-service-core` (a library, not a running service — it has no `/health`,
-`/ready` or database of its own to document) have no `docs/READINESS.md`; every one of the 13
+`/ready` or database of its own to document) have no `docs/READINESS.md`; every one of the 20
 services that actually runs as its own process does.
 
 **`/ready` vs. "production-ready".** `GET /ready` is one HTTP endpoint: a cached, read-only check of
