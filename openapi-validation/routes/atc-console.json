@@ -239,7 +239,22 @@
     { "method": "DELETE", "path": "/api/services/{sid}/atc-auth/users/{id}/mfa" },
     { "method": "GET", "path": "/api/services/{sid}/atc-notify/suppressions" },
     { "method": "POST", "path": "/api/services/{sid}/atc-notify/suppressions" },
-    { "method": "DELETE", "path": "/api/services/{sid}/atc-notify/suppressions/{email}" }
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-notify/suppressions/{email}" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-flags/changes" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-flags/changes/{id}/approve" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-flags/changes/{id}/reject" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/maintenance" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-status/maintenance" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-status/maintenance/{id}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-status/incidents/{id}/updates" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-status/subscribers" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-status/subscribers/{id}" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-media/quarantine" },
+    { "method": "DELETE", "path": "/api/services/{sid}/atc-media/quarantine/{id}" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-payments/disputes" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-payments/disputes/{id}/evidence" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-payments/disputes/{id}/accept" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-content/namespaces/{id}/review" }
   ],
   "exclusions": [
     "GET /* (static asset serving via @fastify/static, wildcard over PUBLIC_DIR) and the SPA fallback in setNotFoundHandler: not an API contract, serves the built Svelte app (index.html) for unmatched non-API GET/HEAD paths."

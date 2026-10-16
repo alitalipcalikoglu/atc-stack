@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (239 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (254 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -94,6 +94,7 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-content.stats.get": (init: FetchOptions<operations["atc-console.atc-content.stats.get"]>) => client.GET("/api/services/{sid}/atc-content/stats", init),
     "atc-console.atc-content.translations.export": (init: FetchOptions<operations["atc-console.atc-content.translations.export"]>) => client.GET("/api/services/{sid}/atc-content/namespaces/{id}/export/{sub}", init),
     "atc-console.atc-content.translations.import": (init: FetchOptions<operations["atc-console.atc-content.translations.import"]>) => client.POST("/api/services/{sid}/atc-content/namespaces/{id}/import", init),
+    "atc-console.atc-content.values.review": (init: FetchOptions<operations["atc-console.atc-content.values.review"]>) => client.POST("/api/services/{sid}/atc-content/namespaces/{id}/review", init),
     "atc-console.atc-export.exports.cancel": (init: FetchOptions<operations["atc-console.atc-export.exports.cancel"]>) => client.POST("/api/services/{sid}/atc-export/exports/{id}/cancel", init),
     "atc-console.atc-export.exports.create": (init: FetchOptions<operations["atc-console.atc-export.exports.create"]>) => client.POST("/api/services/{sid}/atc-export/exports", init),
     "atc-console.atc-export.exports.delete": (init: FetchOptions<operations["atc-console.atc-export.exports.delete"]>) => client.DELETE("/api/services/{sid}/atc-export/exports/{id}", init),
@@ -104,6 +105,9 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-export.exports.retry": (init: FetchOptions<operations["atc-console.atc-export.exports.retry"]>) => client.POST("/api/services/{sid}/atc-export/exports/{id}/retry", init),
     "atc-console.atc-export.sources.list": (init: FetchOptions<operations["atc-console.atc-export.sources.list"]>) => client.GET("/api/services/{sid}/atc-export/sources", init),
     "atc-console.atc-export.stats.get": (init: FetchOptions<operations["atc-console.atc-export.stats.get"]>) => client.GET("/api/services/{sid}/atc-export/stats", init),
+    "atc-console.atc-flags.changes.approve": (init: FetchOptions<operations["atc-console.atc-flags.changes.approve"]>) => client.POST("/api/services/{sid}/atc-flags/changes/{id}/approve", init),
+    "atc-console.atc-flags.changes.list": (init: FetchOptions<operations["atc-console.atc-flags.changes.list"]>) => client.GET("/api/services/{sid}/atc-flags/changes", init),
+    "atc-console.atc-flags.changes.reject": (init: FetchOptions<operations["atc-console.atc-flags.changes.reject"]>) => client.POST("/api/services/{sid}/atc-flags/changes/{id}/reject", init),
     "atc-console.atc-flags.environments.list": (init: FetchOptions<operations["atc-console.atc-flags.environments.list"]>) => client.GET("/api/services/{sid}/atc-flags/environments", init),
     "atc-console.atc-flags.envs.copy": (init: FetchOptions<operations["atc-console.atc-flags.envs.copy"]>) => client.POST("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}/copy", init),
     "atc-console.atc-flags.envs.update": (init: FetchOptions<operations["atc-console.atc-flags.envs.update"]>) => client.PATCH("/api/services/{sid}/atc-flags/flags/{id}/envs/{sub}", init),
@@ -145,6 +149,8 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-media.files.update": (init: FetchOptions<operations["atc-console.atc-media.files.update"]>) => client.PATCH("/api/services/{sid}/atc-media/files/{id}", init),
     "atc-console.atc-media.files.uploadTicketed": (init: FetchOptions<operations["atc-console.atc-media.files.uploadTicketed"]>) => client.PUT("/api/services/{sid}/atc-media/files", init),
     "atc-console.atc-media.files.urls": (init: FetchOptions<operations["atc-console.atc-media.files.urls"]>) => client.POST("/api/services/{sid}/atc-media/files/{id}/urls", init),
+    "atc-console.atc-media.quarantine.delete": (init: FetchOptions<operations["atc-console.atc-media.quarantine.delete"]>) => client.DELETE("/api/services/{sid}/atc-media/quarantine/{id}", init),
+    "atc-console.atc-media.quarantine.list": (init: FetchOptions<operations["atc-console.atc-media.quarantine.list"]>) => client.GET("/api/services/{sid}/atc-media/quarantine", init),
     "atc-console.atc-media.tickets.create": (init: FetchOptions<operations["atc-console.atc-media.tickets.create"]>) => client.POST("/api/services/{sid}/atc-media/tickets", init),
     "atc-console.atc-notify.messages.get": (init: FetchOptions<operations["atc-console.atc-notify.messages.get"]>) => client.GET("/api/services/{sid}/atc-notify/messages/{id}", init),
     "atc-console.atc-notify.messages.list": (init: FetchOptions<operations["atc-console.atc-notify.messages.list"]>) => client.GET("/api/services/{sid}/atc-notify/messages", init),
@@ -154,6 +160,9 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-notify.suppressions.delete": (init: FetchOptions<operations["atc-console.atc-notify.suppressions.delete"]>) => client.DELETE("/api/services/{sid}/atc-notify/suppressions/{email}", init),
     "atc-console.atc-notify.suppressions.list": (init: FetchOptions<operations["atc-console.atc-notify.suppressions.list"]>) => client.GET("/api/services/{sid}/atc-notify/suppressions", init),
     "atc-console.atc-notify.templates.list": (init: FetchOptions<operations["atc-console.atc-notify.templates.list"]>) => client.GET("/api/services/{sid}/atc-notify/templates", init),
+    "atc-console.atc-payments.disputes.accept": (init: FetchOptions<operations["atc-console.atc-payments.disputes.accept"]>) => client.POST("/api/services/{sid}/atc-payments/disputes/{id}/accept", init),
+    "atc-console.atc-payments.disputes.evidence": (init: FetchOptions<operations["atc-console.atc-payments.disputes.evidence"]>) => client.POST("/api/services/{sid}/atc-payments/disputes/{id}/evidence", init),
+    "atc-console.atc-payments.disputes.list": (init: FetchOptions<operations["atc-console.atc-payments.disputes.list"]>) => client.GET("/api/services/{sid}/atc-payments/disputes", init),
     "atc-console.atc-payments.events.list": (init: FetchOptions<operations["atc-console.atc-payments.events.list"]>) => client.GET("/api/services/{sid}/atc-payments/provider-events", init),
     "atc-console.atc-payments.payments.anonymize": (init: FetchOptions<operations["atc-console.atc-payments.payments.anonymize"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/anonymize", init),
     "atc-console.atc-payments.payments.cancel": (init: FetchOptions<operations["atc-console.atc-payments.payments.cancel"]>) => client.POST("/api/services/{sid}/atc-payments/payments/{id}/cancel", init),
@@ -233,7 +242,11 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-shortlink.stats.get": (init: FetchOptions<operations["atc-console.atc-shortlink.stats.get"]>) => client.GET("/api/services/{sid}/atc-shortlink/stats", init),
     "atc-console.atc-status.alerts.ack": (init: FetchOptions<operations["atc-console.atc-status.alerts.ack"]>) => client.POST("/api/services/{sid}/atc-status/alerts/{id}/ack", init),
     "atc-console.atc-status.alerts.list": (init: FetchOptions<operations["atc-console.atc-status.alerts.list"]>) => client.GET("/api/services/{sid}/atc-status/alerts", init),
+    "atc-console.atc-status.incidents.addUpdate": (init: FetchOptions<operations["atc-console.atc-status.incidents.addUpdate"]>) => client.POST("/api/services/{sid}/atc-status/incidents/{id}/updates", init),
     "atc-console.atc-status.incidents.list": (init: FetchOptions<operations["atc-console.atc-status.incidents.list"]>) => client.GET("/api/services/{sid}/atc-status/incidents", init),
+    "atc-console.atc-status.maintenance.create": (init: FetchOptions<operations["atc-console.atc-status.maintenance.create"]>) => client.POST("/api/services/{sid}/atc-status/maintenance", init),
+    "atc-console.atc-status.maintenance.delete": (init: FetchOptions<operations["atc-console.atc-status.maintenance.delete"]>) => client.DELETE("/api/services/{sid}/atc-status/maintenance/{id}", init),
+    "atc-console.atc-status.maintenance.list": (init: FetchOptions<operations["atc-console.atc-status.maintenance.list"]>) => client.GET("/api/services/{sid}/atc-status/maintenance", init),
     "atc-console.atc-status.monitors.check": (init: FetchOptions<operations["atc-console.atc-status.monitors.check"]>) => client.POST("/api/services/{sid}/atc-status/monitors/{id}/check", init),
     "atc-console.atc-status.monitors.checks": (init: FetchOptions<operations["atc-console.atc-status.monitors.checks"]>) => client.GET("/api/services/{sid}/atc-status/monitors/{id}/checks", init),
     "atc-console.atc-status.monitors.delete": (init: FetchOptions<operations["atc-console.atc-status.monitors.delete"]>) => client.DELETE("/api/services/{sid}/atc-status/monitors/{id}", init),
@@ -241,6 +254,8 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-status.monitors.list": (init: FetchOptions<operations["atc-console.atc-status.monitors.list"]>) => client.GET("/api/services/{sid}/atc-status/monitors", init),
     "atc-console.atc-status.monitors.upsert": (init: FetchOptions<operations["atc-console.atc-status.monitors.upsert"]>) => client.PUT("/api/services/{sid}/atc-status/monitors/{id}", init),
     "atc-console.atc-status.stats.get": (init: FetchOptions<operations["atc-console.atc-status.stats.get"]>) => client.GET("/api/services/{sid}/atc-status/stats", init),
+    "atc-console.atc-status.subscribers.delete": (init: FetchOptions<operations["atc-console.atc-status.subscribers.delete"]>) => client.DELETE("/api/services/{sid}/atc-status/subscribers/{id}", init),
+    "atc-console.atc-status.subscribers.list": (init: FetchOptions<operations["atc-console.atc-status.subscribers.list"]>) => client.GET("/api/services/{sid}/atc-status/subscribers", init),
     "atc-console.atc-webhook-out.deliveries.cancel": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.cancel"]>) => client.POST("/api/services/{sid}/atc-webhook-out/deliveries/{id}/cancel", init),
     "atc-console.atc-webhook-out.deliveries.get": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.get"]>) => client.GET("/api/services/{sid}/atc-webhook-out/deliveries/{id}", init),
     "atc-console.atc-webhook-out.deliveries.list": (init: FetchOptions<operations["atc-console.atc-webhook-out.deliveries.list"]>) => client.GET("/api/services/{sid}/atc-webhook-out/deliveries", init),

@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-16",
-  "totalOperations": 635,
+  "totalOperations": 650,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -1372,6 +1372,18 @@
     },
     {
       "service": "atc-console",
+      "operationId": "atc-console.atc-content.values.review",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-content/namespaces/{id}/review",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
       "operationId": "atc-console.atc-export.exports.cancel",
       "method": "POST",
       "path": "/api/services/{sid}/atc-export/exports/{id}/cancel",
@@ -1486,6 +1498,42 @@
       "path": "/api/services/{sid}/atc-export/stats",
       "flags": [
         "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.changes.approve",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-flags/changes/{id}/approve",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.changes.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-flags/changes",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-flags.changes.reject",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-flags/changes/{id}/reject",
+      "flags": [
+        "MUTATION",
         "OPERATOR",
         "POOR_MCP_FIT"
       ],
@@ -1987,6 +2035,30 @@
     },
     {
       "service": "atc-console",
+      "operationId": "atc-console.atc-media.quarantine.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-media/quarantine/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-media.quarantine.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-media/quarantine",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
       "operationId": "atc-console.atc-media.tickets.create",
       "method": "POST",
       "path": "/api/services/{sid}/atc-media/tickets",
@@ -2086,6 +2158,42 @@
       "operationId": "atc-console.atc-notify.templates.list",
       "method": "GET",
       "path": "/api/services/{sid}/atc-notify/templates",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.disputes.accept",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/disputes/{id}/accept",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.disputes.evidence",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-payments/disputes/{id}/evidence",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-payments.disputes.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-payments/disputes",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -3048,9 +3156,57 @@
     },
     {
       "service": "atc-console",
+      "operationId": "atc-console.atc-status.incidents.addUpdate",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-status/incidents/{id}/updates",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
       "operationId": "atc-console.atc-status.incidents.list",
       "method": "GET",
       "path": "/api/services/{sid}/atc-status/incidents",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.maintenance.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-status/maintenance",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.maintenance.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-status/maintenance/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.maintenance.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/maintenance",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
@@ -3135,6 +3291,30 @@
       "operationId": "atc-console.atc-status.stats.get",
       "method": "GET",
       "path": "/api/services/{sid}/atc-status/stats",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.subscribers.delete",
+      "method": "DELETE",
+      "path": "/api/services/{sid}/atc-status/subscribers/{id}",
+      "flags": [
+        "DESTRUCTIVE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-status.subscribers.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-status/subscribers",
       "flags": [
         "READ_SAFE",
         "OPERATOR",
