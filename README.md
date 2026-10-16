@@ -172,11 +172,25 @@ docker compose -f compose/docker-compose.yml exec atc-console node --disable-war
 Every service is **one process on one SQLite database**; the stack scales up, not out. The suite is built for a small team's single host: one machine runs all 20 services, and an unreachable machine means downtime until you restore. What that means in practice:
 
 - **Capacity** comes from the machine (CPU for render and media variants, disk and memory for everything else) and from the per-service limits in each `.env` (`RATE_LIMIT_MAX`, quotas, worker pools). `npm run load` and `npm run load -- --profile writes` measure where it bends.
-- **Recovery point** is the backup interval of `atc-backup` (default 6 hours, `BACKUP_INTERVAL_MIN`) plus the off-site copy in `atc-media`; recovery time is a restore plus a start. There is no replica to fail over to.
+- **Recovery point** is the backup interval of `atc-backup` (default 6 hours, `BACKUP_INTERVAL_MIN`) plus the off-site copy in `atc-media`; recovery time is a restore plus a start, or a promotion of a warm standby (see "High availability").
 - **Second instances are not supported** for a stateful service: two processes on one database file would fight over the write lock and workers. The per-service READMEs ("Scaling model") say which parts could be split (gateway and render are stateless candidates) and `docs/READINESS.md` classifies each service.
 - **Splitting workers** from API processes (`--split-workers`) is supported where a service has a background worker, and is the supported way to isolate heavy work.
 
 If you need more than this, the next step is per-service: move that one service's storage to a server database. The HTTP contracts do not change.
+
+## High availability
+
+Active/passive with a warm standby; never two writers on one database. Pieces:
+
+1. **Gateway failover.** A route lists both hosts in `upstreams`. The gateway polls each upstream's `healthPath` every `UPSTREAM_HEALTH_INTERVAL_MS` (default 5 s) and opens a failing one's breaker before client requests reach it; a passing one rejoins within one interval. Several gateways behind a load balancer are fine: the gateway keeps no state ([atc-gateway examples/upstream-failover.md](https://github.com/alitalipcalikoglu/atc-gateway/blob/main/examples/upstream-failover.md)).
+2. **Snapshot shipping.** The standby host has the same folders and `.env` secrets, services stopped. From cron, every backup interval, `npm run standby -- <source> <file>` in its `atc-backup` pulls the primary's newest successful snapshot of each SQLite source, checks the SHA-256 and `PRAGMA integrity_check`, and swaps it in ([atc-backup examples/standby.md](https://github.com/alitalipcalikoglu/atc-backup/blob/main/examples/standby.md)). The RPO is the primary's `BACKUP_INTERVAL_MIN` plus the pull.
+3. **Failover runbook.**
+   1. Confirm the primary is down, or stop its services: a split brain loses data.
+   2. On the standby, run the pull once more for every source, then start the services (`pm2 start ecosystem.config.cjs` per folder, or `npm run up` here).
+   3. `node bin/stack.js status` must show every service `ok`; the gateway moves traffic by itself once `/health` passes.
+   4. Rebuild the old primary as the new standby before switching back; never start both.
+
+Directory sources (local media files, key folders) ship as `tar.gz` trees and are unpacked by hand, or kept on shared storage (S3 for atc-media). Writes after the last snapshot are lost on promotion.
 
 ## Load test
 
