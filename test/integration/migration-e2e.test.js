@@ -254,7 +254,7 @@ test('console: real old-schema (v3) fixture with an existing admin migrates thro
     serviceId: 'atc-console',
     entry: 'server.mjs',
     seed: (db) => {
-      const id = '22222222-2222-4222-8222-222222222222';
+      const id = '22222222-2222-4222-8222-222222222222'; // a pre-v5 UUID admin id: the migration maps it to adm_
       const now = Date.now();
       db.prepare(`INSERT INTO admins (id, username, name, password_hash, role, created_at, updated_at) VALUES (?, ?, 'Harness Admin', ?, 'admin', ?, ?)`)
         .run(id, 'admin', passwordHash, now, now);
@@ -326,7 +326,7 @@ test('auth: real old-schema (v1) fixture with an existing user migrates through 
       serviceId: 'atc-auth',
       entry: 'src/index.js',
       seed: (db) => {
-        const id = '44444444-4444-4444-8444-444444444444';
+        const id = platformId('usr');
         const now = Date.now();
         db.prepare(`INSERT INTO users (id, email, name, password_hash, email_verified_at, password_changed_at, created_at, updated_at) VALUES (?, ?, 'Harness User', ?, ?, ?, ?, ?)`)
           .run(id, email, passwordHash, now, now, now, now);
@@ -410,7 +410,7 @@ test('notify: a real process refuses to start against a database one schema vers
     serviceId: 'atc-notify',
     entry: 'src/index.js',
     seed: (db) => {
-      sentinelId = '66666666-6666-4666-8666-666666666666';
+      sentinelId = platformId('msg');
       const now = Date.now();
       db.prepare(`
         INSERT INTO messages (id, api_key_id, idempotency_key, channel, payload, status, attempts, max_attempts, next_attempt_at, created_at, updated_at)
@@ -431,7 +431,7 @@ test('auth: a real process refuses to start against a database one schema versio
     serviceId: 'atc-auth',
     entry: 'src/index.js',
     seed: (db) => {
-      sentinelId = '77777777-7777-4777-8777-777777777777';
+      sentinelId = platformId('usr');
       const now = Date.now();
       db.prepare(`INSERT INTO users (id, email, name, password_hash, password_changed_at, created_at, updated_at) VALUES (?, 'sentinel@example.test', NULL, 'not-a-real-hash', ?, ?, ?)`)
         .run(sentinelId, now, now, now);
