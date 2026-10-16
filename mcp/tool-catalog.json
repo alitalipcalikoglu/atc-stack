@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-16",
-  "totalOperations": 651,
+  "totalOperations": 658,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -2614,6 +2614,79 @@
     },
     {
       "service": "atc-console",
+      "operationId": "atc-console.atc-render.fonts.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/fonts",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.jobs.cancel",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-render/renders/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT",
+        "HIGH_RISK"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.jobs.create",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-render/renders",
+      "flags": [
+        "MUTATION",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.jobs.get",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/renders/{id}",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.jobs.list",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/renders",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-render.jobs.pdf",
+      "method": "GET",
+      "path": "/api/services/{sid}/atc-render/renders/{id}/pdf",
+      "flags": [
+        "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
       "operationId": "atc-console.atc-render.preview",
       "method": "POST",
       "path": "/api/services/{sid}/atc-render/preview",
@@ -3029,6 +3102,18 @@
       "path": "/api/services/{sid}/atc-search/stats",
       "flags": [
         "READ_SAFE",
+        "OPERATOR",
+        "POOR_MCP_FIT"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-console",
+      "operationId": "atc-console.atc-shortlink.links.batch",
+      "method": "POST",
+      "path": "/api/services/{sid}/atc-shortlink/links/batch",
+      "flags": [
+        "MUTATION",
         "OPERATOR",
         "POOR_MCP_FIT"
       ],

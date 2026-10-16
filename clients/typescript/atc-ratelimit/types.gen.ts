@@ -627,6 +627,11 @@ export interface components {
             };
             /** @description Live counter rows across every policy (unscoped by key). */
             counters: number;
+            /**
+             * @description The active counter backend (`COUNTER_BACKEND`); `memory` flushes every `COUNTER_FLUSH_MS` and is one process only.
+             * @enum {string}
+             */
+            backend?: "sqlite" | "memory";
             /** @description Database file size in bytes (unscoped by key). */
             dbBytes: number;
             items: {

@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-console's openapi.yaml (254 total).
+ * One operationId-keyed method per operation in atc-console's openapi.yaml (261 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -197,6 +197,12 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-ratelimit.stats.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.stats.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/stats", init),
     "atc-console.atc-ratelimit.subjects.get": (init: FetchOptions<operations["atc-console.atc-ratelimit.subjects.get"]>) => client.GET("/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}", init),
     "atc-console.atc-ratelimit.subjects.resetUsage": (init: FetchOptions<operations["atc-console.atc-ratelimit.subjects.resetUsage"]>) => client.DELETE("/api/services/{sid}/atc-ratelimit/policies/{id}/subjects/{sub}/usage", init),
+    "atc-console.atc-render.fonts.list": (init: FetchOptions<operations["atc-console.atc-render.fonts.list"]>) => client.GET("/api/services/{sid}/atc-render/fonts", init),
+    "atc-console.atc-render.jobs.cancel": (init: FetchOptions<operations["atc-console.atc-render.jobs.cancel"]>) => client.POST("/api/services/{sid}/atc-render/renders/{id}/cancel", init),
+    "atc-console.atc-render.jobs.create": (init: FetchOptions<operations["atc-console.atc-render.jobs.create"]>) => client.POST("/api/services/{sid}/atc-render/renders", init),
+    "atc-console.atc-render.jobs.get": (init: FetchOptions<operations["atc-console.atc-render.jobs.get"]>) => client.GET("/api/services/{sid}/atc-render/renders/{id}", init),
+    "atc-console.atc-render.jobs.list": (init: FetchOptions<operations["atc-console.atc-render.jobs.list"]>) => client.GET("/api/services/{sid}/atc-render/renders", init),
+    "atc-console.atc-render.jobs.pdf": (init: FetchOptions<operations["atc-console.atc-render.jobs.pdf"]>) => client.GET("/api/services/{sid}/atc-render/renders/{id}/pdf", init),
     "atc-console.atc-render.preview": (init: FetchOptions<operations["atc-console.atc-render.preview"]>) => client.POST("/api/services/{sid}/atc-render/preview", init),
     "atc-console.atc-render.stats.get": (init: FetchOptions<operations["atc-console.atc-render.stats.get"]>) => client.GET("/api/services/{sid}/atc-render/stats", init),
     "atc-console.atc-render.templates.create": (init: FetchOptions<operations["atc-console.atc-render.templates.create"]>) => client.POST("/api/services/{sid}/atc-render/templates", init),
@@ -232,6 +238,7 @@ export function createClient(config: ClientConfig) {
     "atc-console.atc-search.indexes.search": (init: FetchOptions<operations["atc-console.atc-search.indexes.search"]>) => client.POST("/api/services/{sid}/atc-search/indexes/{id}/search", init),
     "atc-console.atc-search.indexes.update": (init: FetchOptions<operations["atc-console.atc-search.indexes.update"]>) => client.PATCH("/api/services/{sid}/atc-search/indexes/{id}", init),
     "atc-console.atc-search.stats.get": (init: FetchOptions<operations["atc-console.atc-search.stats.get"]>) => client.GET("/api/services/{sid}/atc-search/stats", init),
+    "atc-console.atc-shortlink.links.batch": (init: FetchOptions<operations["atc-console.atc-shortlink.links.batch"]>) => client.POST("/api/services/{sid}/atc-shortlink/links/batch", init),
     "atc-console.atc-shortlink.links.create": (init: FetchOptions<operations["atc-console.atc-shortlink.links.create"]>) => client.POST("/api/services/{sid}/atc-shortlink/links", init),
     "atc-console.atc-shortlink.links.delete": (init: FetchOptions<operations["atc-console.atc-shortlink.links.delete"]>) => client.DELETE("/api/services/{sid}/atc-shortlink/links/{id}", init),
     "atc-console.atc-shortlink.links.get": (init: FetchOptions<operations["atc-console.atc-shortlink.links.get"]>) => client.GET("/api/services/{sid}/atc-shortlink/links/{id}", init),

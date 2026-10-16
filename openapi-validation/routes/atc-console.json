@@ -254,7 +254,14 @@
     { "method": "GET", "path": "/api/services/{sid}/atc-payments/disputes" },
     { "method": "POST", "path": "/api/services/{sid}/atc-payments/disputes/{id}/evidence" },
     { "method": "POST", "path": "/api/services/{sid}/atc-payments/disputes/{id}/accept" },
-    { "method": "POST", "path": "/api/services/{sid}/atc-content/namespaces/{id}/review" }
+    { "method": "POST", "path": "/api/services/{sid}/atc-content/namespaces/{id}/review" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/fonts" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/renders" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-render/renders" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/renders/{id}" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-render/renders/{id}/cancel" },
+    { "method": "GET", "path": "/api/services/{sid}/atc-render/renders/{id}/pdf" },
+    { "method": "POST", "path": "/api/services/{sid}/atc-shortlink/links/batch" }
   ],
   "exclusions": [
     "GET /* (static asset serving via @fastify/static, wildcard over PUBLIC_DIR) and the SPA fallback in setNotFoundHandler: not an API contract, serves the built Svelte app (index.html) for unmatched non-API GET/HEAD paths."

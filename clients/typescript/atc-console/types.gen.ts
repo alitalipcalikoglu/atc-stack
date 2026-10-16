@@ -5023,6 +5023,152 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/services/{sid}/atc-render/fonts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Font families the render service offers.
+         * @description Typed pass-through to the **render** service instance named by `sid` — console relays this to its `GET /v1/fonts`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-render.fonts.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-render/renders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Render jobs queued by the console.
+         * @description Typed pass-through to the **render** service instance named by `sid` — console relays this to its `GET /v1/renders`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-render.jobs.list"];
+        put?: never;
+        /**
+         * Queue a background render of a template.
+         * @description Typed pass-through to the **render** service instance named by `sid` — console relays this to its `POST /v1/renders`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-render.jobs.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-render/renders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One render job.
+         * @description Typed pass-through to the **render** service instance named by `sid` — console relays this to its `GET /v1/renders/{id}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
+         */
+        get: operations["atc-console.atc-render.jobs.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-render/renders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a queued render job.
+         * @description Typed pass-through to the **render** service instance named by `sid` — console relays this to its `POST /v1/renders/{id}/cancel`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-render.jobs.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-render/renders/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download a finished job's PDF through the console.
+         * @description Typed pass-through to the **render** service instance named by `sid` — console relays this to its `GET /v1/renders/{id}/pdf`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        get: operations["atc-console.atc-render.jobs.pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/services/{sid}/atc-shortlink/links/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create up to 500 short links in one call.
+         * @description Typed pass-through to the **shortlink** service instance named by `sid` — console relays this to its `POST /v1/links/batch`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
+         *
+         *     **Requires the `admin` role** (`requireAdmin`): a signed-in `viewer` gets `403 FORBIDDEN`.
+         *
+         *     Recorded in console's own activity log (`GET /api/audit`).
+         */
+        post: operations["atc-console.atc-shortlink.links.batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -14646,6 +14792,249 @@ export interface operations {
         };
         responses: {
             /** @description Pass-through of the content service's own `POST /v1/namespaces/{id}/review` response body, relayed unchanged. See the content service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-render.fonts.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the render service's own `GET /v1/fonts` response body, relayed unchanged. See the render service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-render.jobs.list": {
+        parameters: {
+            query?: {
+                status?: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+                limit?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the render service's own `GET /v1/renders` response body, relayed unchanged. See the render service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-render.jobs.create": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    template: string;
+                    version?: number;
+                    data?: Record<string, never>;
+                    filename?: string;
+                    store?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the render service's own `POST /v1/renders` response body, relayed unchanged. See the render service's own OpenAPI document for the authoritative body. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-render.jobs.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the render service's own `GET /v1/renders/{id}` response body, relayed unchanged. See the render service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-render.jobs.cancel": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass-through of the render service's own `POST /v1/renders/{id}/cancel` response body, relayed unchanged. See the render service's own OpenAPI document for the authoritative body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-render.jobs.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+                /** @description Downstream resource id, passed through URL-encoded. */
+                id: components["parameters"]["IdParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The finished PDF, streamed through the console as an attachment (never rendered inline), sandboxed and not cached. `409` from the render service while the job is not finished is relayed as is. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["ProxyNotFound"];
+            502: components["responses"]["Unreachable"];
+            default: components["responses"]["DownstreamDefault"];
+        };
+    };
+    "atc-console.atc-shortlink.links.batch": {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
+                "x-console-request": components["parameters"]["CsrfHeader"];
+            };
+            path: {
+                /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
+                sid: components["parameters"]["SidParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    links: {
+                        url: string;
+                        slug?: string;
+                        permanent?: boolean;
+                        expiresAt?: string | null;
+                        maxClicks?: number | null;
+                        tags?: string[];
+                        note?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Pass-through of the shortlink service's own `POST /v1/links/batch` response body, relayed unchanged. See the shortlink service's own OpenAPI document for the authoritative body. */
             200: {
                 headers: {
                     [name: string]: unknown;
