@@ -189,9 +189,10 @@ export const SERVICES = [
     id: 'atc-queue', port: 3016, keysVar: 'QUEUE_API_KEYS',
     env: (c) => ({
       ...auditEnv(c, 'atc-queue'), ...eventsEnv(c, 'atc-queue'),
-      // Push delivery on; local receivers are plain http on private addresses.
+      // Push delivery on for public https receivers only: the local stack has no push target, so
+      // private addresses stay closed (opening them needs PUSH_ALLOWED_HOSTS in the queue's .env).
       PUSH_SECRETS_KEY: c.secret('atc-queue', 'PUSH_SECRETS_KEY'),
-      PUSH_ALLOW_HTTP: c.keep('atc-queue', 'PUSH_ALLOW_HTTP', 'true'), PUSH_ALLOW_PRIVATE: c.keep('atc-queue', 'PUSH_ALLOW_PRIVATE', 'true'),
+      PUSH_ALLOW_HTTP: 'false', PUSH_ALLOW_PRIVATE: 'false',
     }),
     console: { type: 'atc-queue', label: 'Queues', keyEnv: 'QUEUE_API_KEY' },
   },

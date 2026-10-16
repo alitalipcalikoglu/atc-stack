@@ -123,6 +123,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual(['atc-content', 'atc-export', 'atc-render', 'atc-flags'].map((id) => env(id).ACTOR_KEYS), ['atc-console', 'atc-console', 'atc-console', 'atc-console'], 'records name the signed-in admin');
   assert.deepEqual([env('atc-media').ADMIN_KEYS, env('atc-media').KEY_MAX_UPLOAD_BYTES], ['atc-console', 'atc-backup:1073741824,atc-export:268435456'], 'the console sees every media file; backups and exports may upload large files');
   assert.match(env('atc-queue').PUSH_SECRETS_KEY, /^[0-9a-f]{64}$/, 'queue push delivery is on');
+  assert.deepEqual([env('atc-queue').PUSH_ALLOW_HTTP, env('atc-queue').PUSH_ALLOW_PRIVATE], ['false', 'false'], 'no private push targets in the local stack');
   assert.equal(env('atc-status').STATUS_PUBLIC_URL, env('atc-export').SOURCE_STATUS_URL, 'subscriber mails link the status service');
   const contentKeys = keys('atc-content', 'CONTENT_API_KEYS');
   assert.deepEqual([env('atc-console').CONTENT_API_KEY, contentKeys['atc-console'].role, contentKeys['atc-gateway'].role, env('atc-gateway').CONTENT_API_KEY, env('atc-content').CONTENT_PUBLIC_BUNDLES, auditKeys['atc-content'].role], [contentKeys['atc-console'].secret, '', 'read:public', contentKeys['atc-gateway'].secret, 'false', 'write'], 'console edits content, gateway only reads bundles, and only of the public namespace');
