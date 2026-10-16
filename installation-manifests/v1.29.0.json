@@ -19,7 +19,7 @@
     "atc-ratelimit": { "repository": "https://github.com/alitalipcalikoglu/atc-ratelimit.git", "tag": "v1.29.0", "commit": "3b563cf0383213268729c9aa7624307f1803d44b" },
     "atc-geo": { "repository": "https://github.com/alitalipcalikoglu/atc-geo.git", "tag": "v1.29.0", "commit": "68535c3096ccf1bb62a0c6050bdc04175074f39a" },
     "atc-content": { "repository": "https://github.com/alitalipcalikoglu/atc-content.git", "tag": "v1.29.0", "commit": "94bcad9a8621f7ff98787a50b1d64522db4b9b8f" },
-    "atc-export": { "repository": "https://github.com/alitalipcalikoglu/atc-export.git", "tag": "v1.29.0", "commit": "a3fe5d9eda369e01376f29128a3443b1db4bd7b3" },
+    "atc-export": { "repository": "https://github.com/alitalipcalikoglu/atc-export.git", "tag": "v1.29.0", "commit": "effbbca046cf782f04f82bd3b43291810c67d30a" },
     "atc-render": { "repository": "https://github.com/alitalipcalikoglu/atc-render.git", "tag": "v1.29.0", "commit": "9aaa484033ee60ae97dad97c1f48c3d8e5c8d534" },
     "atc-queue": { "repository": "https://github.com/alitalipcalikoglu/atc-queue.git", "tag": "v1.29.0", "commit": "e4da013b7e750288159565c7fc2c5d811ecfeec6" },
     "atc-backup": { "repository": "https://github.com/alitalipcalikoglu/atc-backup.git", "tag": "v1.29.0", "commit": "de265ca386b6e9864e758e81cd32da847529c005" },
