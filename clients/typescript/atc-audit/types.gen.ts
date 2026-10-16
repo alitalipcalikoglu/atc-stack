@@ -259,7 +259,7 @@ export interface paths {
         };
         /**
          * List signed chain anchors, newest first.
-         * @description Keyset pagination via `beforeSeq`/`nextBeforeSeq`.
+         * @description Keyset pagination: pass `nextCursor` back as `cursor`.
          */
         get: operations["atc-audit.anchors.list"];
         put?: never;
@@ -352,8 +352,9 @@ export interface components {
             /** @description SPKI PEM. */
             publicKey: string;
         };
-        /** Format: uuid */
-        Uuid: string;
+        /** @description The platform's one id format, assigned by this service. */
+        EventId: string;
+        ClientId: string;
         /** @description Dotted, lower-case: `atc-auth.login`, `order.item.remove`. */
         Action: string;
         /** @enum {string} */
@@ -366,8 +367,8 @@ export interface components {
             name?: string;
         };
         EventCreate: {
-            /** @description Caller-supplied idempotency key (`clientId`). A repeat for the same `source` returns the existing row instead of storing a new one. */
-            id?: components["schemas"]["Uuid"];
+            /** @description Caller-supplied idempotency key (`clientId`; core's AuditClient sends `aud_<time><random>`). A repeat for the same `source` returns the existing row instead of storing a new one. */
+            id?: components["schemas"]["ClientId"];
             action: components["schemas"]["Action"];
             /** @default success */
             outcome: components["schemas"]["Outcome"];
@@ -389,7 +390,7 @@ export interface components {
         };
         /** @description Stored event, as returned by query/get/export endpoints. */
         Event: {
-            id: components["schemas"]["Uuid"];
+            id: components["schemas"]["EventId"];
             /** @description Monotonic hash-chain sequence number. */
             seq: number;
             /** @description The caller-supplied idempotency key (request body `id`), if any. */
@@ -429,7 +430,7 @@ export interface components {
             accepted: number;
             duplicates: number;
             items: {
-                id: components["schemas"]["Uuid"];
+                id: components["schemas"]["EventId"];
                 seq: number;
                 clientId: string | null;
                 duplicate: boolean;
@@ -476,7 +477,7 @@ export interface components {
         };
         AnchorList: {
             items: components["schemas"]["Anchor"][];
-            nextBeforeSeq: number | null;
+            nextCursor: string | null;
         };
         Stats: {
             windowHours: number;
@@ -562,7 +563,7 @@ export interface components {
         CursorParam: string;
         /** @description Export format. Default `ndjson`. */
         FormatParam: "ndjson" | "csv";
-        IdParam: components["schemas"]["Uuid"];
+        IdParam: components["schemas"]["EventId"];
         /** @description Defaults to the smallest stored `seq`. */
         FromSeqParam: string;
         /** @description Defaults to the current chain head's `seq`. */
@@ -571,8 +572,8 @@ export interface components {
         HoursParam: string;
         /** @description Page size, 1-200. Default 50. */
         AnchorsLimitParam: string;
-        /** @description Keyset cursor from a previous page's `nextBeforeSeq`. */
-        BeforeSeqParam: string;
+        /** @description Opaque `nextCursor` from the previous page. */
+        CursorSeqParam: string;
     };
     requestBodies: never;
     headers: never;
@@ -1032,8 +1033,8 @@ export interface operations {
             query?: {
                 /** @description Page size, 1-200. Default 50. */
                 limit?: components["parameters"]["AnchorsLimitParam"];
-                /** @description Keyset cursor from a previous page's `nextBeforeSeq`. */
-                beforeSeq?: components["parameters"]["BeforeSeqParam"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["parameters"]["CursorSeqParam"];
             };
             header?: never;
             path?: never;

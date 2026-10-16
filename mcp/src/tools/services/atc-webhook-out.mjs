@@ -24,7 +24,7 @@ export const TOOLS = [
     operation: "atc-webhook-out.subscriptions.get",
     description: "Get a subscription. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^sub_[0-9a-f]{16}$", 'u')),
+      id: z.string().regex(new RegExp("^sub_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -34,14 +34,14 @@ export const TOOLS = [
     operation: "atc-webhook-out.subscriptions.listDeliveries",
     description: "List a subscription's deliveries. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^sub_[0-9a-f]{16}$", 'u')),
+      id: z.string().regex(new RegExp("^sub_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
       status: z.enum(["pending", "running", "retrying", "succeeded", "failed", "cancelled"]).describe("Exactly six values. `pending` (queued) → `running` (attempt in flight) → `succeeded` / `failed` (terminal) or `retrying` (scheduled backoff, back to `running` …").optional(),
-      event: z.string().regex(new RegExp("^evt_[0-9a-f]{16}$", 'u')).optional(),
+      event: z.string().regex(new RegExp("^evt_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Defaults to 50 when omitted.").optional(),
-      before: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings).").describe("Keyset pagination — the previous page's `nextBefore`.").optional(),
-      subscription: z.string().regex(new RegExp("^sub_[0-9a-f]{16}$", 'u')).describe("Accepted by the request schema but ignored: the `{id}` path segment always determines the subscription filter on this route.").optional(),
+      cursor: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings).").describe("Opaque `nextCursor` from the previous page.").optional(),
+      subscription: z.string().regex(new RegExp("^sub_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("Accepted by the request schema but ignored: the `{id}` path segment always determines the subscription filter on this route.").optional(),
     },
-    map: {"path":{"id":"id"},"query":{"status":"status","event":"event","limit":"limit","before":"before","subscription":"subscription"},"body":"none"},
+    map: {"path":{"id":"id"},"query":{"status":"status","event":"event","limit":"limit","cursor":"cursor","subscription":"subscription"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -51,9 +51,9 @@ export const TOOLS = [
     input: {
       type: z.string().min(1).max(120).regex(new RegExp("^[a-z0-9]+(?:[._-][a-z0-9]+)*(?:\\.[a-z0-9]+(?:[._-][a-z0-9]+)*)*$", 'u')).describe("Dot-separated lower-case segments, e.g. `order.paid`.").optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Defaults to 50 when omitted.").optional(),
-      before: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings).").describe("Keyset pagination on the internal event sequence — the previous page's `nextBefore`.").optional(),
+      cursor: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings).").describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"type":"type","limit":"limit","before":"before"},"body":"none"},
+    map: {"query":{"type":"type","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -61,7 +61,7 @@ export const TOOLS = [
     operation: "atc-webhook-out.events.get",
     description: "Get an event and its deliveries. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^evt_[0-9a-f]{16}$", 'u')),
+      id: z.string().regex(new RegExp("^evt_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -80,12 +80,12 @@ export const TOOLS = [
     description: "List deliveries. Read-only.",
     input: {
       status: z.enum(["pending", "running", "retrying", "succeeded", "failed", "cancelled"]).describe("Exactly six values. `pending` (queued) → `running` (attempt in flight) → `succeeded` / `failed` (terminal) or `retrying` (scheduled backoff, back to `running` …").optional(),
-      subscription: z.string().regex(new RegExp("^sub_[0-9a-f]{16}$", 'u')).optional(),
-      event: z.string().regex(new RegExp("^evt_[0-9a-f]{16}$", 'u')).optional(),
+      subscription: z.string().regex(new RegExp("^sub_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).optional(),
+      event: z.string().regex(new RegExp("^evt_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Defaults to 50 when omitted.").optional(),
-      before: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings).").describe("Keyset pagination — the previous page's `nextBefore`.").optional(),
+      cursor: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings).").describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"status":"status","subscription":"subscription","event":"event","limit":"limit","before":"before"},"body":"none"},
+    map: {"query":{"status":"status","subscription":"subscription","event":"event","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -93,7 +93,7 @@ export const TOOLS = [
     operation: "atc-webhook-out.deliveries.get",
     description: "Get a delivery. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("A delivery id or event sequence number, as a decimal string (path/query parameters are always strings)."),
+      id: z.string().regex(new RegExp("^dlv_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("The platform's one id format; also sent to receivers as `x-webhook-delivery`."),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -127,7 +127,7 @@ export const TOOLS = [
     operation: "atc-webhook-out.subscriptions.patch",
     description: "Update a subscription. Partial update; at least one field is required. `enabled: true` resumes the subscription (including from the automatic `disabled` state, resetting the consecutive-failure counter); `enabled: false` pauses it. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
-      id: z.string().regex(new RegExp("^sub_[0-9a-f]{16}$", 'u')),
+      id: z.string().regex(new RegExp("^sub_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).optional(),
       url: z.string().min(8).max(2048).optional(),
       events: z.array(z.string().min(1).max(120).regex(new RegExp("^(\\*|[a-z0-9]+(?:[._-][a-z0-9]+)*(?:\\.[a-z0-9]+(?:[._-][a-z0-9]+)*)*(?:\\.\\*)?)$", 'u')).describe("One of three legal forms: an exact event type (`order.paid`), the bare wildcard `*` (matches everything), or a dot-terminated prefix wildcard (`order.*`, match…")).min(1).max(100).optional(),
@@ -142,13 +142,13 @@ export const TOOLS = [
   operationTool({
     service: "atc-webhook-out",
     operation: "atc-webhook-out.events.publish",
-    description: "Publish an event. Inserts the event and fans it out to a `deliveries` row for every currently-active subscription whose patterns match, in the same database transaction as the event insert — a `202` is a durability guarantee for every matching subscriber at the time of publish, not just an ack of receipt. With `idempotencyKey`, a repeat publish from the same API key (`source`) and the same key returns the **original** event and queue…. Safe write: creates, updates, queues or starts work; never deletes anything.",
+    description: "Publish an event. Inserts the event and fans it out to a `deliveries` row for every currently-active subscription whose patterns match, in the same database transaction as the event insert — a `202` is a durability guarantee for every matching subscriber at the time of publish, not just an ack of receipt. With an `Idempotency-Key` header, a repeat publish from the same API key (`source`) and the same key returns the **original** even…. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       type: z.string().min(1).max(120).regex(new RegExp("^[a-z0-9]+(?:[._-][a-z0-9]+)*(?:\\.[a-z0-9]+(?:[._-][a-z0-9]+)*)*$", 'u')).describe("Dot-separated lower-case segments, e.g. `order.paid`."),
       data: z.unknown().describe("Arbitrary JSON payload, stored and echoed back as-is. Defaults to `null`.").optional(),
-      idempotencyKey: z.string().min(1).max(128).optional(),
     },
-    map: {"body":"flat","bodyFields":["type","data","idempotencyKey"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["type","data"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   }),
 ];

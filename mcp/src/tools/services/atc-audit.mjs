@@ -33,7 +33,7 @@ export const TOOLS = [
     operation: "atc-audit.events.get",
     description: "Fetch one event by id. Read-only.",
     input: {
-      id: z.string(),
+      id: z.string().regex(new RegExp("^evt_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("The platform's one id format, assigned by this service."),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -70,12 +70,12 @@ export const TOOLS = [
   operationTool({
     service: "atc-audit",
     operation: "atc-audit.anchors.list",
-    description: "List signed chain anchors, newest first. Keyset pagination via `beforeSeq`/`nextBeforeSeq`. Read-only.",
+    description: "List signed chain anchors, newest first. Keyset pagination: pass `nextCursor` back as `cursor`. Read-only.",
     input: {
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Default 50.").optional(),
-      beforeSeq: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("Keyset cursor from a previous page's `nextBeforeSeq`.").optional(),
+      cursor: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"limit":"limit","beforeSeq":"beforeSeq"},"body":"none"},
+    map: {"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

@@ -60,8 +60,9 @@ export const TOOLS = [
     description: "Re-check a stored backup (admin). Recomputes the SHA-256 and runs `PRAGMA integrity_check` on the stored file. The result is recorded on the backup (`verified`, `verifiedAt`). Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       id: z.string().regex(new RegExp("^bk_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
     },
-    map: {"path":{"id":"id"},"body":"none"},
+    map: {"path":{"id":"id"},"header":{"IdempotencyKey":"Idempotency-Key"},"body":"none"},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

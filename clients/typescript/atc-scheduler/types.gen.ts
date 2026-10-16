@@ -497,7 +497,8 @@ export interface components {
             error: string | null;
         };
         Run: {
-            id: number;
+            /** @description The platform's one id format; also sent to the target as `x-scheduler-run`. */
+            id: string;
             job: components["schemas"]["JobNameValue"];
             /** @enum {string} */
             trigger: "schedule" | "manual";
@@ -530,8 +531,8 @@ export interface components {
         };
         RunList: {
             items: components["schemas"]["Run"][];
-            /** @description Pass as `before` to fetch the next (older) page; `null` on the last page. */
-            nextBefore: string | null;
+            /** @description Pass as `cursor` to fetch the next (older) page; `null` on the last page. */
+            nextCursor: string | null;
         };
         PreviewResponse: {
             /** @description The normalized cron expression. */
@@ -544,10 +545,14 @@ export interface components {
         TargetKeysResponse: {
             /** @description Configured `TARGET_KEYS` names, sorted. */
             items: string[];
+            /** @description Always null; the list is complete. */
+            nextCursor: null;
         };
         TimezonesResponse: {
             /** @description IANA timezone names supported by this Node runtime. */
             items: string[];
+            /** @description Always null; the list is complete. */
+            nextCursor: null;
         };
         StatsResponse: {
             jobs: {
@@ -786,6 +791,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         JobName: components["schemas"]["JobNameValue"];
         RunId: string;
         /** @description Case-sensitive substring match against name and description. */
@@ -799,7 +806,7 @@ export interface components {
         Limit: string;
         RunsStatus: components["schemas"]["RunStatus"];
         RunsJob: components["schemas"]["JobNameValue"];
-        /** @description Opaque keyset cursor — the `id` of the last item from the previous page. */
+        /** @description Opaque `nextCursor` from the previous page. */
         RunsBefore: string;
     };
     requestBodies: never;
@@ -955,7 +962,10 @@ export interface operations {
     "atc-scheduler.jobs.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1075,7 +1085,10 @@ export interface operations {
     "atc-scheduler.jobs.run": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["JobName"];
             };
@@ -1107,8 +1120,8 @@ export interface operations {
                 status?: components["parameters"]["RunsStatus"];
                 /** @description Page size, 1-200. Defaults to 50. */
                 limit?: components["parameters"]["Limit"];
-                /** @description Opaque keyset cursor — the `id` of the last item from the previous page. */
-                before?: components["parameters"]["RunsBefore"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["parameters"]["RunsBefore"];
             };
             header?: never;
             path: {
@@ -1141,8 +1154,8 @@ export interface operations {
                 status?: components["parameters"]["RunsStatus"];
                 /** @description Page size, 1-200. Defaults to 50. */
                 limit?: components["parameters"]["Limit"];
-                /** @description Opaque keyset cursor — the `id` of the last item from the previous page. */
-                before?: components["parameters"]["RunsBefore"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["parameters"]["RunsBefore"];
             };
             header?: never;
             path?: never;
@@ -1196,7 +1209,10 @@ export interface operations {
     "atc-scheduler.runs.cancel": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: components["parameters"]["RunId"];
             };

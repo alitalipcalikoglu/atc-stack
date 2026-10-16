@@ -232,6 +232,14 @@ Default routes are public and change nothing: `/health`, `/.well-known/jwks.json
 
 Every service is its own repository and deployable alone; "Calls" lists the services it talks to over HTTP when configured (all optional except auth → notify for verification and reset mails). Browsers only ever reach the gateway and the console.
 
+## Conventions
+
+Every service and the console follow the same contracts; `test/consistency.test.js` checks them against each `openapi.yaml`.
+
+- **Lists**: every `GET` list answers `{ items, nextCursor }`. Pass `nextCursor` back as `cursor` with an optional `limit`; it is `null` on the last page and always `null` for complete lists. No list pages by `before`, `offset` or page numbers, and search results are `items` too.
+- **Ids**: generated ids have one format, `<prefix>_<time><random>` (2-4 letter kind, creation time in base 36, 16 hex characters), for example `usr_`, `fil_`, `msg_`, `exp_`, `adm_`. Rows that only order a log expose `seq`, never `id`. Names chosen by people (flag keys, index names, link codes, policy names) stay natural keys.
+- **Idempotency**: write routes that create something or start work accept `Idempotency-Key` (8-255 of `A-Za-z0-9._:-`). The first 2xx answer is kept for 24 hours per API key and caller (the console's `X-Actor`, an end-user `X-Access-Token`); a repeat replays it with `Idempotent-Replayed: true`, another body is `409 IDEMPOTENCY_MISMATCH`, a repeat during the first is `409 IDEMPOTENCY_IN_PROGRESS`. It is opt-in per route and never on routes that answer with a secret (API keys, signing secrets, signed URLs, MFA setup). atc-payments keeps its own required key; atc-notify and atc-webhook-out keep their permanent deduplication and read the same header. Service-to-service publishers send the header too.
+
 ## API keys
 
 `npm run keys` lists who may call which service (holder, role, expiry; never secrets). `npm run keys -- rotate <issuer> <holder>` mints a new secret for one key and writes it on both sides: the issuer's key list and the holder's `.env` (and the MCP files when they hold it). Example after a leak: `npm run keys -- rotate atc-media atc-gateway`, then `npm run up` so both services restart and the old secret stops working. Nothing else changes. A key line may end in `@YYYY-MM-DD` to expire after that day once the service runs an `atc-service-core` release that understands it; `setup` never writes expiry dates itself.

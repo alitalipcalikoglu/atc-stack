@@ -124,8 +124,8 @@ export interface paths {
         put?: never;
         /**
          * Queue a message for delivery
-         * @description Inserts the message and returns immediately (`202` for a newly-created message, `200` when the request replays an existing `idempotencyKey`); actual delivery happens later, out of band, via the worker process. `channel` is always `email`; the body's `data` is additionally validated, at request time, against the named template's own JSON Schema (`GET /v1/templates` lists the templates this instance ships with, each with its schema).
-         *     **Idempotency**: `idempotencyKey`, when given, scopes one logical send per API key. Reusing a key with the identical channel and payload replays the original row (`200`); reusing it with a different channel or payload is a conflict (`409 IDEMPOTENCY_CONFLICT`) — the key is not a slot to overwrite.
+         * @description Inserts the message and returns immediately (`202` for a newly-created message, `200` when the request replays an existing `Idempotency-Key`); actual delivery happens later, out of band, via the worker process. `channel` is always `email`; the body's `data` is additionally validated, at request time, against the named template's own JSON Schema (`GET /v1/templates` lists the templates this instance ships with, each with its schema).
+         *     **Idempotency**: the `Idempotency-Key` header, when given, scopes one logical send per API key for as long as the message row lives (not only 24 h as on other POSTs). Reusing a key with the identical channel and payload replays the original row (`200`, `Idempotent-Replayed: true`); reusing it with a different channel or payload is `409 IDEMPOTENCY_MISMATCH` — the key is not a slot to overwrite.
          *     **State machine**: `queued -> processing -> sent | failed`. A `failed` message is retryable exactly once per call via `POST /v1/messages/{id}/retry` (full attempt-budget reset, not automatic); there is no cancel/abort endpoint. Automatic retries use exponential backoff with jitter (`BACKOFF_BASE_MS`, default 5000ms; `BACKOFF_CAP_MS`, default 3600000ms) up to `MAX_ATTEMPTS` attempts (default 8) before a message is settled as `failed`.
          *     **Suppressions**: suppressed addresses are removed from `to`/`cc`/`bcc` and listed in the response's `suppressed`; when no `to` address is left the answer is `422 RECIPIENTS_SUPPRESSED`. The worker checks again right before sending.
          *     **Quotas**: `DAILY_SEND_LIMIT` / `KEY_DAILY_LIMIT` (recipients per key per UTC day) and `RECIPIENT_HOURLY_LIMIT` (mails per address per hour, default 20) answer `429 QUOTA_EXCEEDED` with `retry-after` and `details[0].scope` (`key` or `recipient`). Idempotent replays do not count.
@@ -304,7 +304,7 @@ export interface components {
     schemas: {
         ErrorEnvelope: {
             error: {
-                /** @description Stable machine-readable error code, e.g. `VALIDATION_FAILED`, `NOT_FOUND`, `IDEMPOTENCY_CONFLICT`. */
+                /** @description Stable machine-readable error code, e.g. `VALIDATION_FAILED`, `NOT_FOUND`, `IDEMPOTENCY_MISMATCH`. */
                 code: string;
                 message: string;
                 /** @description Present for `VALIDATION_FAILED`; one entry per failed constraint. */
@@ -363,7 +363,6 @@ export interface components {
         MessageStatus: "queued" | "processing" | "sent" | "failed";
         /** @description Public view of a queued message. Template `data` is never exposed (it may hold PII). */
         Message: {
-            /** Format: uuid */
             id: string;
             /** @description Id of the API key that created the message (the caller's own key unless it has the `admin` role). */
             keyId: string;
@@ -444,11 +443,8 @@ export interface components {
             unsubscribe?: boolean;
             /** @description Validated server-side against the named template's own JSON Schema (see the `if`/`then` branches below, one per template, and `GET /v1/templates` for the same schemas at runtime). `locale` defaults to `tr` when omitted on every template. */
             data: Record<string, never>;
-            idempotencyKey?: components["schemas"]["IdempotencyKey"];
         } & (unknown & unknown & unknown);
         EmailList: string[];
-        /** @description Scopes one logical send per API key. Reusing it with an identical channel+payload replays the original message; reusing it with a different one is a `409 IDEMPOTENCY_CONFLICT`. */
-        IdempotencyKey: string;
         TemplateDescriptor: {
             name: string;
             description: string;
@@ -459,6 +455,8 @@ export interface components {
         };
         TemplateList: {
             items: components["schemas"]["TemplateDescriptor"][];
+            /** @description Always null; the list is complete (every list answers `{ items, nextCursor }`). */
+            nextCursor: null;
         };
     };
     responses: {
@@ -505,6 +503,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         MessageId: string;
     };
     requestBodies: never;
@@ -678,7 +678,10 @@ export interface operations {
     "atc-notify.messages.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -688,7 +691,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Idempotent replay — an existing message with the same `idempotencyKey`, channel and payload was returned unchanged. */
+            /** @description Idempotent replay — an existing message with the same `Idempotency-Key`, channel and payload was returned unchanged. */
             200: {
                 headers: {
                     location: components["headers"]["Location"];
@@ -733,7 +736,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description `IDEMPOTENCY_CONFLICT` — `idempotencyKey` was already used by this API key with a different channel or payload. */
+            /** @description `IDEMPOTENCY_MISMATCH` — the `Idempotency-Key` was already used by this API key with a different channel or payload; `INVALID_IDEMPOTENCY_KEY` is a 400. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -805,7 +808,10 @@ export interface operations {
     "atc-notify.messages.retry": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: components["parameters"]["MessageId"];
             };
@@ -894,7 +900,10 @@ export interface operations {
     "atc-notify.suppressions.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1015,7 +1024,10 @@ export interface operations {
     "atc-notify.suppressions.report": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };

@@ -533,6 +533,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         NameParam: string;
         IdParam: components["schemas"]["MessageId"];
     };
@@ -698,6 +700,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["QueueSummary"][];
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                     };
                 };
             };
@@ -789,7 +793,10 @@ export interface operations {
     "atc-queue.queues.purge": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["NameParam"];
             };
@@ -824,7 +831,10 @@ export interface operations {
     "atc-queue.queues.redrive": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["NameParam"];
             };
@@ -894,7 +904,10 @@ export interface operations {
     "atc-queue.messages.enqueue": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["NameParam"];
             };
@@ -919,7 +932,10 @@ export interface operations {
     "atc-queue.messages.enqueueBatch": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["NameParam"];
             };

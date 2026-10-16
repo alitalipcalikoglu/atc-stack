@@ -196,7 +196,7 @@ export interface paths {
         };
         /**
          * Browse documents (no query)
-         * @description Requires a `read`-role key scoped to this index (or unscoped). Equivalent to an empty search sorted newest-first; every returned item omits `score` entirely (it is stripped, not `null`, unlike a real search hit). Default `limit` is **50** here (search's default is 20), clamped to `maxPage` (default 100, `MAX_PAGE`). Default `offset` is 0.
+         * @description Requires a `read`-role key scoped to this index (or unscoped). Equivalent to an empty search sorted newest-first; every returned item omits `score` entirely (it is stripped, not `null`, unlike a real search hit). Default `limit` is **50** here (search's default is 20), clamped to `maxPage` (default 100, `MAX_PAGE`). Pass `nextCursor` back as `cursor` for the next page.
          */
         get: operations["atc-search.documents.browse"];
         /**
@@ -252,13 +252,13 @@ export interface paths {
          * @description Requires a `read`-role key scoped to this index (or unscoped). Query form of the same search as `POST` on this path, sharing the same response shape (`SearchResult`) — but the two are intentionally **not** validated the same way:
          *     This endpoint's querystring schema is permissive: any additional query parameter is accepted as long as its value is a string of at most 2000 characters (`additionalProperties: { type: string, maxLength: 2000 }`), regardless of its name. Of those, only parameters whose name starts with the literal prefix `filter.` are actually consumed — `filter.<attrKey>=v1,v2` becomes an AND-across-keys, OR-within-key attribute filter (comma-split, one attribute key per parameter). Any other unrecognized parameter is accepted by validation and then silently ignored. This dynamic `filter.*`-prefix pattern cannot be expressed as a fixed OpenAPI parameter list; `filter.<key>` here documents the pattern, not a literal parameter named `<key>`.
          *     The `POST` form below is the strict opposite: `filters` is one explicit object field and the request body schema rejects any unknown field (`additionalProperties: false`).
-         *     Default `limit` is **20** here (browse's default is 50), clamped to `maxPage` (default 100). Default `offset` is 0, `sort` is `relevance`, `highlight` is `false`.
+         *     Default `limit` is **20** here (browse's default is 50), clamped to `maxPage` (default 100). Default `sort` is `relevance`, `highlight` is `false`. Pass `nextCursor` back as `cursor` for the next page; it is `null` on the last page and once the next page would start past `maxOffset` (default 10000, `MAX_OFFSET`).
          */
         get: operations["atc-search.query.get"];
         put?: never;
         /**
          * Search (JSON body form)
-         * @description Requires a `read`-role key scoped to this index (or unscoped). Body form of the same search as `GET` on this path, sharing the same response shape (`SearchResult`). Unlike the `GET` form, the request body schema is strict: `additionalProperties: false`, `filters` is one explicit object field (`{ "<attrKey>": ["v1", "v2"] }`, up to 20 keys, up to 50 values per key), and `highlight` is a real JSON boolean. Default `limit` is 20, clamped to `maxPage` (default 100); default `offset` is 0; default `sort` is `relevance`.
+         * @description Requires a `read`-role key scoped to this index (or unscoped). Body form of the same search as `GET` on this path, sharing the same response shape (`SearchResult`). Unlike the `GET` form, the request body schema is strict: `additionalProperties: false`, `filters` is one explicit object field (`{ "<attrKey>": ["v1", "v2"] }`, up to 20 keys, up to 50 values per key), and `highlight` is a real JSON boolean. Default `limit` is 20, clamped to `maxPage` (default 100); default `sort` is `relevance`; `cursor` takes the previous `nextCursor`.
          */
         post: operations["atc-search.query.post"];
         delete?: never;
@@ -366,8 +366,8 @@ export interface components {
         };
         /** @description 1-1000 as a plain decimal string, no leading zero. */
         LimitParam: string;
-        /** @description 0 or a positive decimal string, no leading zero. */
-        OffsetParam: string;
+        /** @description Opaque `nextCursor` of the previous page. */
+        CursorParam: string;
         /** @enum {string} */
         SortParam: "relevance" | "newest" | "oldest";
         /** @description Column weights for ranking; higher counts more. */
@@ -411,6 +411,8 @@ export interface components {
             index: components["schemas"]["IndexView"];
         };
         IndexListResponse: {
+            /** @description Always null; the list is complete. */
+            nextCursor: null;
             items: components["schemas"]["IndexView"][];
         };
         CreateIndexRequest: {
@@ -480,8 +482,8 @@ export interface components {
             /** @description Documents, newest first. No `score` field (stripped, not `null`). */
             items: components["schemas"]["DocumentView"][];
             total: number;
-            limit: number;
-            offset: number;
+            /** @description Pass as `cursor` for the next page; `null` on the last page. */
+            nextCursor: string | null;
         };
         /** @description Present on a hit only when the request asked for `highlight=true`/`highlight: true`. */
         Highlights: {
@@ -501,11 +503,11 @@ export interface components {
         };
         SearchResult: {
             total: number;
-            limit: number;
-            offset: number;
+            /** @description Pass as `cursor` for the next page; `null` on the last page and when the next page would start past `maxOffset`. */
+            nextCursor: string | null;
             /** @description The parsed FTS5 match expression actually run (not the raw `q`/`filter.*` input) — empty string when the input had no usable terms. */
             query: string;
-            hits: components["schemas"]["SearchHit"][];
+            items: components["schemas"]["SearchHit"][];
             /** @description One entry per requested facet key, keyed by that attribute name. */
             facets: {
                 [key: string]: components["schemas"]["FacetValue"][];
@@ -520,8 +522,8 @@ export interface components {
             facets?: components["schemas"]["FacetKeys"];
             /** @description Default 20 when omitted, clamped to `maxPage` (default 100). */
             limit?: number;
-            /** @description Default 0 when omitted. */
-            offset?: number;
+            /** @description Opaque `nextCursor` of the previous page. */
+            cursor?: string;
             /** @description Real JSON boolean here (the `GET` form uses a `"true"`/`"false"` string). */
             highlight?: boolean;
             sort?: components["schemas"]["SortParam"];
@@ -531,6 +533,8 @@ export interface components {
             title: string;
         };
         SuggestResponse: {
+            /** @description Always null; suggestions are one short list. */
+            nextCursor: null;
             /** @description Title matches only — not the full `DocumentView`. */
             items: components["schemas"]["SuggestItem"][];
         };
@@ -637,6 +641,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         IndexName: components["schemas"]["IndexNameValue"];
         DocId: string;
     };
@@ -783,7 +789,10 @@ export interface operations {
     "atc-search.indexes.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -911,7 +920,10 @@ export interface operations {
     "atc-search.indexes.clear": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["IndexName"];
             };
@@ -939,8 +951,8 @@ export interface operations {
             query?: {
                 /** @description Page size. Default 50, clamped to `maxPage` (default 100). */
                 limit?: components["schemas"]["LimitParam"];
-                /** @description Row offset. Default 0. Rejected with 400 `INVALID_QUERY` if greater than `maxOffset` (default 10000, `MAX_OFFSET`). */
-                offset?: components["schemas"]["OffsetParam"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["schemas"]["CursorParam"];
             };
             header?: never;
             path: {
@@ -959,7 +971,7 @@ export interface operations {
                     "application/json": components["schemas"]["BrowseResponse"];
                 };
             };
-            /** @description `INVALID_QUERY` (`offset` greater than `maxOffset`) or `VALIDATION_FAILED` (`limit`/ `offset` fail their pattern, or an unknown query parameter is present — this endpoint's querystring schema is strict, unlike the search endpoints). */
+            /** @description `INVALID_QUERY` (a malformed `cursor`, or one past `maxOffset`) or `VALIDATION_FAILED` (`limit`/ `cursor` fail their pattern, or an unknown query parameter is present — this endpoint's querystring schema is strict, unlike the search endpoints). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1099,8 +1111,8 @@ export interface operations {
                 q?: string;
                 /** @description Page size. Default 20, clamped to `maxPage` (default 100). */
                 limit?: components["schemas"]["LimitParam"];
-                /** @description Row offset. Default 0. Rejected with 400 `INVALID_QUERY` if greater than `maxOffset` (default 10000). */
-                offset?: components["schemas"]["OffsetParam"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["schemas"]["CursorParam"];
                 /** @description `"true"` to include `highlights` on every hit. Note: a string enum here (`"true"`/`"false"`), not a real boolean — this is the querystring form; the `POST` body form below uses a real JSON boolean for the same field. */
                 highlight?: "true" | "false";
                 /** @description Comma-separated attribute keys to compute facet counts for (up to 20). Each key must be a valid attribute key or `tags`, or this returns 400 `INVALID_QUERY`. */
@@ -1126,7 +1138,7 @@ export interface operations {
                     "application/json": components["schemas"]["SearchResult"];
                 };
             };
-            /** @description `INVALID_QUERY` (offset beyond `maxOffset`, more than 32 search terms, an invalid `facets` key, or an invalid `filter.<key>` attribute key / more than 50 values for one filter key). */
+            /** @description `INVALID_QUERY` (a malformed `cursor` or one past `maxOffset`, more than 32 search terms, an invalid `facets` key, or an invalid `filter.<key>` attribute key / more than 50 values for one filter key). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1165,7 +1177,7 @@ export interface operations {
                     "application/json": components["schemas"]["SearchResult"];
                 };
             };
-            /** @description `INVALID_QUERY` (offset beyond `maxOffset`, more than 32 search terms, an invalid `facets`/`filters` attribute key) or `VALIDATION_FAILED` (body fails schema validation, e.g. an unknown field). */
+            /** @description `INVALID_QUERY` (a malformed `cursor` or one past `maxOffset`, more than 32 search terms, an invalid `facets`/`filters` attribute key) or `VALIDATION_FAILED` (body fails schema validation, e.g. an unknown field). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1237,7 +1249,10 @@ export interface operations {
     "atc-search.contentSync.run": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 namespace: string;
             };

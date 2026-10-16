@@ -678,6 +678,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         /** @description The link's short code. */
         CodeParam: components["schemas"]["Code"];
         /**
@@ -921,7 +923,10 @@ export interface operations {
     "atc-shortlink.links.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -962,7 +967,10 @@ export interface operations {
     "atc-shortlink.links.batch": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };

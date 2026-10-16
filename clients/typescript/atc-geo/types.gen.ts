@@ -1148,6 +1148,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         /** @description BCP 47 language tag for localized names. Invalid or unrecognized tags never error — they silently fall back to DEFAULT_LANG (env-configurable, default "en"). */
         Lang: string;
         CollectionName: string;
@@ -1418,6 +1420,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["CountryView"][];
                     };
                 };
@@ -1482,6 +1486,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["CurrencyView"][];
                     };
                 };
@@ -1550,6 +1556,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["TimezoneView"][];
                     };
                 };
@@ -1713,6 +1721,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["CollectionView"][];
                     };
                 };
@@ -1725,7 +1735,10 @@ export interface operations {
     "atc-geo.collections.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1856,7 +1869,10 @@ export interface operations {
     "atc-geo.collections.clear": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["CollectionName"];
             };
@@ -1888,8 +1904,8 @@ export interface operations {
             query?: {
                 /** @description Default 50. */
                 limit?: string;
-                /** @description Default 0. */
-                offset?: string;
+                /** @description Opaque `nextCursor` from the previous page (places are ordered by name, then id). A malformed cursor is `400 INVALID_CURSOR`. */
+                cursor?: string;
             };
             header?: never;
             path: {
@@ -1911,8 +1927,8 @@ export interface operations {
                         items: components["schemas"]["PlaceView"][];
                         /** @description Total places in the collection */
                         total: number;
-                        limit: number;
-                        offset: number;
+                        /** @description Pass as `cursor` for the next page; null on the last page. */
+                        nextCursor: string | null;
                     };
                 };
             };
@@ -2077,6 +2093,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; nearby answers one ranked page of up to `limit` places. */
+                        nextCursor: null;
                         from: components["schemas"]["Point"];
                         radiusKm: number;
                         /** @description Matches found within the radius */

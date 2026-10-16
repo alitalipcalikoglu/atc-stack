@@ -22,7 +22,7 @@ export const TOOLS = [
     operation: "atc-auth.users.get",
     description: "Get a user by id. Read-only.",
     input: {
-      id: z.string().describe("User id."),
+      id: z.string().regex(new RegExp("^usr_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("User id."),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -32,7 +32,7 @@ export const TOOLS = [
     operation: "atc-auth.sessions.list",
     description: "List a user's active sessions. Sessions that are neither revoked nor expired, as of now. Read-only.",
     input: {
-      id: z.string().describe("User id."),
+      id: z.string().regex(new RegExp("^usr_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("User id."),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -40,13 +40,13 @@ export const TOOLS = [
   operationTool({
     service: "atc-auth",
     operation: "atc-auth.events.list",
-    description: "List a user's audit events. Keyset-paginated, newest first. Note the pagination field is `nextBefore`, not `nextCursor` — this service is one of several across the platform whose list envelopes use a slightly different cursor field name (a known, not-yet-normalized cross-service inconsistency). Read-only.",
+    description: "List a user's audit events. Keyset-paginated, newest first: pass `nextCursor` back as `cursor`. Read-only.",
     input: {
-      id: z.string().describe("User id."),
+      id: z.string().regex(new RegExp("^usr_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("User id."),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).describe("Page size, 1-100. Default 50.").optional(),
-      before: z.string().regex(new RegExp("^[0-9]{1,15}$", 'u')).describe("Event id cursor from a previous page's `nextBefore`.").optional(),
+      cursor: z.string().regex(new RegExp("^[0-9]{1,15}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"id":"id"},"query":{"limit":"limit","before":"before"},"body":"none"},
+    map: {"path":{"id":"id"},"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

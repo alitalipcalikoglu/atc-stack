@@ -239,7 +239,7 @@ export interface paths {
         };
         /**
          * List a user's audit events
-         * @description Keyset-paginated, newest first. Note the pagination field is `nextBefore`, not `nextCursor` — this service is one of several across the platform whose list envelopes use a slightly different cursor field name (a known, not-yet-normalized cross-service inconsistency).
+         * @description Keyset-paginated, newest first: pass `nextCursor` back as `cursor`.
          */
         get: operations["atc-auth.events.list"];
         put?: never;
@@ -646,7 +646,6 @@ export interface components {
             };
         };
         User: {
-            /** Format: uuid */
             id: string;
             /** Format: email */
             email: string;
@@ -672,7 +671,6 @@ export interface components {
             updatedAt: string;
         };
         Session: {
-            /** Format: uuid */
             id: string;
             /** Format: date-time */
             createdAt: string;
@@ -684,7 +682,8 @@ export interface components {
             userAgent: string | null;
         };
         Event: {
-            id: number;
+            /** @description Position in the event log (log rows expose `seq` */
+            seq: number;
             /** @description e.g. login.succeeded, login.failed, session.revoked, account.disabled, password.changed. */
             type: string;
             ip: string | null;
@@ -704,19 +703,12 @@ export interface components {
             refreshToken: string;
             /** Format: date-time */
             refreshTokenExpiresAt: string;
-            /** Format: uuid */
             sessionId: string;
         };
         AccessClaims: {
-            /**
-             * Format: uuid
-             * @description User id.
-             */
+            /** @description User id. */
             sub: string;
-            /**
-             * Format: uuid
-             * @description Session id.
-             */
+            /** @description Session id. */
             sid: string;
             /** Format: email */
             email: string;
@@ -823,11 +815,13 @@ export interface components {
         };
         SessionListResponse: {
             items: components["schemas"]["Session"][];
+            /** @description Always null; a user's sessions come in one page. */
+            nextCursor: null;
         };
         EventListResponse: {
             items: components["schemas"]["Event"][];
-            /** @description Event-id cursor for the next (older) page, or null when there is no next page. Named `nextBefore`, not `nextCursor` — this list endpoint's field name differs from `/v1/users`'s, a known cross-service/cross-endpoint inconsistency, not a typo. */
-            nextBefore: string | null;
+            /** @description Opaque cursor for the next (older) page, or null when there is no next page. */
+            nextCursor: string | null;
         };
         /** @description Source-verified shape of `AuthService#introspect`, exposed as-is by the HTTP handler (`{ active, ...(reason && {reason}), ...(claims && {claims}) }`). Exactly two forms occur: `active: true` always carries `claims` and never `reason`; `active: false` always carries `reason`, and additionally carries `claims` only for the two reasons where the JWT itself verified but the session or account turned out not to be usable (`SESSION_REVOKED`, `ACCOUNT_DISABLED`) — a JWT-level failure (`INVALID`, `EXPIRED`, `UNKNOWN_KEY`) never has claims to attach. */
         IntrospectResponse: {
@@ -997,6 +991,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         /** @description User id. */
         UserId: string;
         /** @description The end user's own JWT access token (not the API key). Checked manually by the handler via `introspect()`; a missing or invalid value yields `401 INVALID_TOKEN`, not a schema-level 400. */
@@ -1180,7 +1176,10 @@ export interface operations {
     "atc-auth.users.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1420,8 +1419,8 @@ export interface operations {
             query?: {
                 /** @description Page size, 1-100. Default 50. */
                 limit?: string;
-                /** @description Event id cursor from a previous page's `nextBefore`. */
-                before?: string;
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: string;
             };
             header?: never;
             path: {
@@ -1823,7 +1822,10 @@ export interface operations {
     "atc-auth.users.anonymize": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 /** @description User id. */
                 id: components["parameters"]["UserId"];

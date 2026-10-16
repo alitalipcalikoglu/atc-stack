@@ -92,8 +92,9 @@ export const TOOLS = [
     description: "Acknowledge an alert (admin). Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       id: z.string().regex(new RegExp("^alr_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
     },
-    map: {"path":{"id":"id"},"body":"none"},
+    map: {"path":{"id":"id"},"header":{"IdempotencyKey":"Idempotency-Key"},"body":"none"},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -135,13 +136,14 @@ export const TOOLS = [
     operation: "atc-status.maintenance.create",
     description: "Plan a maintenance window (admin). While active, failures of the listed monitors (all when `monitors` is empty or null) open no incident and send no alert; the public page shows the window and those monitors as in maintenance. At most 30 days long. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       title: z.string().min(1).max(120),
       message: z.string().max(1000).optional(),
       monitors: z.array(z.string()).max(100).nullable().optional(),
       startsAt: z.string(),
       endsAt: z.string(),
     },
-    map: {"body":"flat","bodyFields":["title","message","monitors","startsAt","endsAt"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["title","message","monitors","startsAt","endsAt"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
 ];

@@ -33,11 +33,11 @@ export const TOOLS = [
       filters: z.record(z.string(), z.array(z.string().max(200)).max(50)).describe("AND across keys, OR within a key. Up to 20 keys, up to 50 values per key.").optional(),
       facets: z.array(z.string().min(1).max(64)).max(20).describe("Attribute keys the console offers as filter groups. At most 20.").optional(),
       limit: z.number().int().min(1).max(1000).describe("Default 20 when omitted, clamped to `maxPage` (default 100).").optional(),
-      offset: z.number().int().min(0).describe("Default 0 when omitted.").optional(),
+      cursor: z.string().max(64).describe("Opaque `nextCursor` of the previous page.").optional(),
       highlight: z.boolean().describe("Real JSON boolean here (the `GET` form uses a `\"true\"`/`\"false\"` string).").optional(),
       sort: z.enum(["relevance", "newest", "oldest"]).optional(),
     },
-    map: {"path":{"name":"name"},"body":"flat","bodyFields":["q","filters","facets","limit","offset","highlight","sort"]},
+    map: {"path":{"name":"name"},"body":"flat","bodyFields":["q","filters","facets","limit","cursor","highlight","sort"]},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -66,13 +66,13 @@ export const TOOLS = [
   operationTool({
     service: "atc-search",
     operation: "atc-search.documents.browse",
-    description: "Browse documents (no query). Requires a `read`-role key scoped to this index (or unscoped). Equivalent to an empty search sorted newest-first; every returned item omits `score` entirely (it is stripped, not `null`, unlike a real search hit). Default `limit` is **50** here (search's default is 20), clamped to `maxPage` (default 100, `MAX_PAGE`). Default `offset` is 0. Read-only.",
+    description: "Browse documents (no query). Requires a `read`-role key scoped to this index (or unscoped). Equivalent to an empty search sorted newest-first; every returned item omits `score` entirely (it is stripped, not `null`, unlike a real search hit). Default `limit` is **50** here (search's default is 20), clamped to `maxPage` (default 100, `MAX_PAGE`). Pass `nextCursor` back as `cursor` for the next page. Read-only.",
     input: {
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|1000)$", 'u')).describe("1-1000 as a plain decimal string, no leading zero.").describe("Page size. Default 50, clamped to `maxPage` (default 100).").optional(),
-      offset: z.string().regex(new RegExp("^(0|[1-9][0-9]{0,6})$", 'u')).describe("0 or a positive decimal string, no leading zero.").describe("Row offset. Default 0. Rejected with 400 `INVALID_QUERY` if greater than `maxOffset` (default 10000, `MAX_OFFSET`).").optional(),
+      cursor: z.string().max(64).describe("Opaque `nextCursor` of the previous page.").describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"name":"name"},"query":{"limit":"limit","offset":"offset"},"body":"none"},
+    map: {"path":{"name":"name"},"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -88,13 +88,14 @@ export const TOOLS = [
     operation: "atc-search.indexes.create",
     description: "Create an index. Requires a `write`-role key. If the key is index-scoped, the requested `name` must be in its scope (checked after body validation, before creation) or this returns 403 — a scoped key can preemptively be issued for an index that does not exist yet. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       description: z.string().max(500).optional(),
       weights: z.object({ title: z.number().optional(), body: z.number().optional(), tags: z.number().optional() }).strict().describe("Partial weights; omitted fields keep their current value (create: the service default `{ title: 5, body: 1, tags: 3 }`). Each given value must be between 0 and…").optional(),
       facets: z.array(z.string().min(1).max(64)).max(20).describe("Attribute keys the console offers as filter groups. At most 20.").optional(),
       language: z.enum(["none", "tr"]).describe("`tr` stems Turkish suffixes (case, possessive, plural) when indexing and searching; changing it reindexes the index in place. Default `none`.").optional(),
     },
-    map: {"body":"flat","bodyFields":["name","description","weights","facets","language"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["name","description","weights","facets","language"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({

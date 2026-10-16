@@ -21,7 +21,7 @@ export const TOOLS = [
       status: z.enum(["queued", "running", "succeeded", "failed", "cancelled"]).optional(),
       source: z.string().regex(new RegExp("^atc-[a-z][a-z0-9-]{0,30}$", 'u')).optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).describe("Default 50").optional(),
-      cursor: z.string().regex(new RegExp("^exp_[0-9a-z]{9}[0-9a-f]{12}$", 'u')).describe("`nextCursor` from the previous page.").optional(),
+      cursor: z.string().regex(new RegExp("^exp_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("`nextCursor` from the previous page.").optional(),
     },
     map: {"query":{"status":"status","source":"source","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -31,7 +31,7 @@ export const TOOLS = [
     operation: "atc-export.exports.get",
     description: "One export job with progress. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^exp_[0-9a-z]{9}[0-9a-f]{12}$", 'u')),
+      id: z.string().regex(new RegExp("^exp_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -49,7 +49,7 @@ export const TOOLS = [
     operation: "atc-export.exports.download",
     description: "Short-lived signed URL of the export file. `DOWNLOAD_TTL_SEC` (300 s by default). `NO_FILE` (409) unless the job succeeded with at least one row (NDJSON exports with no rows store no file). Audited. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^exp_[0-9a-z]{9}[0-9a-f]{12}$", 'u')),
+      id: z.string().regex(new RegExp("^exp_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -59,12 +59,13 @@ export const TOOLS = [
     operation: "atc-export.exports.create",
     description: "Queue an export. `filters` are checked against the source's filter list from this API (`INVALID_FILTER`). `notifyEmail` needs notify to be configured (`NOTIFY_DISABLED`). Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       source: z.string().regex(new RegExp("^atc-[a-z][a-z0-9-]{0,30}$", 'u')),
       format: z.enum(["csv", "ndjson"]),
       filters: z.record(z.string(), z.string().max(254)).optional(),
       notifyEmail: z.string().max(254).optional(),
     },
-    map: {"body":"flat","bodyFields":["source","format","filters","notifyEmail"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["source","format","filters","notifyEmail"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -72,9 +73,10 @@ export const TOOLS = [
     operation: "atc-export.exports.retry",
     description: "Queue a failed or cancelled export again from scratch. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
-      id: z.string().regex(new RegExp("^exp_[0-9a-z]{9}[0-9a-f]{12}$", 'u')),
+      id: z.string().regex(new RegExp("^exp_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
     },
-    map: {"path":{"id":"id"},"body":"none"},
+    map: {"path":{"id":"id"},"header":{"IdempotencyKey":"Idempotency-Key"},"body":"none"},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
 ];

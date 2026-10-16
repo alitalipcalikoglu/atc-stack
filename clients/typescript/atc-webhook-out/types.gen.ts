@@ -269,8 +269,9 @@ export interface paths {
          *     a `202` is a durability guarantee for every matching subscriber at the time of publish, not
          *     just an ack of receipt.
          *
-         *     With `idempotencyKey`, a repeat publish from the same API key (`source`) and the same key
-         *     returns the **original** event and queues nothing new: `duplicate: true` and HTTP `200`
+         *     With an `Idempotency-Key` header, a repeat publish from the same API key (`source`) and the
+         *     same key returns the **original** event (for as long as the event is kept, with
+         *     `Idempotent-Replayed: true`) and queues nothing new: `duplicate: true` and HTTP `200`
          *     instead of `202`. `deliveries` in the response is always an integer **count** of the
          *     deliveries created (or, for a duplicate, already existing) for this event — never an array
          *     of delivery objects.
@@ -430,6 +431,8 @@ export interface components {
         };
         SubscriptionId: string;
         EventId: string;
+        /** @description The platform's one id format; also sent to receivers as `x-webhook-delivery`. */
+        DeliveryId: string;
         /** @description A delivery id or event sequence number, as a decimal string (path/query parameters are always strings). */
         IntIdString: string;
         /** @description Page size, 1-200. Defaults to 50 when omitted. */
@@ -541,7 +544,7 @@ export interface components {
             event: components["schemas"]["Event"];
             /** @description Count of deliveries created (new publish) or already existing (idempotent duplicate) for this event. An integer count, never an array of delivery objects. */
             deliveries: number;
-            /** @description True when this call matched an existing `idempotencyKey` from the same API key and returned the original event instead of publishing a new one. */
+            /** @description True when this call matched an existing `Idempotency-Key` from the same API key and returned the original event instead of publishing a new one. */
             duplicate: boolean;
         };
         Attempt: {
@@ -553,7 +556,7 @@ export interface components {
             error: string | null;
         };
         Delivery: {
-            id: number;
+            id: components["schemas"]["DeliveryId"];
             eventId: components["schemas"]["EventId"];
             subscriptionId: components["schemas"]["SubscriptionId"];
             status: components["schemas"]["DeliveryStatus"];
@@ -579,7 +582,7 @@ export interface components {
         DeliveryListResponse: {
             items: components["schemas"]["Delivery"][];
             /** @description Keyset pagination cursor (a delivery id as a string) — pass as `before` to fetch the next page. `null` on the last page. */
-            nextBefore: string | null;
+            nextCursor: string | null;
         };
         Stats: {
             subscriptions: {
@@ -723,7 +726,10 @@ export interface components {
             };
         };
     };
-    parameters: never;
+    parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -1118,7 +1124,10 @@ export interface operations {
     "atc-webhook-out.subscriptions.test": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: components["schemas"]["SubscriptionId"];
             };
@@ -1148,7 +1157,10 @@ export interface operations {
     "atc-webhook-out.subscriptions.replay": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: components["schemas"]["SubscriptionId"];
             };
@@ -1205,8 +1217,8 @@ export interface operations {
                 status?: components["schemas"]["DeliveryStatus"];
                 event?: components["schemas"]["EventId"];
                 limit?: components["schemas"]["Limit"];
-                /** @description Keyset pagination — the previous page's `nextBefore`. */
-                before?: components["schemas"]["IntIdString"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["schemas"]["IntIdString"];
                 /**
                  * @description Accepted by the request schema but ignored: the `{id}` path segment always determines
                  *     the subscription filter on this route.
@@ -1242,8 +1254,8 @@ export interface operations {
             query?: {
                 type?: components["schemas"]["EventType"];
                 limit?: components["schemas"]["Limit"];
-                /** @description Keyset pagination on the internal event sequence — the previous page's `nextBefore`. */
-                before?: components["schemas"]["IntIdString"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["schemas"]["IntIdString"];
             };
             header?: never;
             path?: never;
@@ -1259,7 +1271,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["Event"][];
-                        nextBefore: string | null;
+                        nextCursor: string | null;
                     };
                 };
             };
@@ -1272,7 +1284,10 @@ export interface operations {
     "atc-webhook-out.events.publish": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1282,7 +1297,6 @@ export interface operations {
                     type: components["schemas"]["EventType"];
                     /** @description Arbitrary JSON payload, stored and echoed back as-is. Defaults to `null`. */
                     data?: unknown;
-                    idempotencyKey?: string;
                 };
             };
         };
@@ -1296,7 +1310,7 @@ export interface operations {
                     /**
                      * @example {
                      *       "event": {
-                     *         "id": "evt_1a2b3c4d5e6f7081",
+                     *         "id": "evt_mgx1k2ab1a2b3c4d5e6f7081",
                      *         "type": "order.paid",
                      *         "data": {
                      *           "orderId": 42
@@ -1322,7 +1336,7 @@ export interface operations {
                     /**
                      * @example {
                      *       "event": {
-                     *         "id": "evt_1a2b3c4d5e6f7081",
+                     *         "id": "evt_mgx1k2ab1a2b3c4d5e6f7081",
                      *         "type": "order.paid",
                      *         "data": {
                      *           "orderId": 42
@@ -1418,6 +1432,8 @@ export interface operations {
                             /** Format: date-time */
                             lastAt: string;
                         }[];
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                     };
                 };
             };
@@ -1433,8 +1449,8 @@ export interface operations {
                 subscription?: components["schemas"]["SubscriptionId"];
                 event?: components["schemas"]["EventId"];
                 limit?: components["schemas"]["Limit"];
-                /** @description Keyset pagination — the previous page's `nextBefore`. */
-                before?: components["schemas"]["IntIdString"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["schemas"]["IntIdString"];
             };
             header?: never;
             path?: never;
@@ -1462,7 +1478,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: components["schemas"]["IntIdString"];
+                id: components["schemas"]["DeliveryId"];
             };
             cookie?: never;
         };
@@ -1489,9 +1505,12 @@ export interface operations {
     "atc-webhook-out.deliveries.redeliver": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
-                id: components["schemas"]["IntIdString"];
+                id: components["schemas"]["DeliveryId"];
             };
             cookie?: never;
         };
@@ -1518,9 +1537,12 @@ export interface operations {
     "atc-webhook-out.deliveries.cancel": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
-                id: components["schemas"]["IntIdString"];
+                id: components["schemas"]["DeliveryId"];
             };
             cookie?: never;
         };

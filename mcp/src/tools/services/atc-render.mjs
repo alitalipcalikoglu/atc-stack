@@ -47,12 +47,13 @@ export const TOOLS = [
     operation: "atc-render.templates.create",
     description: "Create a template with its first version. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       name: z.string().regex(new RegExp("^[a-z][a-z0-9-]{0,63}$", 'u')),
       description: z.string().max(500).optional(),
       layout: z.object({ page: z.object({ size: z.enum(["A4", "Letter", "A5"]).optional(), orientation: z.enum(["portrait", "landscape"]).optional(), margins: z.object({ top: z.number().min(18).max(144).optional(), right: z.number().min(18).max(144).optional(), bottom: z.number().min(18).max(144).optional(), left: z.number().min(18).max(144).optional() }).strict().optional(), fontSize: z.number().min(6).max(18).optional(), font: z.string().regex(new RegExp("^[a-z0-9][a-z0-9_]{0,47}$", 'u')).describe("A FONTS_DIR family id (GET /v1/fonts); default DejaVu Sans.").optional() }).strict().optional(), header: z.object({ text: z.string().max(500), align: z.enum(["left", "center", "right"]).optional() }).strict().optional(), footer: z.object({ text: z.string().max(500), align: z.enum(["left", "center", "right"]).optional() }).strict().optional(), blocks: z.array(z.union([z.object({ type: z.literal("heading"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), level: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(), text: z.string().max(10000), align: z.enum(["left", "center", "right"]).optional(), color: z.string().regex(new RegExp("^#[0-9A-Fa-f]{6}$", 'u')).optional() }).strict(), z.union([z.unknown(), z.unknown()]), z.object({ type: z.literal("keyValue"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), items: z.array(z.object({ label: z.unknown(), value: z.unknown(), if: z.unknown().optional() }).strict()).min(1).max(100), labelWidth: z.number().min(0.1).max(0.7).optional() }).strict(), z.object({ type: z.literal("table"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), rows: z.string().regex(new RegExp("^[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Data path of an array; each element is one row."), columns: z.array(z.object({ header: z.unknown(), value: z.unknown(), width: z.unknown().optional(), align: z.unknown().optional() }).strict()).min(1).max(20), zebra: z.boolean().optional(), fontSize: z.number().min(6).max(18).optional(), empty: z.string().max(10000).optional() }).strict(), z.union([z.unknown(), z.unknown()]), z.object({ type: z.literal("qr"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), value: z.string().min(1).max(2000), size: z.number().min(40).max(400).optional(), align: z.enum(["left", "center", "right"]).optional() }).strict(), z.object({ type: z.literal("divider"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), color: z.string().regex(new RegExp("^#[0-9A-Fa-f]{6}$", 'u')).optional() }).strict(), z.object({ type: z.literal("spacer"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), height: z.number().min(1).max(800) }).strict(), z.object({ type: z.literal("pageBreak"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional() }).strict()])).min(1).max(1000) }).strict(),
       note: z.string().max(500).optional(),
     },
-    map: {"body":"flat","bodyFields":["name","description","layout","note"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["name","description","layout","note"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -72,10 +73,11 @@ export const TOOLS = [
     description: "Publish a new immutable version. The new version becomes the latest; versions beyond `MAX_VERSIONS` (100) are pruned, oldest first. Numbers are never reused. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       name: z.string().regex(new RegExp("^[a-z][a-z0-9-]{0,63}$", 'u')),
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       layout: z.object({ page: z.object({ size: z.enum(["A4", "Letter", "A5"]).optional(), orientation: z.enum(["portrait", "landscape"]).optional(), margins: z.object({ top: z.number().min(18).max(144).optional(), right: z.number().min(18).max(144).optional(), bottom: z.number().min(18).max(144).optional(), left: z.number().min(18).max(144).optional() }).strict().optional(), fontSize: z.number().min(6).max(18).optional(), font: z.string().regex(new RegExp("^[a-z0-9][a-z0-9_]{0,47}$", 'u')).describe("A FONTS_DIR family id (GET /v1/fonts); default DejaVu Sans.").optional() }).strict().optional(), header: z.object({ text: z.string().max(500), align: z.enum(["left", "center", "right"]).optional() }).strict().optional(), footer: z.object({ text: z.string().max(500), align: z.enum(["left", "center", "right"]).optional() }).strict().optional(), blocks: z.array(z.union([z.object({ type: z.literal("heading"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), level: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(), text: z.string().max(10000), align: z.enum(["left", "center", "right"]).optional(), color: z.string().regex(new RegExp("^#[0-9A-Fa-f]{6}$", 'u')).optional() }).strict(), z.union([z.unknown(), z.unknown()]), z.object({ type: z.literal("keyValue"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), items: z.array(z.object({ label: z.unknown(), value: z.unknown(), if: z.unknown().optional() }).strict()).min(1).max(100), labelWidth: z.number().min(0.1).max(0.7).optional() }).strict(), z.object({ type: z.literal("table"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), rows: z.string().regex(new RegExp("^[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Data path of an array; each element is one row."), columns: z.array(z.object({ header: z.unknown(), value: z.unknown(), width: z.unknown().optional(), align: z.unknown().optional() }).strict()).min(1).max(20), zebra: z.boolean().optional(), fontSize: z.number().min(6).max(18).optional(), empty: z.string().max(10000).optional() }).strict(), z.union([z.unknown(), z.unknown()]), z.object({ type: z.literal("qr"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), value: z.string().min(1).max(2000), size: z.number().min(40).max(400).optional(), align: z.enum(["left", "center", "right"]).optional() }).strict(), z.object({ type: z.literal("divider"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), color: z.string().regex(new RegExp("^#[0-9A-Fa-f]{6}$", 'u')).optional() }).strict(), z.object({ type: z.literal("spacer"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional(), height: z.number().min(1).max(800) }).strict(), z.object({ type: z.literal("pageBreak"), if: z.string().regex(new RegExp("^!?[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z0-9_$]+){0,15}$", 'u')).describe("Render the block only when this data path is truthy; prefix ! to negate.").optional() }).strict()])).min(1).max(1000) }).strict(),
       note: z.string().max(500).optional(),
     },
-    map: {"path":{"name":"name"},"body":"flat","bodyFields":["layout","note"]},
+    map: {"path":{"name":"name"},"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["layout","note"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -107,8 +109,9 @@ export const TOOLS = [
     input: {
       status: z.enum(["queued", "running", "succeeded", "failed"]).optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("1-200, default 50.").optional(),
+      cursor: z.string().regex(new RegExp("^rnd_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("Platform id format: `rnd_<time><random>`.").describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"status":"status","limit":"limit"},"body":"none"},
+    map: {"query":{"status":"status","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -116,7 +119,7 @@ export const TOOLS = [
     operation: "atc-render.jobs.get",
     description: "One render job. Read-only.",
     input: {
-      id: z.string(),
+      id: z.string().regex(new RegExp("^rnd_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("Platform id format: `rnd_<time><random>`."),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -126,13 +129,14 @@ export const TOOLS = [
     operation: "atc-render.jobs.create",
     description: "Queue an asynchronous render. Same body as this API. The template version is pinned now (latest unless `version` is given); the job is drawn in the background, at most `RENDER_JOB_CONCURRENCY` at a time, and kept `RENDER_JOB_HOURS` after it finishes. Poll this API. Only the submitting key can read the job. Role `read`. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       template: z.string().regex(new RegExp("^[a-z][a-z0-9-]{0,63}$", 'u')),
       version: z.number().int().min(1).optional(),
       data: z.record(z.string(), z.unknown()).optional(),
       filename: z.string().min(1).max(120).optional(),
       store: z.boolean().describe("Store the PDF in atc-media instead of keeping it here.").optional(),
     },
-    map: {"body":"flat","bodyFields":["template","version","data","filename","store"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["template","version","data","filename","store"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
 ];

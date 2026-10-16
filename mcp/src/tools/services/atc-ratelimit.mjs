@@ -49,13 +49,13 @@ export const TOOLS = [
   operationTool({
     service: "atc-ratelimit",
     operation: "atc-ratelimit.overrides.list",
-    description: "List a policy's subject overrides. Requires a `read` (or `readwrite`) API key, scoped to this policy. Offset-paginated. Read-only.",
+    description: "List a policy's subject overrides. Requires a `read` (or `readwrite`) API key, scoped to this policy. Ordered by subject; pass `nextCursor` back as `cursor` for the next page. Read-only.",
     input: {
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).describe("Policy name."),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|1000)$", 'u')).describe("Page size, 1-1000. Default 50.").optional(),
-      offset: z.string().regex(new RegExp("^(0|[1-9][0-9]{0,6})$", 'u')).describe("Rows to skip. Default 0.").optional(),
+      cursor: z.string().min(1).max(200).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"name":"name"},"query":{"limit":"limit","offset":"offset"},"body":"none"},
+    map: {"path":{"name":"name"},"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -82,11 +82,12 @@ export const TOOLS = [
     operation: "atc-ratelimit.policies.create",
     description: "Create a policy. Requires a `write` (or `readwrite`) API key, scoped to the new policy's own name. Returns `Location: this API on success. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       description: z.string().max(500).optional(),
       limits: z.array(z.object({ window: z.number().int().min(1).describe("Window size in seconds."), limit: z.number().int().min(0).describe("Units allowed per window. 0 hard-blocks every check against this window.") }).strict()).min(1).max(20).describe("Sorted by window ascending once stored. Distinct windows only."),
     },
-    map: {"body":"flat","bodyFields":["name","description","limits"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["name","description","limits"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({

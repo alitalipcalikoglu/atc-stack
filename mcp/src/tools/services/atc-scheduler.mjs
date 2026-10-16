@@ -37,9 +37,9 @@ export const TOOLS = [
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       status: z.enum(["pending", "running", "retrying", "succeeded", "failed", "skipped", "cancelled"]).describe("The full run-status lattice for this service (7 values). `pending` -> `running` -> (`retrying` -> `running`)* -> one of `succeeded`/`failed`/`skipped`/`cancell…").optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Defaults to 50.").optional(),
-      before: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("Opaque keyset cursor — the `id` of the last item from the previous page.").optional(),
+      cursor: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"name":"name"},"query":{"status":"status","limit":"limit","before":"before"},"body":"none"},
+    map: {"path":{"name":"name"},"query":{"status":"status","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -50,9 +50,9 @@ export const TOOLS = [
       job: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).optional(),
       status: z.enum(["pending", "running", "retrying", "succeeded", "failed", "skipped", "cancelled"]).describe("The full run-status lattice for this service (7 values). `pending` -> `running` -> (`retrying` -> `running`)* -> one of `succeeded`/`failed`/`skipped`/`cancell…").optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Defaults to 50.").optional(),
-      before: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("Opaque keyset cursor — the `id` of the last item from the previous page.").optional(),
+      cursor: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"job":"job","status":"status","limit":"limit","before":"before"},"body":"none"},
+    map: {"query":{"job":"job","status":"status","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -60,7 +60,7 @@ export const TOOLS = [
     operation: "atc-scheduler.runs.get",
     description: "Get a run. Read-only.",
     input: {
-      id: z.string().regex(new RegExp("^[1-9][0-9]{0,15}$", 'u')),
+      id: z.string().regex(new RegExp("^run_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -106,6 +106,7 @@ export const TOOLS = [
     operation: "atc-scheduler.jobs.create",
     description: "Create a job. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       description: z.string().max(500).optional(),
       tags: z.array(z.string().min(1).max(40)).max(20).describe("Normalized on save (trimmed, lower-cased, de-duplicated, sorted).").optional(),
@@ -116,7 +117,7 @@ export const TOOLS = [
       timeoutMs: z.number().int().min(1).max(3600000).describe("Defaults to the server's `DEFAULT_TIMEOUT_MS`. Must be between 1000 and the server's `MAX_TIMEOUT_MS`, else `INVALID_TARGET`.").optional(),
       retry: z.object({ max: z.number().int().min(0).max(1000).describe("Retries after the first attempt (0 = none). Defaults to 3. Bounded server-side by `MAX_RETRIES`; a value above that bound is `INVALID_TARGET`.").optional(), backoffSec: z.number().int().min(1).max(86400).describe("First retry delay in seconds, doubling per retry, capped at `MAX_BACKOFF_SEC`. Defaults to 30. A value above that server bound is `INVALID_TARGET`.").optional() }).strict().optional(),
     },
-    map: {"body":"flat","bodyFields":["name","description","tags","enabled","schedule","target","targetKey","timeoutMs","retry"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["name","description","tags","enabled","schedule","target","targetKey","timeoutMs","retry"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
   }),
   operationTool({

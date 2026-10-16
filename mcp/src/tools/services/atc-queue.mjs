@@ -78,12 +78,13 @@ export const TOOLS = [
     description: "Enqueue one message (write). `201` for a new message; `200` with `deduplicated: true` when a message with the same `dedupeKey` is still in the queue (that message is returned unchanged). Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       name: z.string().regex(new RegExp("^[a-z][a-z0-9._-]{0,63}$", 'u')),
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       body: z.unknown().describe("Any JSON"),
       delaySec: z.number().int().min(0).max(1209600).optional(),
       priority: z.number().int().min(-100).max(100).describe("Higher first; default 0.").optional(),
       dedupeKey: z.string().min(1).max(200).describe("While a message with this key is in the queue, enqueuing it again returns that message.").optional(),
     },
-    map: {"path":{"name":"name"},"body":"flat","bodyFields":["body","delaySec","priority","dedupeKey"]},
+    map: {"path":{"name":"name"},"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["body","delaySec","priority","dedupeKey"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -92,9 +93,10 @@ export const TOOLS = [
     description: "Enqueue up to MAX_BATCH messages in one transaction (write). Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       name: z.string().regex(new RegExp("^[a-z][a-z0-9._-]{0,63}$", 'u')),
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       messages: z.array(z.object({ body: z.unknown().describe("Any JSON"), delaySec: z.number().int().min(0).max(1209600).optional(), priority: z.number().int().min(-100).max(100).describe("Higher first; default 0.").optional(), dedupeKey: z.string().min(1).max(200).describe("While a message with this key is in the queue, enqueuing it again returns that message.").optional() }).strict()).min(1).max(1000),
     },
-    map: {"path":{"name":"name"},"body":"flat","bodyFields":["messages"]},
+    map: {"path":{"name":"name"},"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["messages"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
 ];

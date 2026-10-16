@@ -280,7 +280,7 @@ export interface paths {
         };
         /**
          * List a policy's subject overrides
-         * @description Requires a `read` (or `readwrite`) API key, scoped to this policy. Offset-paginated.
+         * @description Requires a `read` (or `readwrite`) API key, scoped to this policy. Ordered by subject; pass `nextCursor` back as `cursor` for the next page.
          */
         get: operations["atc-ratelimit.overrides.list"];
         put?: never;
@@ -567,6 +567,8 @@ export interface components {
             policy: components["schemas"]["Policy"];
         };
         PoliciesListResponse: {
+            /** @description Always null; the list is complete. */
+            nextCursor: null;
             items: components["schemas"]["Policy"][];
         };
         StatsResponse: {
@@ -586,6 +588,8 @@ export interface components {
             }[];
         };
         TopResponse: {
+            /** @description Always null; the top list is one ranked page. */
+            nextCursor: null;
             /** @description The resolved window (seconds) these results were computed against. */
             window: number;
             /** @description That window's configured limit. */
@@ -598,10 +602,10 @@ export interface components {
         };
         OverridesListResponse: {
             items: components["schemas"]["Override"][];
-            /** @description Total overrides for this policy, independent of limit/offset. */
+            /** @description Total overrides for this policy, independent of paging. */
             total: number;
-            limit: number;
-            offset: number;
+            /** @description Pass as `cursor` for the next page; `null` on the last page. */
+            nextCursor: string | null;
         };
         OverrideResponse: {
             override: components["schemas"]["Override"];
@@ -785,6 +789,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         /** @description Policy name. */
         PolicyName: components["schemas"]["PolicyNameValue"];
         /** @description Subject identifier (opaque to this service — a user id, an IP, an API key id, ...). */
@@ -1079,7 +1085,10 @@ export interface operations {
     "atc-ratelimit.policies.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1297,8 +1306,8 @@ export interface operations {
             query?: {
                 /** @description Page size, 1-1000. Default 50. */
                 limit?: string;
-                /** @description Rows to skip. Default 0. */
-                offset?: string;
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: string;
             };
             header?: never;
             path: {

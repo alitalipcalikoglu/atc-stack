@@ -257,7 +257,7 @@ export interface paths {
         };
         /**
          * List quarantined uploads
-         * @description Newest first, at most 200. The bytes stay on disk until deleted here or purged after `QUARANTINE_DAYS`; they are never served.
+         * @description Newest first, keyset-paged. The bytes stay on disk until deleted here or purged after `QUARANTINE_DAYS`; they are never served.
          */
         get: operations["atc-media.quarantine.list"];
         put?: never;
@@ -405,7 +405,7 @@ export interface components {
                 details?: unknown;
             };
         };
-        /** Format: uuid */
+        /** @description The platform's one id format, `fil_<base36 time><16 hex>`. */
         FileId: string;
         /** @enum {string} */
         Visibility: "public" | "private";
@@ -589,6 +589,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         FileId: components["schemas"]["FileId"];
         /** @description Defaults to `private` when omitted. */
         UploadVisibility: components["schemas"]["Visibility"];
@@ -984,7 +986,10 @@ export interface operations {
     "atc-media.files.restore": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: components["parameters"]["FileId"];
             };
@@ -1108,7 +1113,12 @@ export interface operations {
     };
     "atc-media.quarantine.list": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Page size, 1-200. Default 50. */
+                limit?: string;
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1123,6 +1133,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["QuarantineItem"][];
+                        nextCursor: string | null;
                     };
                 };
             };

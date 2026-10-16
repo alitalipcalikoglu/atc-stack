@@ -400,7 +400,7 @@ export interface paths {
         };
         /**
          * Read console's own admin-activity log.
-         * @description console's local log of what administrators did in this console — distinct from the audit service reached through `/api/services/{sid}/atc-audit/*`. Entries are also forwarded to the first configured audit service when one has a write-capable key. Keyset pagination: pass the previous page's `nextBefore` as `before`. Default page size 50.
+         * @description console's local log of what administrators did in this console — distinct from the audit service reached through `/api/services/{sid}/atc-audit/*`. Entries are also forwarded to the first configured audit service when one has a write-capable key. Keyset pagination: pass the previous page's `nextCursor` as `cursor`. Default page size 50.
          *
          *     Query validation uses console's shared `paging` schema — the one query schema in the service with `additionalProperties: true`, so unrecognized query keys are accepted by validation and then silently ignored; only documented parameters are ever forwarded downstream.
          *
@@ -748,7 +748,7 @@ export interface paths {
          * Page a user's events.
          * @description Typed pass-through to the **auth** service instance named by `sid` — console relays this to its `GET /v1/users/{id}/events`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Query validation uses console's shared `paging` schema — the one query schema in the service with `additionalProperties: true`, so unrecognized query keys are accepted by validation and then silently ignored; only documented parameters are ever forwarded downstream.
          *
@@ -1468,7 +1468,7 @@ export interface paths {
          * Page one flag's change history.
          * @description Typed pass-through to the **flags** service instance named by `sid` — console relays this to its `GET /v1/flags/{key}/history`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -1492,7 +1492,7 @@ export interface paths {
          * Page the service-wide change history.
          * @description Typed pass-through to the **flags** service instance named by `sid` — console relays this to its `GET /v1/history`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -1778,7 +1778,7 @@ export interface paths {
          * Page one job's runs.
          * @description Typed pass-through to the **scheduler** service instance named by `sid` — console relays this to its `GET /v1/runs?job={name}`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `status`, `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `status`, `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -1802,7 +1802,7 @@ export interface paths {
          * Page runs across jobs.
          * @description Typed pass-through to the **scheduler** service instance named by `sid` — console relays this to its `GET /v1/runs`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `job`, `status`, `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `job`, `status`, `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -2058,7 +2058,7 @@ export interface paths {
          * Page deliveries.
          * @description Typed pass-through to the **webhook-out** service instance named by `sid` — console relays this to its `GET /v1/deliveries`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `status`, `subscription`, `event`, `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `status`, `subscription`, `event`, `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -2152,7 +2152,7 @@ export interface paths {
          * Page emitted events.
          * @description Typed pass-through to the **webhook-out** service instance named by `sid` — console relays this to its `GET /v1/events`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `type`, `limit`, `before` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `type`, `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -2338,7 +2338,7 @@ export interface paths {
          * Browse documents in an index.
          * @description Typed pass-through to the **search** service instance named by `sid` — console relays this to its `GET /v1/indexes/{name}/documents`. There is no generic proxy anywhere in console: this route is hand-written, individually schema-validated and individually role-gated.
          *
-         *     Of the accepted query parameters only `limit`, `offset` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
+         *     Of the accepted query parameters only `limit`, `cursor` are forwarded downstream; the rest belong to the shared query schema this route reuses and are ignored here.
          *
          *     Requires any signed-in session (`requireSession`); both `admin` and `viewer` may call it.
          */
@@ -5080,7 +5080,6 @@ export interface components {
         Admin: {
             /** @description Service ids the account is limited to; null = every service. */
             services: string[] | null;
-            /** Format: uuid */
             id: string;
             /** @description Sign-in name, stored trimmed and lower-cased. */
             username: string;
@@ -5115,8 +5114,8 @@ export interface components {
         };
         /** @description One entry of console's own local admin-activity log (distinct from the audit service). */
         AuditEntry: {
-            id: number;
-            /** Format: uuid */
+            /** @description Log position; the keyset cursor. */
+            seq: number;
             adminId: string | null;
             adminUsername: string | null;
             /** @description e.g. `login.succeeded`, `login.failed`, `password.changed`, `totp.enabled`, `admin.created`, `atc-flags.flag.update`. */
@@ -5208,8 +5207,8 @@ export interface components {
             events?: {
                 [key: string]: unknown;
             }[];
-            /** @description The events response's `nextBefore` cursor, for `GET .../atc-auth/users/{id}/events`. */
-            eventsNextBefore?: string | null;
+            /** @description The events response's `nextCursor`, for `GET .../atc-auth/users/{id}/events`. */
+            eventsNextCursor?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -5223,8 +5222,8 @@ export interface components {
             history?: {
                 [key: string]: unknown;
             }[];
-            /** @description The history response's `nextBefore` cursor, for `GET .../atc-flags/flags/{id}/history`. */
-            historyNextBefore?: string | null;
+            /** @description The history response's `nextCursor`, for `GET .../atc-flags/flags/{id}/history`. */
+            historyNextCursor?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -5238,8 +5237,8 @@ export interface components {
             runs?: {
                 [key: string]: unknown;
             }[];
-            /** @description The runs response's `nextBefore` cursor, for `GET .../atc-scheduler/jobs/{id}/runs`. */
-            runsNextBefore?: string | null;
+            /** @description The runs response's `nextCursor`, for `GET .../atc-scheduler/jobs/{id}/runs`. */
+            runsNextCursor?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -5253,8 +5252,8 @@ export interface components {
             deliveries?: {
                 [key: string]: unknown;
             }[];
-            /** @description The deliveries response's `nextBefore` cursor, for `GET .../atc-webhook-out/deliveries?subscription=...`. */
-            deliveriesNextBefore?: string | null;
+            /** @description The deliveries response's `nextCursor`, for `GET .../atc-webhook-out/deliveries?subscription=...`. */
+            deliveriesNextCursor?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -5372,8 +5371,6 @@ export interface components {
         Paging_cursor: string;
         Paging_status: string;
         Paging_email: string;
-        /** @description Keyset bound for `before`-paginated downstream lists. */
-        Paging_before: string;
         Paging_action: string;
         AuditQ_source: string;
         AuditQ_action: string;
@@ -5412,7 +5409,6 @@ export interface components {
         FlagsQ_archived: "true" | "false";
         FlagsQ_limit: string;
         FlagsQ_cursor: string;
-        FlagsQ_before: string;
         SchedulerQ_q: string;
         SchedulerQ_tag: string;
         SchedulerQ_enabled: "true" | "false";
@@ -5420,7 +5416,6 @@ export interface components {
         SchedulerQ_job: string;
         SchedulerQ_limit: string;
         SchedulerQ_cursor: string;
-        SchedulerQ_before: string;
         /** @description Cron expression to preview; only read by the preview operation. */
         SchedulerQ_cron: string;
         SchedulerQ_timezone: string;
@@ -5433,9 +5428,9 @@ export interface components {
         WebhookQ_subscription: string;
         WebhookQ_limit: string;
         WebhookQ_cursor: string;
-        WebhookQ_before: string;
         OffsetQ_limit: string;
-        OffsetQ_offset: string;
+        /** @description Opaque `nextCursor` of the previous page. */
+        OffsetQ_cursor: string;
         RlStatsQ_hours: string;
         RlTopQ_window: string;
         RlTopQ_limit: string;
@@ -5472,7 +5467,7 @@ export interface components {
         EmailParam: string;
         /** @description Second-level downstream resource id (session, environment, document, override, subject, place or variant), passed through URL-encoded. */
         SubParam: string;
-        /** @description Console administrator id (UUID). */
+        /** @description Console administrator id (`adm_<time><random>`). */
         AdminIdParam: string;
         /** @description CSRF guard. `requireSession`/`requireAdmin` reject every non-GET/HEAD request whose value is not exactly `"1"` with `403 FORBIDDEN`. A browser cannot set a custom header cross-site without a CORS pre-flight the console never approves, which — together with the `SameSite=Strict` session cookie — is the whole CSRF defence. */
         CsrfHeader: "1";
@@ -5748,6 +5743,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["AdminSession"][];
                     };
                 };
@@ -6003,6 +6000,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["Admin"][];
                     };
                 };
@@ -6078,7 +6077,7 @@ export interface operations {
                 "x-console-request": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Console administrator id (UUID). */
+                /** @description Console administrator id (`adm_<time><random>`). */
                 id: components["parameters"]["AdminIdParam"];
             };
             cookie?: never;
@@ -6123,7 +6122,7 @@ export interface operations {
                 "x-console-request": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Console administrator id (UUID). */
+                /** @description Console administrator id (`adm_<time><random>`). */
                 id: components["parameters"]["AdminIdParam"];
             };
             cookie?: never;
@@ -6184,7 +6183,7 @@ export interface operations {
                 "x-console-request": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Console administrator id (UUID). */
+                /** @description Console administrator id (`adm_<time><random>`). */
                 id: components["parameters"]["AdminIdParam"];
             };
             cookie?: never;
@@ -6235,7 +6234,7 @@ export interface operations {
                 "x-console-request": components["parameters"]["CsrfHeader"];
             };
             path: {
-                /** @description Console administrator id (UUID). */
+                /** @description Console administrator id (`adm_<time><random>`). */
                 id: components["parameters"]["AdminIdParam"];
             };
             cookie?: never;
@@ -6272,8 +6271,6 @@ export interface operations {
                 cursor?: components["parameters"]["Paging_cursor"];
                 status?: components["parameters"]["Paging_status"];
                 email?: components["parameters"]["Paging_email"];
-                /** @description Keyset bound for `before`-paginated downstream lists. */
-                before?: components["parameters"]["Paging_before"];
                 action?: components["parameters"]["Paging_action"];
             };
             header?: never;
@@ -6291,7 +6288,7 @@ export interface operations {
                     "application/json": {
                         items: components["schemas"]["AuditEntry"][];
                         /** @description Cursor for the next page, or null on the last page. */
-                        nextBefore: string | null;
+                        nextCursor: string | null;
                     };
                 };
             };
@@ -6315,6 +6312,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["DocumentationService"][];
                     };
                 };
@@ -6379,6 +6378,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["ServiceDescriptor"][];
                     };
                 };
@@ -6402,6 +6403,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["ServiceOverview"][];
                     };
                 };
@@ -6425,6 +6428,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: components["schemas"]["ServiceAbout"][];
                     };
                 };
@@ -6518,8 +6523,6 @@ export interface operations {
                 cursor?: components["parameters"]["Paging_cursor"];
                 status?: components["parameters"]["Paging_status"];
                 email?: components["parameters"]["Paging_email"];
-                /** @description Keyset bound for `before`-paginated downstream lists. */
-                before?: components["parameters"]["Paging_before"];
                 action?: components["parameters"]["Paging_action"];
             };
             header?: never;
@@ -6687,8 +6690,6 @@ export interface operations {
                 cursor?: components["parameters"]["Paging_cursor"];
                 status?: components["parameters"]["Paging_status"];
                 email?: components["parameters"]["Paging_email"];
-                /** @description Keyset bound for `before`-paginated downstream lists. */
-                before?: components["parameters"]["Paging_before"];
                 action?: components["parameters"]["Paging_action"];
             };
             header?: never;
@@ -6875,8 +6876,6 @@ export interface operations {
                 cursor?: components["parameters"]["Paging_cursor"];
                 status?: components["parameters"]["Paging_status"];
                 email?: components["parameters"]["Paging_email"];
-                /** @description Keyset bound for `before`-paginated downstream lists. */
-                before?: components["parameters"]["Paging_before"];
                 action?: components["parameters"]["Paging_action"];
             };
             header?: never;
@@ -7101,8 +7100,6 @@ export interface operations {
                 cursor?: components["parameters"]["Paging_cursor"];
                 status?: components["parameters"]["Paging_status"];
                 email?: components["parameters"]["Paging_email"];
-                /** @description Keyset bound for `before`-paginated downstream lists. */
-                before?: components["parameters"]["Paging_before"];
                 action?: components["parameters"]["Paging_action"];
             };
             header?: never;
@@ -8106,7 +8103,6 @@ export interface operations {
                 archived?: components["parameters"]["FlagsQ_archived"];
                 limit?: components["parameters"]["FlagsQ_limit"];
                 cursor?: components["parameters"]["FlagsQ_cursor"];
-                before?: components["parameters"]["FlagsQ_before"];
             };
             header?: never;
             path: {
@@ -8295,7 +8291,6 @@ export interface operations {
                 archived?: components["parameters"]["FlagsQ_archived"];
                 limit?: components["parameters"]["FlagsQ_limit"];
                 cursor?: components["parameters"]["FlagsQ_cursor"];
-                before?: components["parameters"]["FlagsQ_before"];
             };
             header?: never;
             path: {
@@ -8333,7 +8328,6 @@ export interface operations {
                 archived?: components["parameters"]["FlagsQ_archived"];
                 limit?: components["parameters"]["FlagsQ_limit"];
                 cursor?: components["parameters"]["FlagsQ_cursor"];
-                before?: components["parameters"]["FlagsQ_before"];
             };
             header?: never;
             path: {
@@ -8593,7 +8587,6 @@ export interface operations {
                 job?: components["parameters"]["SchedulerQ_job"];
                 limit?: components["parameters"]["SchedulerQ_limit"];
                 cursor?: components["parameters"]["SchedulerQ_cursor"];
-                before?: components["parameters"]["SchedulerQ_before"];
                 /** @description Cron expression to preview; only read by the preview operation. */
                 cron?: components["parameters"]["SchedulerQ_cron"];
                 timezone?: components["parameters"]["SchedulerQ_timezone"];
@@ -8635,7 +8628,6 @@ export interface operations {
                 job?: components["parameters"]["SchedulerQ_job"];
                 limit?: components["parameters"]["SchedulerQ_limit"];
                 cursor?: components["parameters"]["SchedulerQ_cursor"];
-                before?: components["parameters"]["SchedulerQ_before"];
                 /** @description Cron expression to preview; only read by the preview operation. */
                 cron?: components["parameters"]["SchedulerQ_cron"];
                 timezone?: components["parameters"]["SchedulerQ_timezone"];
@@ -8902,7 +8894,6 @@ export interface operations {
                 job?: components["parameters"]["SchedulerQ_job"];
                 limit?: components["parameters"]["SchedulerQ_limit"];
                 cursor?: components["parameters"]["SchedulerQ_cursor"];
-                before?: components["parameters"]["SchedulerQ_before"];
                 /** @description Cron expression to preview; only read by the preview operation. */
                 cron?: components["parameters"]["SchedulerQ_cron"];
                 timezone?: components["parameters"]["SchedulerQ_timezone"];
@@ -8946,7 +8937,6 @@ export interface operations {
                 job?: components["parameters"]["SchedulerQ_job"];
                 limit?: components["parameters"]["SchedulerQ_limit"];
                 cursor?: components["parameters"]["SchedulerQ_cursor"];
-                before?: components["parameters"]["SchedulerQ_before"];
                 /** @description Cron expression to preview; only read by the preview operation. */
                 cron?: components["parameters"]["SchedulerQ_cron"];
                 timezone?: components["parameters"]["SchedulerQ_timezone"];
@@ -9108,7 +9098,6 @@ export interface operations {
                 subscription?: components["parameters"]["WebhookQ_subscription"];
                 limit?: components["parameters"]["WebhookQ_limit"];
                 cursor?: components["parameters"]["WebhookQ_cursor"];
-                before?: components["parameters"]["WebhookQ_before"];
             };
             header?: never;
             path: {
@@ -9410,7 +9399,6 @@ export interface operations {
                 subscription?: components["parameters"]["WebhookQ_subscription"];
                 limit?: components["parameters"]["WebhookQ_limit"];
                 cursor?: components["parameters"]["WebhookQ_cursor"];
-                before?: components["parameters"]["WebhookQ_before"];
             };
             header?: never;
             path: {
@@ -9545,7 +9533,6 @@ export interface operations {
                 subscription?: components["parameters"]["WebhookQ_subscription"];
                 limit?: components["parameters"]["WebhookQ_limit"];
                 cursor?: components["parameters"]["WebhookQ_cursor"];
-                before?: components["parameters"]["WebhookQ_before"];
             };
             header?: never;
             path: {
@@ -9874,7 +9861,8 @@ export interface operations {
                     };
                     facets?: string[];
                     limit?: number;
-                    offset?: number;
+                    /** @description Opaque `nextCursor` of the previous page. */
+                    cursor?: string;
                     highlight?: boolean;
                     /** @enum {string} */
                     sort?: "relevance" | "newest" | "oldest";
@@ -9903,7 +9891,8 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: components["parameters"]["OffsetQ_limit"];
-                offset?: components["parameters"]["OffsetQ_offset"];
+                /** @description Opaque `nextCursor` of the previous page. */
+                cursor?: components["parameters"]["OffsetQ_cursor"];
             };
             header?: never;
             path: {
@@ -10326,7 +10315,8 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: components["parameters"]["OffsetQ_limit"];
-                offset?: components["parameters"]["OffsetQ_offset"];
+                /** @description Opaque `nextCursor` of the previous page. */
+                cursor?: components["parameters"]["OffsetQ_cursor"];
             };
             header?: never;
             path: {
@@ -11108,7 +11098,8 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: components["parameters"]["OffsetQ_limit"];
-                offset?: components["parameters"]["OffsetQ_offset"];
+                /** @description Opaque `nextCursor` of the previous page. */
+                cursor?: components["parameters"]["OffsetQ_cursor"];
             };
             header?: never;
             path: {
@@ -11842,7 +11833,7 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: string;
-                before?: string;
+                cursor?: string;
             };
             header?: never;
             path: {
@@ -14379,7 +14370,10 @@ export interface operations {
     };
     "atc-console.atc-status.subscribers.list": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Opaque keyset cursor from the previous page. */
+                cursor?: components["parameters"]["Paging_cursor"];
+            };
             header?: never;
             path: {
                 /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */
@@ -14440,7 +14434,10 @@ export interface operations {
     };
     "atc-console.atc-media.quarantine.list": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Opaque keyset cursor from the previous page. */
+                cursor?: components["parameters"]["Paging_cursor"];
+            };
             header?: never;
             path: {
                 /** @description Service instance id, as configured in this deployment's `services.json`. Validated only by shape at the schema layer; whether the id exists — and whether the instance behind it is of the type this route needs — is checked at call time and both failures produce the same `404 UNKNOWN_SERVICE`. The set of valid values is deployment configuration, not part of this contract, and differs per environment. */

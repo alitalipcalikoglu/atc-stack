@@ -57,9 +57,9 @@ export const TOOLS = [
     input: {
       ns: z.string().regex(new RegExp("^[a-z][a-z0-9-]{0,63}$", 'u')),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).describe("Default 20").optional(),
-      before: z.string().regex(new RegExp("^[0-9]{1,10}$", 'u')).describe("`nextBefore` from the previous page.").optional(),
+      cursor: z.string().regex(new RegExp("^[0-9]{1,10}$", 'u')).describe("`nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"ns":"ns"},"query":{"limit":"limit","before":"before"},"body":"none"},
+    map: {"path":{"ns":"ns"},"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -98,12 +98,13 @@ export const TOOLS = [
     operation: "atc-content.namespaces.create",
     description: "Create a namespace. Creates the namespace with its default locale and, optionally, more locales. A `fallback` may name a locale listed later in the same request. The default locale has no fallback. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       name: z.string().regex(new RegExp("^[a-z][a-z0-9-]{0,63}$", 'u')),
       defaultLocale: z.string().min(2).max(35).describe("BCP 47 language[-Script][-REGION], e.g. `en`, `tr-CY`, `zh-Hant-TW`, `es-419`. Case-insensitive on input."),
       description: z.string().max(500).optional(),
       locales: z.array(z.object({ locale: z.string().min(2).max(35).describe("BCP 47 language[-Script][-REGION], e.g. `en`, `tr-CY`, `zh-Hant-TW`, `es-419`. Case-insensitive on input."), fallback: z.string().min(2).max(35).describe("BCP 47 language[-Script][-REGION], e.g. `en`, `tr-CY`, `zh-Hant-TW`, `es-419`. Case-insensitive on input.").nullable().optional() }).strict()).max(500).optional(),
     },
-    map: {"body":"flat","bodyFields":["name","defaultLocale","description","locales"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["name","defaultLocale","description","locales"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({

@@ -45,9 +45,9 @@ export const TOOLS = [
     input: {
       key: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).describe("Lower-case dot/dash/underscore-separated segments."),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).describe("Default 50, max 100.").optional(),
-      before: z.string().regex(new RegExp("^[0-9]{1,15}$", 'u')).describe("Return entries with an id before this cursor (exclusive, descending order).").optional(),
+      cursor: z.string().regex(new RegExp("^[0-9]{1,15}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"key":"key"},"query":{"limit":"limit","before":"before"},"body":"none"},
+    map: {"path":{"key":"key"},"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -56,9 +56,9 @@ export const TOOLS = [
     description: "History across every flag. Read-only.",
     input: {
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).describe("Default 50, max 100.").optional(),
-      before: z.string().regex(new RegExp("^[0-9]{1,15}$", 'u')).describe("Return entries with an id before this cursor (exclusive, descending order).").optional(),
+      cursor: z.string().regex(new RegExp("^[0-9]{1,15}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"limit":"limit","before":"before"},"body":"none"},
+    map: {"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -85,6 +85,7 @@ export const TOOLS = [
     operation: "atc-flags.flags.create",
     description: "Create a flag. Creates the flag and seeds identical initial state in every configured environment (`enabled`, `value`, `offValue` default per `kind`, `percentage` 100, no rules). Requires a `write`-capable key. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       key: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).describe("Lower-case dot/dash/underscore-separated segments."),
       kind: z.enum(["boolean", "string", "number", "json"]),
       description: z.string().max(500).optional(),
@@ -93,7 +94,7 @@ export const TOOLS = [
       offValue: z.record(z.string(), z.unknown()).describe("Initial `offValue` for every environment. Defaults to the kind's zero value.").optional(),
       enabled: z.boolean().describe("Initial `enabled` for every environment. Default false.").optional(),
     },
-    map: {"body":"flat","bodyFields":["key","kind","description","tags","value","offValue","enabled"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["key","kind","description","tags","value","offValue","enabled"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({
@@ -118,8 +119,9 @@ export const TOOLS = [
       status: z.enum(["pending", "approved", "rejected"]).optional(),
       key: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).describe("Lower-case dot/dash/underscore-separated segments.").optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).optional(),
+      cursor: z.string().regex(new RegExp("^chg_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"status":"status","key":"key","limit":"limit"},"body":"none"},
+    map: {"query":{"status":"status","key":"key","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

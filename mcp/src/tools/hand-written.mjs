@@ -317,22 +317,20 @@ export const HAND_TOOLS = [
   },
 
   // ---------------------------------------------------------------------------------------------
-  // atc-search.query -- authenticated read, offset-based pagination (deliberately different pagination
-  // style from atc-notify.messages.list's cursor style -- both are real, neither is normalized to
-  // match the other).
-  // atc-search/openapi.yaml operationId atc-search.query.get, path {name}, query {q?, limit?, offset?, ...}.
+  // atc-search.query -- authenticated read, cursor pagination like every other list.
+  // atc-search/openapi.yaml operationId atc-search.query.get, path {name}, query {q?, limit?, cursor?, ...}.
   // ---------------------------------------------------------------------------------------------
   {
     name: 'atc-search.query',
     operations: ['atc-search.query.get'],
     description:
       'Full-text search over one index. Empty/omitted `q` is a browse (no ranking, score is null ' +
-      'on every hit). Offset-based pagination: total/limit/offset in the response, not a cursor.',
+      'on every hit). Results are `items` plus `total`; pass `nextCursor` back as `cursor` for the next page.',
     inputSchema: {
       name: z.string().describe('Index name.'),
       q: z.string().max(500).optional(),
       limit: z.number().int().min(1).max(1000).optional().describe('Default 20, clamped server-side to maxPage (default 100).'),
-      offset: z.number().int().min(0).optional(),
+      cursor: z.string().max(64).optional().describe('`nextCursor` of the previous page.'),
       highlight: z.boolean().optional(),
     },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
@@ -344,7 +342,7 @@ export const HAND_TOOLS = [
           query: {
             q: args.q,
             limit: args.limit !== undefined ? String(args.limit) : undefined,
-            offset: args.offset !== undefined ? String(args.offset) : undefined,
+            cursor: args.cursor,
             highlight: args.highlight !== undefined ? String(args.highlight) : undefined,
           },
         },

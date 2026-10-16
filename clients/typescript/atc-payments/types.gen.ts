@@ -1135,6 +1135,8 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: string;
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: string;
             };
             header?: never;
             path?: never;
@@ -1149,6 +1151,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Pass as `cursor` for older events; null on the last page. */
+                        nextCursor: string | null;
                         items: {
                             id?: string;
                             type?: string;

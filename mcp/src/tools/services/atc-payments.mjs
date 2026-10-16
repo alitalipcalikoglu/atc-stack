@@ -52,8 +52,9 @@ export const TOOLS = [
     description: "Recent Stripe webhook events and what they did. Read-only.",
     input: {
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).optional(),
+      cursor: z.string().max(272).describe("Opaque `nextCursor` from the previous page.").optional(),
     },
-    map: {"query":{"limit":"limit"},"body":"none"},
+    map: {"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({

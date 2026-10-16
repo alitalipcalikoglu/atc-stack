@@ -505,7 +505,8 @@ export interface components {
             rules?: components["schemas"]["Rule"][];
         };
         HistoryEntry: {
-            id: number;
+            /** @description Position in the history log (log rows expose `seq` */
+            seq: number;
             key: string;
             /** @description null for flag-level actions (flag.create/update/delete); an environment name for env.update/env.copy. */
             env: string | null;
@@ -765,7 +766,7 @@ export interface components {
             content: {
                 "application/json": {
                     items: components["schemas"]["HistoryEntry"][];
-                    nextBefore: string | null;
+                    nextCursor: string | null;
                 };
             };
         };
@@ -782,12 +783,14 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         KeyParam: components["schemas"]["FlagKey"];
         /** @description Environment-scope-gated — see the `ApiKeyAuth` security scheme description. */
         EnvParam: components["schemas"]["EnvName"];
         /** @description Default 50, max 100. */
         HistoryLimit: string;
-        /** @description Return entries with an id before this cursor (exclusive, descending order). */
+        /** @description Opaque `nextCursor` from the previous page. */
         HistoryBefore: string;
     };
     requestBodies: never;
@@ -952,6 +955,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                         items: {
                             env: string;
                             version: number;
@@ -1003,7 +1008,10 @@ export interface operations {
     "atc-flags.flags.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1134,8 +1142,8 @@ export interface operations {
             query?: {
                 /** @description Default 50, max 100. */
                 limit?: components["parameters"]["HistoryLimit"];
-                /** @description Return entries with an id before this cursor (exclusive, descending order). */
-                before?: components["parameters"]["HistoryBefore"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["parameters"]["HistoryBefore"];
             };
             header?: never;
             path: {
@@ -1159,6 +1167,8 @@ export interface operations {
                 status?: "pending" | "approved" | "rejected";
                 key?: components["schemas"]["FlagKey"];
                 limit?: string;
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: string;
             };
             header?: never;
             path?: never;
@@ -1174,6 +1184,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["Change"][];
+                        nextCursor: string | null;
                         protectedEnvs: string[];
                     };
                 };
@@ -1185,7 +1196,10 @@ export interface operations {
     "atc-flags.changes.approve": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: string;
             };
@@ -1240,7 +1254,10 @@ export interface operations {
     "atc-flags.changes.reject": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 id: string;
             };
@@ -1293,8 +1310,8 @@ export interface operations {
             query?: {
                 /** @description Default 50, max 100. */
                 limit?: components["parameters"]["HistoryLimit"];
-                /** @description Return entries with an id before this cursor (exclusive, descending order). */
-                before?: components["parameters"]["HistoryBefore"];
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["parameters"]["HistoryBefore"];
             };
             header?: never;
             path?: never;
@@ -1400,7 +1417,10 @@ export interface operations {
     "atc-flags.envs.copy": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 key: components["parameters"]["KeyParam"];
                 /** @description Environment-scope-gated — see the `ApiKeyAuth` security scheme description. */

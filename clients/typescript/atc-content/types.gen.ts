@@ -628,6 +628,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         NsParam: components["schemas"]["NamespaceName"];
         LocaleParam: components["schemas"]["Locale"];
         KeyParam: components["schemas"]["Key"];
@@ -789,6 +791,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["Namespace"][];
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                     };
                 };
             };
@@ -800,7 +804,10 @@ export interface operations {
     "atc-content.namespaces.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1102,7 +1109,10 @@ export interface operations {
     "atc-content.translations.import": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 ns: components["parameters"]["NsParam"];
             };
@@ -1185,7 +1195,10 @@ export interface operations {
     "atc-content.values.review": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 ns: components["parameters"]["NsParam"];
             };
@@ -1234,7 +1247,10 @@ export interface operations {
     "atc-content.releases.publish": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 ns: components["parameters"]["NsParam"];
             };
@@ -1258,7 +1274,10 @@ export interface operations {
     "atc-content.releases.rollback": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 ns: components["parameters"]["NsParam"];
             };
@@ -1286,8 +1305,8 @@ export interface operations {
             query?: {
                 /** @description Default 20 */
                 limit?: string;
-                /** @description `nextBefore` from the previous page. */
-                before?: string;
+                /** @description `nextCursor` from the previous page. */
+                cursor?: string;
             };
             header?: never;
             path: {
@@ -1305,7 +1324,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["Release"][];
-                        nextBefore: string | null;
+                        /** @description Pass as `cursor` for older releases; null on the last page. */
+                        nextCursor: string | null;
                     };
                 };
             };

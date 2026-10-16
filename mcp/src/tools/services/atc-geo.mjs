@@ -121,9 +121,9 @@ export const TOOLS = [
     input: {
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|1000)$", 'u')).describe("Default 50.").optional(),
-      offset: z.string().regex(new RegExp("^(0|[1-9][0-9]{0,6})$", 'u')).describe("Default 0.").optional(),
+      cursor: z.string().min(1).max(1200).describe("Opaque `nextCursor` from the previous page (places are ordered by name, then id). A malformed cursor is `400 INVALID_CURSOR`.").optional(),
     },
-    map: {"path":{"name":"name"},"query":{"limit":"limit","offset":"offset"},"body":"none"},
+    map: {"path":{"name":"name"},"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -172,10 +172,11 @@ export const TOOLS = [
     operation: "atc-geo.collections.create",
     description: "Create a place collection. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
+      IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       name: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')),
       description: z.string().max(500).optional(),
     },
-    map: {"body":"flat","bodyFields":["name","description"]},
+    map: {"header":{"IdempotencyKey":"Idempotency-Key"},"body":"flat","bodyFields":["name","description"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
   }),
   operationTool({

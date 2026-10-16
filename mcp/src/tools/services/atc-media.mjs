@@ -22,7 +22,7 @@ export const TOOLS = [
     operation: "atc-media.files.signUrls",
     description: "(Re-)sign delivery URLs for a file. Returns a fresh `urls` map (same shape as `FileView.urls`) with a caller-chosen TTL. For a `public` file every URL is unsigned and `expiresAt` is always `null`, regardless of `ttl`. Read-only.",
     input: {
-      id: z.string(),
+      id: z.string().regex(new RegExp("^fil_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("The platform's one id format, `fil_<base36 time><16 hex>`."),
       ttl: z.string().regex(new RegExp("^\\d{1,7}$", 'u')).describe("Signature lifetime in seconds. Digits only; server-side clamped to a maximum of 604800 (7 days) even if a larger value is supplied. Defaults to `SIGNED_URL_TTL…").optional(),
     },
     map: {"path":{"id":"id"},"query":{"ttl":"ttl"},"body":"none"},
@@ -31,9 +31,12 @@ export const TOOLS = [
   operationTool({
     service: "atc-media",
     operation: "atc-media.quarantine.list",
-    description: "List quarantined uploads. Newest first, at most 200. The bytes stay on disk until deleted here or purged after `QUARANTINE_DAYS`; they are never served. Read-only.",
-    input: {},
-    map: {"body":"none"},
+    description: "List quarantined uploads. Newest first, keyset-paged. The bytes stay on disk until deleted here or purged after `QUARANTINE_DAYS`; they are never served. Read-only.",
+    input: {
+      limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Page size, 1-200. Default 50.").optional(),
+      cursor: z.string().max(128).describe("Opaque `nextCursor` from the previous page.").optional(),
+    },
+    map: {"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

@@ -317,9 +317,10 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Platform id format: `rnd_<time><random>`. */
+        JobId: string;
         Job: {
-            /** Format: uuid */
-            id: string;
+            id: components["schemas"]["JobId"];
             /** @enum {string} */
             status: "queued" | "running" | "succeeded" | "failed";
             template: string;
@@ -584,6 +585,8 @@ export interface components {
         };
     };
     parameters: {
+        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+        IdempotencyKeyHeader: string;
         NameParam: components["schemas"]["TemplateName"];
     };
     requestBodies: never;
@@ -743,6 +746,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["Template"][];
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                     };
                 };
             };
@@ -753,7 +758,10 @@ export interface operations {
     "atc-render.templates.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -875,7 +883,10 @@ export interface operations {
     "atc-render.versions.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path: {
                 name: components["parameters"]["NameParam"];
             };
@@ -1048,6 +1059,8 @@ export interface operations {
                         /** @constant */
                         default: "dejavu";
                         items: string[];
+                        /** @description Always null; the list is complete. */
+                        nextCursor: null;
                     };
                 };
             };
@@ -1061,6 +1074,8 @@ export interface operations {
                 status?: "queued" | "running" | "succeeded" | "failed";
                 /** @description 1-200, default 50. */
                 limit?: string;
+                /** @description Opaque `nextCursor` from the previous page. */
+                cursor?: components["schemas"]["JobId"];
             };
             header?: never;
             path?: never;
@@ -1076,6 +1091,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         items: components["schemas"]["Job"][];
+                        /** @description Pass as `cursor` for older jobs; null on the last page. */
+                        nextCursor: string | null;
                     };
                 };
             };
@@ -1087,7 +1104,10 @@ export interface operations {
     "atc-render.jobs.create": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -1129,7 +1149,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                id: components["schemas"]["JobId"];
             };
             cookie?: never;
         };
@@ -1165,7 +1185,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                id: components["schemas"]["JobId"];
             };
             cookie?: never;
         };
