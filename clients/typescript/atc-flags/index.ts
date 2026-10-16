@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-flags's openapi.yaml (20 total).
+ * One operationId-keyed method per operation in atc-flags's openapi.yaml (23 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -39,6 +39,9 @@ export function createClient(config: ClientConfig) {
     credentials: config.credentials,
   });
   return {
+    "atc-flags.changes.approve": (init: FetchOptions<operations["atc-flags.changes.approve"]>) => client.POST("/v1/changes/{id}/approve", init),
+    "atc-flags.changes.list": (init: FetchOptions<operations["atc-flags.changes.list"]>) => client.GET("/v1/changes", init),
+    "atc-flags.changes.reject": (init: FetchOptions<operations["atc-flags.changes.reject"]>) => client.POST("/v1/changes/{id}/reject", init),
     "atc-flags.environments.list": (init: FetchOptions<operations["atc-flags.environments.list"]>) => client.GET("/v1/environments", init),
     "atc-flags.envs.copy": (init: FetchOptions<operations["atc-flags.envs.copy"]>) => client.POST("/v1/flags/{key}/envs/{env}/copy", init),
     "atc-flags.envs.get": (init: FetchOptions<operations["atc-flags.envs.get"]>) => client.GET("/v1/flags/{key}/envs/{env}", init),

@@ -23,7 +23,7 @@ future edit that reintroduces one of these is a failing test, not a design doc n
 
 ## One server, explicit tool list, default deny
 
-This is **not** an API mirror. Of the platform's 608 canonical operations, **157 tools** are exposed (see "Available tools"). The scope, decided for the `1.28.0` suite:
+This is **not** an API mirror. Of the platform's 635 canonical operations, **168 tools** are exposed (see "Available tools"). The scope, decided for the `1.28.0` suite:
 
 - **Every service gets read tools plus safe writes**: create and update, enqueue, publish, start an export, render a stored document, create a monitor, create a payment intent, and similar calls that either can be undone by another safe call or only queue/start work.
 - **Nothing destructive or irreversible**: no delete, purge, clear, refund, cancel, restore, revoke, rotate, reset, key or role changes, dead-letter purge, and nothing that re-sends mail or deliveries. Every tool declares `destructiveHint: false`.
@@ -36,7 +36,7 @@ How a tool comes to exist:
 - `tool-policy.mjs` names, per service, the operations that are tools and gives a one-line reason for every class of write operation that is not.
 - `tools.generate.mjs` turns those operations into explicit, committed definitions under `src/tools/services/<service>.mjs`: each tool is named after its `operationId`, and its input schema copies the operation's own path, query, header and body contract from its `openapi.yaml`. Nothing reads a spec at runtime.
 - `src/tools/hand-written.mjs` keeps `atc-stack.status` and the first ten tools as they were; `src/tools/overrides.mjs` holds the few deliberate tweaks (secret filtering, render always stored, extra descriptions).
-- `tool-catalog.json` classifies all 608 operations (`READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`), marks the ones a tool calls as `exposed`, and carries the policy. `tool-catalog.reconcile.mjs` fails when policy, tools and catalog disagree, or when a write operation is neither a tool nor excluded with a reason.
+- `tool-catalog.json` classifies all 635 operations (`READ_SAFE`/`MUTATION`/`DESTRUCTIVE`/`HIGH_RISK`/`OPERATOR`/`INTERNAL`/`BINARY`/`ASYNC`/`POOR_MCP_FIT`), marks the ones a tool calls as `exposed`, and carries the policy. `tool-catalog.reconcile.mjs` fails when policy, tools and catalog disagree, or when a write operation is neither a tool nor excluded with a reason.
 
 ## Install / build / configure / run
 
@@ -168,6 +168,7 @@ Not exposed:
 | `atc-content.keys.upsert` | safe write, idempotent |
 
 Not exposed:
+- `values.review`: Approving translations is a reviewer's judgement; four eyes by design.
 - `namespaces.delete`, `locales.delete`, `keys.delete`: Deletes are irreversible.
 - `releases.publish`, `releases.rollback`: Changes what every end user is served at once; a human decision in the console.
 - `translations.import`: Bulk overwrite of a whole locale; not undoable key by key.
@@ -202,8 +203,10 @@ Not exposed:
 | `atc-flags.stats.get` | read |
 | `atc-flags.flags.create` | safe write |
 | `atc-flags.flags.patch` | safe write, idempotent |
+| `atc-flags.changes.list` | read |
 
 Not exposed:
+- `changes.approve`, `changes.reject`: Approval of a protected-environment change is a second person's decision; an agent must not make it.
 - `flags.delete`: Irreversible.
 - `envs.copy`, `envs.patch`: Bulk changes to a whole environment at once.
 - `evaluate.get`, `snapshot.get`: Duplicates of evaluate.post / SDK bootstrap payloads; no extra value for an agent.
@@ -243,8 +246,10 @@ Not exposed:
 | `atc-media.files.get` | read |
 | `atc-media.files.list` | read |
 | `atc-media.files.signUrls` | read |
+| `atc-media.quarantine.list` | read |
 
 Not exposed:
+- `quarantine.delete`: Deletes the only copy of a rejected upload; irreversible.
 - `files.delete`, `files.restore`: Delete is irreversible; restore is its operator counterpart.
 - `files.patch`: Can switch a private file to public, which exposes it.
 - `files.upload`, `files.uploadTicketed`, `tickets.create`: Binary uploads do not fit MCP tool calls.
@@ -274,8 +279,11 @@ Not exposed:
 | `atc-payments.stats.get` | read |
 | `atc-payments.payments.create` | safe write, idempotent, external |
 | `atc-payments.payments.sync` | safe write, idempotent, external |
+| `atc-payments.disputes.list` | read |
+| `atc-payments.disputes.get` | read |
 
 Not exposed:
+- `disputes.evidence`, `disputes.accept`: Evidence goes to the card issuer and accepting concedes the money; both are final.
 - `refunds.create`, `payments.cancel`: Moves or stops real money; irreversible.
 - `webhooks.stripe`: Stripe-only endpoint authenticated by its signature.
 
@@ -329,8 +337,13 @@ Not exposed:
 | `atc-render.templates.update` | safe write, idempotent |
 | `atc-render.versions.create` | safe write |
 | `atc-render.render.create` | safe write |
+| `atc-render.fonts.list` | read |
+| `atc-render.jobs.list` | read |
+| `atc-render.jobs.get` | read |
+| `atc-render.jobs.create` | safe write |
 
 Not exposed:
+- `jobs.pdf`: Returns the PDF bytes; jobs.get reports the outcome.
 - `templates.delete`: Irreversible.
 - `render.preview`: Returns the PDF bytes; render.create stores the document and returns a reference instead.
 
@@ -383,6 +396,7 @@ Not exposed:
 | `atc-shortlink.links.getStats` | read |
 | `atc-shortlink.stats.get` | read |
 | `atc-shortlink.links.patch` | safe write, idempotent |
+| `atc-shortlink.links.batch` | safe write |
 
 Not exposed:
 - `links.delete`: Irreversible.
@@ -401,8 +415,14 @@ Not exposed:
 | `atc-status.stats.get` | read |
 | `atc-status.page.summary` | read |
 | `atc-status.monitors.upsert` | safe write, idempotent, external |
+| `atc-status.maintenance.list` | read |
+| `atc-status.maintenance.create` | safe write |
 
 Not exposed:
+- `incidents.addUpdate`: Publishes text on the public status page and mails subscribers; a human writes it.
+- `maintenance.delete`, `subscribers.delete`: Irreversible.
+- `subscribers.list`: Lists subscriber e-mail addresses (personal data).
+- `page.subscribe`, `page.subscribeConfirmPage`, `page.subscribeConfirm`, `page.unsubscribePage`, `page.unsubscribe`: Public pages for people subscribing by e-mail; the tokens in the links are the credential.
 - `monitors.delete`: Irreversible (checks and incidents go with it).
 - `monitors.check`: Can open an incident and send alert e-mails.
 - `page.get`: HTML; page.summary has the same data.

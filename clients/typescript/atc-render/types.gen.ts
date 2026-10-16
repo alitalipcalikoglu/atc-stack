@@ -221,6 +221,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/fonts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Font families a layout can name in page.font
+         * @description `default` is the built-in DejaVu family used when `page.font` is absent; `items` are the FONTS_DIR families.
+         */
+        get: operations["atc-render.fonts.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/renders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The calling key's render jobs, newest first */
+        get: operations["atc-render.jobs.list"];
+        put?: never;
+        /**
+         * Queue an asynchronous render
+         * @description Same body as `POST /v1/render`. The template version is pinned now (latest unless `version` is given); the job is drawn in the background, at most `RENDER_JOB_CONCURRENCY` at a time, and kept `RENDER_JOB_HOURS` after it finishes. Poll `GET /v1/renders/{id}`. Only the submitting key can read the job. Role `read`.
+         */
+        post: operations["atc-render.jobs.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/renders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One render job */
+        get: operations["atc-render.jobs.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/renders/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The PDF of a finished job */
+        get: operations["atc-render.jobs.pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stats": {
         parameters: {
             query?: never;
@@ -242,6 +317,37 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Job: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "queued" | "running" | "succeeded" | "failed";
+            template: string;
+            version: number;
+            filename: string;
+            store: boolean;
+            createdBy: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            startedAt: string | null;
+            /** Format: date-time */
+            finishedAt: string | null;
+            pages: number | null;
+            bytes: number | null;
+            error: {
+                code?: string;
+                message?: string;
+            } | null;
+            /** @description Succeeded only: `{ download }` (GET it with the same key) or, with store, `{ fileId, url, expiresAt }` (the URL expires after DOWNLOAD_TTL_SEC; sign a new one in media). */
+            result: {
+                download?: string;
+                fileId?: string;
+                url?: string;
+                /** Format: date-time */
+                expiresAt?: string | null;
+            } | null;
+        };
         TemplateName: string;
         ErrorEnvelope: {
             error: {
@@ -283,6 +389,8 @@ export interface components {
                     left?: number;
                 };
                 fontSize?: number;
+                /** @description A FONTS_DIR family id (GET /v1/fonts); default DejaVu Sans. */
+                font?: string;
             };
             header?: {
                 text: string;
@@ -392,7 +500,7 @@ export interface components {
         };
     };
     responses: {
-        /** @description `VALIDATION_FAILED` (layout or body against the schema; `details[].path` names the block), `INVALID_LAYOUT` (template name) or `MEDIA_DISABLED`. */
+        /** @description `VALIDATION_FAILED` (layout or body against the schema; `details[].path` names the block), `INVALID_LAYOUT` (template name), `UNKNOWN_FONT` (`page.font` is not a FONTS_DIR family) or `MEDIA_DISABLED`. */
         BadRequest: {
             headers: {
                 [name: string]: unknown;
@@ -456,7 +564,7 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
-        /** @description `BUSY` (all render slots in use) or `RATE_LIMITED`. */
+        /** @description `BUSY` (all render slots in use), `QUEUE_FULL` (RENDER_QUEUE_MAX jobs waiting, on POST /v1/renders) or `RATE_LIMITED`. */
         Busy: {
             headers: {
                 [name: string]: unknown;
@@ -921,6 +1029,182 @@ export interface operations {
             429: components["responses"]["Busy"];
         };
     };
+    "atc-render.fonts.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Installed families. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        default: "dejavu";
+                        items: string[];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    "atc-render.jobs.list": {
+        parameters: {
+            query?: {
+                status?: "queued" | "running" | "succeeded" | "failed";
+                /** @description 1-200, default 50. */
+                limit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Jobs. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Job"][];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    "atc-render.jobs.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    template: components["schemas"]["TemplateName"];
+                    version?: number;
+                    data?: Record<string, never>;
+                    filename?: string;
+                    /** @description Store the PDF in atc-media instead of keeping it here. */
+                    store?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Queued. */
+            202: {
+                headers: {
+                    location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        job: components["schemas"]["Job"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            413: components["responses"]["TooLarge"];
+            429: components["responses"]["Busy"];
+        };
+    };
+    "atc-render.jobs.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The job. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        job: components["schemas"]["Job"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description `JOB_NOT_FOUND` (unknown, purged, or another key's job). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-render.jobs.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDF. */
+            200: {
+                headers: {
+                    "content-disposition"?: string;
+                    "x-render-pages"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description `JOB_NOT_FOUND`. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `JOB_NOT_READY`: queued, running, failed, or stored in media (`details.fileId`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
     "atc-render.stats.get": {
         parameters: {
             query?: never;
@@ -955,6 +1239,15 @@ export interface operations {
                         };
                         active: number;
                         concurrency: number;
+                        /** @description Kept asynchronous jobs by status, plus RENDER_JOB_CONCURRENCY and RENDER_QUEUE_MAX. */
+                        jobs?: {
+                            queued?: number;
+                            running?: number;
+                            succeeded?: number;
+                            failed?: number;
+                            concurrency?: number;
+                            queueMax?: number;
+                        };
                     };
                 };
             };

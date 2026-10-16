@@ -88,7 +88,7 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   assert.deepEqual([env('atc-render').MEDIA_URL.endsWith(':3003'), env('atc-render').MEDIA_API_KEY, env('atc-console').RENDER_API_KEY, auditKeys['atc-render'].role], [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-render'].secret, keys('atc-render', 'RENDER_API_KEYS')['atc-console'].secret, 'write']);
   assert.deepEqual(Object.keys(keys('atc-render', 'RENDER_API_KEYS')).sort(), ['atc-console', 'atc-scheduler'], 'template placeholders dropped; the scheduler may call render');
   assert.deepEqual([keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].role, env('atc-console').QUEUE_API_KEY, Object.keys(keys('atc-queue', 'QUEUE_API_KEYS')).sort()], ['admin', keys('atc-queue', 'QUEUE_API_KEYS')['atc-console'].secret, ['atc-console', 'atc-export', 'atc-scheduler']]);
-  assert.equal(env('atc-media').KEY_MAX_UPLOAD_BYTES, 'atc-backup:1073741824', 'database backups fit through media');
+  assert.equal(env('atc-media').KEY_MAX_UPLOAD_BYTES, 'atc-backup:1073741824,atc-export:268435456', 'database backups and large exports fit through media');
   const bk = env('atc-backup');
   assert.deepEqual([bk.BACKUP_TREES, bk.BACKUP_ENCRYPTION_KEY], ['atc-media-files=../atc-media/data/files,atc-auth-keys=../atc-auth/keys,atc-audit-keys=../atc-audit/keys', ''], 'blobs and signing keys are archived; encryption is the operator\'s choice');
   assert.deepEqual([keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].role, env('atc-console').BACKUP_API_KEY, bk.MEDIA_API_KEY, bk.ALLOW_LIVE_RESTORE, auditKeys['atc-backup'].role], ['admin', keys('atc-backup', 'BACKUP_API_KEYS')['atc-console'].secret, keys('atc-media', 'MEDIA_API_KEYS')['atc-backup'].secret, 'false', 'write']);
@@ -120,7 +120,10 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
     [true, keys('atc-media', 'MEDIA_API_KEYS')['atc-export'].secret, keys('atc-notify', 'NOTIFY_API_KEYS')['atc-export'].secret, auditKeys['atc-export-reader'].secret, 'read', 'write', 'read', 'read', 'read', true], 'export reads every source with read keys and writes files to media');
   assert.equal(env('atc-console').EXPORT_API_KEY, keys('atc-export', 'EXPORT_API_KEYS')['atc-console'].secret);
   assert.deepEqual(env('atc-media').ALLOWED_TYPES.split(','), ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'application/pdf', 'text/csv', 'application/x-ndjson', 'application/vnd.sqlite3', 'application/gzip', 'application/vnd.atc-backup'], 'media accepts export files and database backups');
-  assert.deepEqual(['atc-content', 'atc-export', 'atc-render'].map((id) => env(id).ACTOR_KEYS), ['atc-console', 'atc-console', 'atc-console'], 'records name the signed-in admin');
+  assert.deepEqual(['atc-content', 'atc-export', 'atc-render', 'atc-flags'].map((id) => env(id).ACTOR_KEYS), ['atc-console', 'atc-console', 'atc-console', 'atc-console'], 'records name the signed-in admin');
+  assert.deepEqual([env('atc-media').ADMIN_KEYS, env('atc-media').KEY_MAX_UPLOAD_BYTES], ['atc-console', 'atc-backup:1073741824,atc-export:268435456'], 'the console sees every media file; backups and exports may upload large files');
+  assert.match(env('atc-queue').PUSH_SECRETS_KEY, /^[0-9a-f]{64}$/, 'queue push delivery is on');
+  assert.equal(env('atc-status').STATUS_PUBLIC_URL, env('atc-export').SOURCE_STATUS_URL, 'subscriber mails link the status service');
   const contentKeys = keys('atc-content', 'CONTENT_API_KEYS');
   assert.deepEqual([env('atc-console').CONTENT_API_KEY, contentKeys['atc-console'].role, contentKeys['atc-gateway'].role, env('atc-gateway').CONTENT_API_KEY, env('atc-content').CONTENT_PUBLIC_BUNDLES, auditKeys['atc-content'].role], [contentKeys['atc-console'].secret, '', 'read:public', contentKeys['atc-gateway'].secret, 'false', 'write'], 'console edits content, gateway only reads bundles, and only of the public namespace');
   assert.deepEqual(Object.keys(keys('atc-search', 'SEARCH_API_KEYS')), ['atc-console'], 'template placeholders dropped');

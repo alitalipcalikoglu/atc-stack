@@ -21,6 +21,17 @@
     { "method": "GET", "path": "/v1/alerts" },
     { "method": "POST", "path": "/v1/alerts/{id}/ack" },
     { "method": "POST", "path": "/v1/ping/{id}/{token}" },
-    { "method": "GET", "path": "/v1/ping/{id}/{token}" }
+    { "method": "GET", "path": "/v1/ping/{id}/{token}" },
+    { "method": "POST", "path": "/v1/incidents/{id}/updates" },
+    { "method": "GET", "path": "/v1/maintenance" },
+    { "method": "POST", "path": "/v1/maintenance" },
+    { "method": "DELETE", "path": "/v1/maintenance/{id}" },
+    { "method": "GET", "path": "/v1/subscribers" },
+    { "method": "DELETE", "path": "/v1/subscribers/{id}" },
+    { "method": "POST", "path": "/status/subscribe" },
+    { "method": "GET", "path": "/status/subscribe/{token}" },
+    { "method": "POST", "path": "/status/subscribe/{token}" },
+    { "method": "GET", "path": "/status/unsubscribe/{token}" },
+    { "method": "POST", "path": "/status/unsubscribe/{token}" }
   ]
 }

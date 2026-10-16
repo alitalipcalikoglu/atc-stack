@@ -58,7 +58,7 @@ export const TOOLS = [
   operationTool({
     service: "atc-queue",
     operation: "atc-queue.queues.upsert",
-    description: "Create a queue or change its settings (admin). Omitted fields keep their current value (defaults on create - visibility 30 s, 5 attempts, backoff 5 s doubling to 900 s). Safe write: creates, updates, queues or starts work; never deletes anything.",
+    description: "Create a queue or change its settings (admin). Omitted fields keep their current value (defaults on create - visibility 30 s, 5 attempts, backoff 5 s doubling to 900 s). `push` switches the queue to push delivery (needs PUSH_SECRETS_KEY on the server; `secret` is required the first time and kept when omitted later), `push: null` back to pulling. 400 `PUSH_DISABLED` or `INVALID_PUSH_URL`. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       name: z.string().regex(new RegExp("^[a-z][a-z0-9._-]{0,63}$", 'u')),
       description: z.string().max(500).optional(),
@@ -66,9 +66,10 @@ export const TOOLS = [
       maxAttempts: z.number().int().min(1).max(100).describe("Deliveries before dead-lettering.").optional(),
       backoffBaseSec: z.number().int().min(0).max(86400).optional(),
       backoffMaxSec: z.number().int().min(0).max(604800).optional(),
-      paused: z.boolean().describe("Pulls return nothing while paused; enqueue still works.").optional(),
+      paused: z.boolean().describe("Pulls return nothing and nothing is pushed while paused; enqueue still works.").optional(),
+      push: z.object({ url: z.string().min(8).max(2048).describe("https (http only with PUSH_ALLOW_HTTP); public hosts only unless PUSH_ALLOW_PRIVATE."), secret: z.string().min(32).max(256).describe("Signing secret; stored encrypted").optional(), concurrency: z.number().int().min(1).max(32).optional() }).strict().nullable().describe("Push delivery: every due message is POSTed to `url` as `{ id, queue, attempt, priority, enqueuedAt, body }` with `x-queue-signature: t=<unix>,v1=<hex HMAC-SHA2…").optional(),
     },
-    map: {"path":{"name":"name"},"body":"flat","bodyFields":["description","visibilitySec","maxAttempts","backoffBaseSec","backoffMaxSec","paused"]},
+    map: {"path":{"name":"name"},"body":"flat","bodyFields":["description","visibilitySec","maxAttempts","backoffBaseSec","backoffMaxSec","paused","push"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({

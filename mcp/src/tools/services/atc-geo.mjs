@@ -19,7 +19,7 @@ export const TOOLS = [
   operationTool({
     service: "atc-geo",
     operation: "atc-geo.phone.normalize",
-    description: "Normalize a phone number to E.164. National numbering plans are not modelled: validity only checks that the resolved calling code is known and the digit count is 8-15 (E.164 length rule), not that the subscriber number actually exists. When `number` has no `+`/`00` international prefix, `country` is required to resolve it as a national number; if `country` is given but not a known country code, this returns 404 COUNTRY_NOT_FOUND (not a 400) — the sam…. Read-only.",
+    description: "Normalize a phone number to E.164. Validity checks that the resolved calling code is known and the digit count is 8-15 (E.164 length rule); for countries with a national plan (TR, NANP, GB/GG/JE/IM, DE, FR, NL, ES, IT/SM/VA, RU, KZ, AZ) the national number must also match one of the plan's number types, reported in `type`. Whether the subscriber number exists is never known. When `number` has no `+`/`00` international prefix, `country` is required to…. Read-only.",
     input: {
       number: z.string().min(1).max(40),
       country: z.string().min(2).max(3).describe("Default country for a number given without an international prefix.").optional(),

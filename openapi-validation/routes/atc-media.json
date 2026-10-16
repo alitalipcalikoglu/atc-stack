@@ -16,7 +16,9 @@
     { "method": "POST", "path": "/v1/files/{id}/urls" },
     { "method": "POST", "path": "/v1/uploads" },
     { "method": "GET", "path": "/v1/usage" },
-    { "method": "GET", "path": "/metrics" }
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/quarantine" },
+    { "method": "DELETE", "path": "/v1/quarantine/{id}" }
   ],
   "exclusions": []
 }

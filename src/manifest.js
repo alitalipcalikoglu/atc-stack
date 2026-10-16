@@ -81,7 +81,9 @@ export const SERVICES = [
     env: (c) => ({
       ...auditEnv(c, 'atc-media'), PUBLIC_BASE_URL: c.publicUrl('atc-media'), SIGNING_SECRET: c.secret('atc-media', 'SIGNING_SECRET'), CORS_ORIGINS: c.keep('atc-media', 'CORS_ORIGINS', c.url('atc-gateway')),
       // Database backups (atc-backup) are far larger than the default upload limit.
-      KEY_MAX_UPLOAD_BYTES: 'atc-backup:1073741824',
+      KEY_MAX_UPLOAD_BYTES: 'atc-backup:1073741824,atc-export:268435456',
+      ADMIN_KEYS: 'atc-console', // the console browses every key's files and the virus quarantine
+      CLAMD_HOST: c.keep('atc-media', 'CLAMD_HOST', ''),
       ALLOWED_TYPES: withDataTypes(c.keep('atc-media', 'ALLOWED_TYPES', 'image/jpeg,image/png,image/webp,image/gif,image/avif,application/pdf')),
     }),
     console: { type: 'atc-media', label: 'Media', keyEnv: 'MEDIA_API_KEY' },
@@ -100,7 +102,7 @@ export const SERVICES = [
   },
   {
     id: 'atc-flags', port: 3007, keysVar: 'FLAGS_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-flags'), ...eventsEnv(c, 'atc-flags'),}),
+    env: (c) => ({ ...auditEnv(c, 'atc-flags'), ...eventsEnv(c, 'atc-flags'), ACTOR_KEYS: 'atc-console', PROTECTED_ENVS: c.keep('atc-flags', 'PROTECTED_ENVS', '') }),
     console: { type: 'atc-flags', label: 'Flags', keyEnv: 'FLAGS_API_KEY' },
   },
   {
@@ -185,7 +187,12 @@ export const SERVICES = [
   },
   {
     id: 'atc-queue', port: 3016, keysVar: 'QUEUE_API_KEYS',
-    env: (c) => ({ ...auditEnv(c, 'atc-queue'), ...eventsEnv(c, 'atc-queue') }),
+    env: (c) => ({
+      ...auditEnv(c, 'atc-queue'), ...eventsEnv(c, 'atc-queue'),
+      // Push delivery on; local receivers are plain http on private addresses.
+      PUSH_SECRETS_KEY: c.secret('atc-queue', 'PUSH_SECRETS_KEY'),
+      PUSH_ALLOW_HTTP: c.keep('atc-queue', 'PUSH_ALLOW_HTTP', 'true'), PUSH_ALLOW_PRIVATE: c.keep('atc-queue', 'PUSH_ALLOW_PRIVATE', 'true'),
+    }),
     console: { type: 'atc-queue', label: 'Queues', keyEnv: 'QUEUE_API_KEY' },
   },
   {
@@ -211,6 +218,8 @@ export const SERVICES = [
       NOTIFY_URL: c.url('atc-notify'), NOTIFY_API_KEY: c.issue('atc-notify', 'atc-status'),
       ALERT_EMAILS: c.keep('atc-status', 'ALERT_EMAILS', 'ops@example.com'),
       ALERT_HOOK_SECRET: c.secret('atc-status', 'ALERT_HOOK_SECRET'),
+      // Links in subscriber confirmation and incident mails point at the public status page.
+      STATUS_PUBLIC_URL: c.keep('atc-status', 'STATUS_PUBLIC_URL', c.url('atc-status')),
     }),
     console: { type: 'atc-status', label: 'Status', keyEnv: 'STATUS_API_KEY' },
   },

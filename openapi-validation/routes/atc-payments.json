@@ -17,6 +17,10 @@
     { "method": "GET", "path": "/v1/provider-events" },
     { "method": "GET", "path": "/v1/stats" },
     { "method": "POST", "path": "/v1/payments/{id}/anonymize" },
-    { "method": "POST", "path": "/v1/reconciliation" }
+    { "method": "POST", "path": "/v1/reconciliation" },
+    { "method": "GET", "path": "/v1/disputes" },
+    { "method": "GET", "path": "/v1/disputes/{id}" },
+    { "method": "POST", "path": "/v1/disputes/{id}/evidence" },
+    { "method": "POST", "path": "/v1/disputes/{id}/accept" }
   ]
 }

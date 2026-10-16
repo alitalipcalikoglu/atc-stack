@@ -50,6 +50,7 @@ export const POLICY = {
   'atc-content': {
     tools: ['atc-content.namespaces.list', 'atc-content.namespaces.get', 'atc-content.keys.list', 'atc-content.keys.get', 'atc-content.releases.list', 'atc-content.releases.get', 'atc-content.stats.get', 'atc-content.bundles.get', 'atc-content.namespaces.create', 'atc-content.namespaces.update', 'atc-content.locales.upsert', 'atc-content.keys.upsert'],
     excluded: [
+      { ops: ['atc-content.values.review'], reason: "Approving translations is a reviewer's judgement; four eyes by design." },
       { ops: ['atc-content.namespaces.delete', 'atc-content.locales.delete', 'atc-content.keys.delete'], reason: 'Deletes are irreversible.' },
       { ops: ['atc-content.releases.publish', 'atc-content.releases.rollback'], reason: 'Changes what every end user is served at once; a human decision in the console.' },
       { ops: ['atc-content.translations.import'], reason: 'Bulk overwrite of a whole locale; not undoable key by key.' },
@@ -61,8 +62,9 @@ export const POLICY = {
     excluded: [{ ops: ['atc-export.exports.cancel', 'atc-export.exports.delete'], reason: 'Cancel and delete discard work and files irreversibly.' }],
   },
   'atc-flags': {
-    tools: ['atc-flags.environments.list', 'atc-flags.flags.list', 'atc-flags.flags.get', 'atc-flags.flags.getHistory', 'atc-flags.history.list', 'atc-flags.envs.get', 'atc-flags.stats.get', 'atc-flags.evaluate.post', 'atc-flags.flags.create', 'atc-flags.flags.patch'],
+    tools: ['atc-flags.environments.list', 'atc-flags.flags.list', 'atc-flags.flags.get', 'atc-flags.flags.getHistory', 'atc-flags.history.list', 'atc-flags.envs.get', 'atc-flags.stats.get', 'atc-flags.evaluate.post', 'atc-flags.flags.create', 'atc-flags.flags.patch', 'atc-flags.changes.list'],
     excluded: [
+      { ops: ['atc-flags.changes.approve', 'atc-flags.changes.reject'], reason: "Approval of a protected-environment change is a second person's decision; an agent must not make it." },
       { ops: ['atc-flags.flags.delete'], reason: 'Irreversible.' },
       { ops: ['atc-flags.envs.copy', 'atc-flags.envs.patch'], reason: 'Bulk changes to a whole environment at once.' },
       { ops: ['atc-flags.evaluate.get', 'atc-flags.snapshot.get'], reason: 'Duplicates of evaluate.post / SDK bootstrap payloads; no extra value for an agent.' },
@@ -76,8 +78,9 @@ export const POLICY = {
     ],
   },
   'atc-media': {
-    tools: ['atc-media.files.list', 'atc-media.files.get', 'atc-media.files.signUrls'],
+    tools: ['atc-media.files.list', 'atc-media.files.get', 'atc-media.files.signUrls', 'atc-media.quarantine.list'],
     excluded: [
+      { ops: ['atc-media.quarantine.delete'], reason: 'Deletes the only copy of a rejected upload; irreversible.' },
       { ops: ['atc-media.files.delete', 'atc-media.files.restore'], reason: 'Delete is irreversible; restore is its operator counterpart.' },
       { ops: ['atc-media.files.patch'], reason: 'Can switch a private file to public, which exposes it.' },
       { ops: ['atc-media.files.upload', 'atc-media.files.uploadTicketed', 'atc-media.tickets.create'], reason: 'Binary uploads do not fit MCP tool calls.' },
@@ -92,8 +95,9 @@ export const POLICY = {
     ],
   },
   'atc-payments': {
-    tools: ['atc-payments.payments.list', 'atc-payments.payments.get', 'atc-payments.ledger.list', 'atc-payments.events.list', 'atc-payments.stats.get', 'atc-payments.payments.create', 'atc-payments.payments.sync'],
+    tools: ['atc-payments.payments.list', 'atc-payments.payments.get', 'atc-payments.ledger.list', 'atc-payments.events.list', 'atc-payments.stats.get', 'atc-payments.payments.create', 'atc-payments.payments.sync', 'atc-payments.disputes.list', 'atc-payments.disputes.get'],
     excluded: [
+      { ops: ['atc-payments.disputes.evidence', 'atc-payments.disputes.accept'], reason: 'Evidence goes to the card issuer and accepting concedes the money; both are final.' },
       { ops: ['atc-payments.refunds.create', 'atc-payments.payments.cancel'], reason: 'Moves or stops real money; irreversible.' },
       { ops: ['atc-payments.payments.anonymize'], reason: 'Erases customer data here and at Stripe; irreversible.' },
       { ops: ['atc-payments.reconciliation.run'], reason: 'Reads Stripe once per payment and can repair (write); a deliberate operator action.' },
@@ -117,8 +121,9 @@ export const POLICY = {
     ],
   },
   'atc-render': {
-    tools: ['atc-render.templates.list', 'atc-render.templates.get', 'atc-render.versions.get', 'atc-render.stats.get', 'atc-render.templates.create', 'atc-render.templates.update', 'atc-render.versions.create', 'atc-render.render.create'],
+    tools: ['atc-render.templates.list', 'atc-render.templates.get', 'atc-render.versions.get', 'atc-render.stats.get', 'atc-render.templates.create', 'atc-render.templates.update', 'atc-render.versions.create', 'atc-render.render.create', 'atc-render.fonts.list', 'atc-render.jobs.list', 'atc-render.jobs.get', 'atc-render.jobs.create'],
     excluded: [
+      { ops: ['atc-render.jobs.pdf'], reason: 'Returns the PDF bytes; jobs.get reports the outcome.' },
       { ops: ['atc-render.templates.delete'], reason: 'Irreversible.' },
       { ops: ['atc-render.render.preview'], reason: 'Returns the PDF bytes; render.create stores the document and returns a reference instead.' },
     ],
@@ -139,7 +144,7 @@ export const POLICY = {
     ],
   },
   'atc-shortlink': {
-    tools: ['atc-shortlink.links.list', 'atc-shortlink.links.get', 'atc-shortlink.links.getStats', 'atc-shortlink.stats.get', 'atc-shortlink.links.create', 'atc-shortlink.links.patch'],
+    tools: ['atc-shortlink.links.list', 'atc-shortlink.links.get', 'atc-shortlink.links.getStats', 'atc-shortlink.stats.get', 'atc-shortlink.links.create', 'atc-shortlink.links.patch', 'atc-shortlink.links.batch'],
     excluded: [
       { ops: ['atc-shortlink.links.delete'], reason: 'Irreversible.' },
       { ops: ['atc-shortlink.links.getQr', 'atc-shortlink.qr.getForText', 'atc-shortlink.qr.getPublic'], reason: 'Binary images.' },
@@ -147,8 +152,12 @@ export const POLICY = {
     ],
   },
   'atc-status': {
-    tools: ['atc-status.monitors.list', 'atc-status.monitors.get', 'atc-status.monitors.checks', 'atc-status.incidents.list', 'atc-status.incidents.get', 'atc-status.stats.get', 'atc-status.page.summary', 'atc-status.alerts.list', 'atc-status.alerts.ack', 'atc-status.monitors.upsert'],
+    tools: ['atc-status.monitors.list', 'atc-status.monitors.get', 'atc-status.monitors.checks', 'atc-status.incidents.list', 'atc-status.incidents.get', 'atc-status.stats.get', 'atc-status.page.summary', 'atc-status.alerts.list', 'atc-status.alerts.ack', 'atc-status.monitors.upsert', 'atc-status.maintenance.list', 'atc-status.maintenance.create'],
     excluded: [
+      { ops: ['atc-status.page.subscribe', 'atc-status.page.subscribeConfirmPage', 'atc-status.page.subscribeConfirm', 'atc-status.page.unsubscribePage', 'atc-status.page.unsubscribe'], reason: 'Public pages for people subscribing by e-mail; the tokens in the links are the credential.' },
+      { ops: ['atc-status.subscribers.list'], reason: 'Lists subscriber e-mail addresses (personal data).' },
+      { ops: ['atc-status.maintenance.delete', 'atc-status.subscribers.delete'], reason: 'Irreversible.' },
+      { ops: ['atc-status.incidents.addUpdate'], reason: 'Publishes text on the public status page and mails subscribers; a human writes it.' },
       { ops: ['atc-status.hooks.webhook-out'], reason: 'Signed machine endpoint for atc-webhook-out deliveries.' },
       { ops: ['atc-status.ping.post', 'atc-status.ping.get'], reason: 'Heartbeat from a monitored job; the path token is the credential.' },
       { ops: ['atc-status.monitors.delete'], reason: 'Irreversible (checks and incidents go with it).' },

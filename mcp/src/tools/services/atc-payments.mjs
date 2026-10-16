@@ -28,7 +28,7 @@ export const TOOLS = [
   operationTool({
     service: "atc-payments",
     operation: "atc-payments.payments.get",
-    description: "One payment with its refunds and ledger entries. Read-only.",
+    description: "One payment with its refunds, disputes and ledger entries. Read-only.",
     input: {
       id: z.string().regex(new RegExp("^pay_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')),
     },
@@ -88,5 +88,29 @@ export const TOOLS = [
     },
     map: {"path":{"id":"id"},"body":"none"},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+  }),
+  operationTool({
+    service: "atc-payments",
+    operation: "atc-payments.disputes.list",
+    description: "Disputes (chargebacks), newest first. Mirrored from `charge.dispute.*` webhooks. `open=true` lists those that need or await a response. Read-only.",
+    input: {
+      status: z.string().regex(new RegExp("^[a-z_]{2,40}$", 'u')).optional(),
+      open: z.enum(["true", "false"]).optional(),
+      payment: z.string().regex(new RegExp("^pay_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).optional(),
+      limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).optional(),
+      cursor: z.string().max(120).optional(),
+    },
+    map: {"query":{"status":"status","open":"open","payment":"payment","limit":"limit","cursor":"cursor"},"body":"none"},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }),
+  operationTool({
+    service: "atc-payments",
+    operation: "atc-payments.disputes.get",
+    description: "One dispute. Read-only.",
+    input: {
+      id: z.string().regex(new RegExp("^(dp|du)_[A-Za-z0-9]{6,64}$", 'u')),
+    },
+    map: {"path":{"id":"id"},"body":"none"},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

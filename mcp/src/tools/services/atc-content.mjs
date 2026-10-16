@@ -31,10 +31,12 @@ export const TOOLS = [
       ns: z.string().regex(new RegExp("^[a-z][a-z0-9-]{0,63}$", 'u')),
       q: z.string().min(1).max(120).describe("Substring of key or description.").optional(),
       missing: z.string().min(2).max(35).describe("BCP 47 language[-Script][-REGION], e.g. `en`, `tr-CY`, `zh-Hant-TW`, `es-419`. Case-insensitive on input.").describe("Only keys without a value in this locale.").optional(),
+      review: z.enum(["pending", "approved", "rejected"]).describe("Only keys with a value in this review state.").optional(),
+      reviewLocale: z.string().min(2).max(35).describe("BCP 47 language[-Script][-REGION], e.g. `en`, `tr-CY`, `zh-Hant-TW`, `es-419`. Case-insensitive on input.").describe("With `review`").optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("Default 50").optional(),
       cursor: z.string().regex(new RegExp("^[a-z0-9][a-z0-9._-]{0,127}$", 'u')).describe("`nextCursor` from the previous page.").optional(),
     },
-    map: {"path":{"ns":"ns"},"query":{"q":"q","missing":"missing","limit":"limit","cursor":"cursor"},"body":"none"},
+    map: {"path":{"ns":"ns"},"query":{"q":"q","missing":"missing","review":"review","reviewLocale":"reviewLocale","limit":"limit","cursor":"cursor"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({

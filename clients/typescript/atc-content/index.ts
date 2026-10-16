@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-content's openapi.yaml (24 total).
+ * One operationId-keyed method per operation in atc-content's openapi.yaml (25 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -63,6 +63,7 @@ export function createClient(config: ClientConfig) {
     "atc-content.stats.get": (init: FetchOptions<operations["atc-content.stats.get"]>) => client.GET("/v1/stats", init),
     "atc-content.translations.export": (init: FetchOptions<operations["atc-content.translations.export"]>) => client.GET("/v1/namespaces/{ns}/export/{locale}", init),
     "atc-content.translations.import": (init: FetchOptions<operations["atc-content.translations.import"]>) => client.POST("/v1/namespaces/{ns}/import", init),
+    "atc-content.values.review": (init: FetchOptions<operations["atc-content.values.review"]>) => client.POST("/v1/namespaces/{ns}/review", init),
   } as const;
 }
 

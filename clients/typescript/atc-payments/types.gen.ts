@@ -150,7 +150,7 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** One payment with its refunds and ledger entries */
+        /** One payment with its refunds, disputes and ledger entries */
         get: operations["atc-payments.payments.get"];
         put?: never;
         post?: never;
@@ -302,6 +302,89 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/disputes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Disputes (chargebacks), newest first
+         * @description Mirrored from `charge.dispute.*` webhooks. `open=true` lists those that need or await a response.
+         */
+        get: operations["atc-payments.disputes.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/disputes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DisputeParam"];
+            };
+            cookie?: never;
+        };
+        /** One dispute */
+        get: operations["atc-payments.disputes.get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/disputes/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DisputeParam"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Save text evidence on Stripe, optionally submit it (write)
+         * @description Text fields only (files are added in the Stripe dashboard). Fields are merged with what was sent before. `submit: true` sends the evidence to the card issuer; Stripe then moves the dispute to `under_review` and no more changes are possible. Only disputes in `needs_response` or `warning_needs_response` take evidence (`409 INVALID_STATE`).
+         */
+        post: operations["atc-payments.disputes.evidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/disputes/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DisputeParam"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept (concede) a dispute (write)
+         * @description Stripe closes the dispute as `lost`; the disputed amount stays with the customer. Irreversible.
+         */
+        post: operations["atc-payments.disputes.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stats": {
         parameters: {
             query?: never;
@@ -386,6 +469,30 @@ export interface components {
             /** Format: date-time */
             at?: string;
         };
+        Dispute: {
+            /** @description Stripe dispute id. */
+            id?: string;
+            paymentId?: string;
+            amount?: number;
+            currency?: string;
+            /** @description Stripe reason: fraudulent, product_not_received, duplicate, subscription_canceled, … */
+            reason?: string;
+            /** @description Stripe status: warning_needs_response, needs_response, warning_under_review, under_review, won, lost, warning_closed. */
+            status?: string;
+            /** Format: date-time */
+            evidenceDueBy?: string | null;
+            /** @description Text evidence sent so far. */
+            evidence?: {
+                [key: string]: string;
+            };
+            /** Format: date-time */
+            submittedAt?: string | null;
+            submittedBy?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
         Balance: {
             currency?: string;
             charged?: number;
@@ -396,6 +503,7 @@ export interface components {
         PaymentDetail: {
             payment: components["schemas"]["Payment"];
             refunds: components["schemas"]["Refund"][];
+            disputes: components["schemas"]["Dispute"][];
             ledger: components["schemas"]["LedgerEntry"][];
             /** @description What can still be refunded now. */
             refundable: number;
@@ -430,7 +538,7 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
-        /** @description `PAYMENT_NOT_FOUND`. */
+        /** @description `PAYMENT_NOT_FOUND` or `DISPUTE_NOT_FOUND`. */
         NotFound: {
             headers: {
                 [name: string]: unknown;
@@ -466,6 +574,17 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
+        /** @description The dispute. */
+        DisputeOne: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    dispute: components["schemas"]["Dispute"];
+                };
+            };
+        };
         /** @description The payment. */
         Detail: {
             headers: {
@@ -478,6 +597,7 @@ export interface components {
     };
     parameters: {
         PaymentParam: string;
+        DisputeParam: string;
         IdempotencyKey: string;
     };
     requestBodies: never;
@@ -1047,6 +1167,125 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    "atc-payments.disputes.list": {
+        parameters: {
+            query?: {
+                status?: string;
+                open?: "true" | "false";
+                payment?: string;
+                limit?: string;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Dispute"][];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    "atc-payments.disputes.get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DisputeParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DisputeOne"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-payments.disputes.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DisputeParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Keys: access_activity_log, billing_address, cancellation_policy_disclosure, cancellation_rebuttal, customer_email_address, customer_name, customer_purchase_ip, duplicate_charge_explanation, duplicate_charge_id, product_description, refund_policy_disclosure, refund_refusal_explanation, service_date, shipping_address, shipping_carrier, shipping_date, shipping_tracking_number, uncategorized_text. */
+                    evidence: {
+                        [key: string]: string;
+                    };
+                    submit?: boolean;
+                };
+            };
+        };
+        responses: {
+            200: components["responses"]["DisputeOne"];
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description `PROVIDER_REJECTED`: Stripe refused the evidence. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            502: components["responses"]["ProviderError"];
+            503: components["responses"]["Disabled"];
+        };
+    };
+    "atc-payments.disputes.accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DisputeParam"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: components["responses"]["DisputeOne"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description `PROVIDER_REJECTED`. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            502: components["responses"]["ProviderError"];
+            503: components["responses"]["Disabled"];
+        };
+    };
     "atc-payments.stats.get": {
         parameters: {
             query?: never;
@@ -1083,6 +1322,10 @@ export interface operations {
                             dead?: number;
                         };
                         currencies: string[];
+                        /** @description Disputes by Stripe status. */
+                        disputes?: {
+                            [key: string]: number;
+                        };
                     };
                 };
             };

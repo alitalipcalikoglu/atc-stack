@@ -261,6 +261,164 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/incidents/{id}/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post a written update on an incident (admin)
+         * @description Shown on the public page under the incident. `resolved` on an open incident closes it (and sends the closing alert).
+         */
+        post: operations["atc-status.incidents.addUpdate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Maintenance windows (active and planned; past 30 days) */
+        get: operations["atc-status.maintenance.list"];
+        put?: never;
+        /**
+         * Plan a maintenance window (admin)
+         * @description While active, failures of the listed monitors (all when `monitors` is empty or null) open no incident and send no alert; the public page shows the window and those monitors as in maintenance. At most 30 days long.
+         */
+        post: operations["atc-status.maintenance.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/maintenance/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** End or cancel a window (admin) */
+        delete: operations["atc-status.maintenance.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/subscribers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status page subscribers (admin; contains addresses) */
+        get: operations["atc-status.subscribers.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/subscribers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a subscriber (admin) */
+        delete: operations["atc-status.subscribers.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/status/subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Subscribe to the status page by e-mail (HTML form post)
+         * @description Needs STATUS_PUBLIC_URL and atc-notify. Always the same answer for a valid address (no hint whether it was already subscribed); a confirmation mail goes out. Rate limited per address (10 per minute).
+         */
+        post: operations["atc-status.page.subscribe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/status/subscribe/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        /** The confirmation link (shows a button; changes nothing) */
+        get: operations["atc-status.page.subscribeConfirmPage"];
+        put?: never;
+        /** Confirm the subscription */
+        post: operations["atc-status.page.subscribeConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/status/unsubscribe/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        /** The unsubscribe link in every mail (shows a button) */
+        get: operations["atc-status.page.unsubscribePage"];
+        put?: never;
+        /** Leave the list */
+        post: operations["atc-status.page.unsubscribe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/hooks/webhook-out": {
         parameters: {
             query?: never;
@@ -367,22 +525,28 @@ export interface components {
             };
         };
         /**
-         * @description `down` = open incident; `degraded` = last check failed, below the threshold.
+         * @description `down` = open incident; `degraded` = last check failed, below the threshold; `maintenance` = inside an active maintenance window.
          * @enum {string}
          */
-        State: "up" | "down" | "degraded" | "unknown" | "paused";
+        State: "up" | "down" | "degraded" | "unknown" | "paused" | "maintenance";
         MonitorSettings: {
             name?: string;
             description?: string;
             /**
-             * @description Fixed at creation; default `http`. `tcp` and `tls` take an https URL with host and port as `url` (only host and port are used). `heartbeat` has no target: the monitored job pings `/v1/ping/{id}/{token}` within `intervalSec` plus `graceSec`.
+             * @description Fixed at creation; default `http`. `tcp` and `tls` take an https URL with host and port as `url` (only host and port are used). `dns` takes a host name as `url` and looks up `dnsType` records. `heartbeat` has no target: the monitored job pings `/v1/ping/{id}/{token}` within `intervalSec` plus `graceSec`.
              * @enum {string}
              */
-            kind?: "http" | "tcp" | "tls" | "heartbeat";
+            kind?: "http" | "tcp" | "tls" | "dns" | "heartbeat";
+            /**
+             * @description dns only, default A.
+             * @enum {string}
+             */
+            dnsType?: "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS";
+            /** @description http/tcp/tls: an http(s) URL; dns: a host name such as example.com. */
             url?: string;
             /** @enum {string} */
             method?: "GET" | "HEAD";
-            /** @description http with GET only: text the first KiB of the body must contain. */
+            /** @description http with GET: text the first KiB of the body must contain; dns: text one of the records must contain (e.g. the expected address). */
             expectText?: string | null;
             /** @description tls only, default 14: fail when the certificate expires within this many days. */
             warnDays?: number;
@@ -403,7 +567,9 @@ export interface components {
         Monitor: {
             id?: string;
             /** @enum {string} */
-            kind?: "http" | "tcp" | "tls" | "heartbeat";
+            kind?: "http" | "tcp" | "tls" | "dns" | "heartbeat";
+            /** @enum {string|null} */
+            dnsType?: "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS" | null;
             name?: string;
             description?: string;
             /** @description null for heartbeat monitors. */
@@ -471,6 +637,29 @@ export interface components {
             ackedAt?: string | null;
             ackedBy?: string | null;
             notifyError?: string | null;
+        };
+        Maintenance: {
+            id?: string;
+            title?: string;
+            message?: string;
+            monitors?: string[] | null;
+            /** Format: date-time */
+            startsAt?: string;
+            /** Format: date-time */
+            endsAt?: string;
+            /** @enum {string} */
+            state?: "planned" | "active" | "ended";
+            createdBy?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        IncidentUpdate: {
+            /** Format: date-time */
+            at?: string;
+            /** @enum {string} */
+            status?: "investigating" | "identified" | "monitoring" | "resolved";
+            message?: string;
+            by?: string;
         };
         Incident: {
             id?: string;
@@ -737,7 +926,21 @@ export interface operations {
                     "application/json": {
                         title: string;
                         /** @enum {string} */
-                        overall: "operational" | "degraded" | "outage";
+                        overall: "operational" | "degraded" | "outage" | "maintenance";
+                        /** @description Whether the page offers e-mail subscriptions. */
+                        subscribe?: boolean;
+                        /** @description Active windows and those starting within 14 days that touch a public monitor. */
+                        maintenance?: {
+                            title?: string;
+                            message?: string;
+                            /** Format: date-time */
+                            startsAt?: string;
+                            /** Format: date-time */
+                            endsAt?: string;
+                            active?: boolean;
+                            /** @description Monitor names; null = everything. */
+                            monitors?: string[] | null;
+                        }[];
                         /** Format: date-time */
                         updatedAt: string;
                         monitors: {
@@ -757,6 +960,12 @@ export interface operations {
                             /** Format: date-time */
                             closedAt?: string | null;
                             durationSec?: number;
+                            updates?: {
+                                status?: string;
+                                message?: string;
+                                /** Format: date-time */
+                                at?: string;
+                            }[];
                         }[];
                     };
                 };
@@ -977,7 +1186,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The incident. */
+            /** @description The incident and its written updates. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -985,12 +1194,371 @@ export interface operations {
                 content: {
                     "application/json": {
                         incident: components["schemas"]["Incident"];
+                        updates: components["schemas"]["IncidentUpdate"][];
                     };
                 };
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-status.incidents.addUpdate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "investigating" | "identified" | "monitoring" | "resolved";
+                    message: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Posted. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        incident?: components["schemas"]["Incident"];
+                        updates?: components["schemas"]["IncidentUpdate"][];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-status.maintenance.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Windows. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        current: components["schemas"]["Maintenance"][];
+                        past: components["schemas"]["Maintenance"][];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    "atc-status.maintenance.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    message?: string;
+                    monitors?: string[] | null;
+                    /** Format: date-time */
+                    startsAt: string;
+                    /** Format: date-time */
+                    endsAt: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Planned. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        maintenance?: components["schemas"]["Maintenance"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-status.maintenance.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-status.subscribers.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The newest 500 and the totals. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled?: boolean;
+                        counts?: {
+                            total?: number;
+                            confirmed?: number;
+                        };
+                        items?: {
+                            id?: string;
+                            email?: string;
+                            confirmed?: boolean;
+                            /** Format: date-time */
+                            confirmedAt?: string | null;
+                            /** Format: date-time */
+                            createdAt?: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    "atc-status.subscribers.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    "atc-status.page.subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": {
+                    email: string;
+                };
+            };
+        };
+        responses: {
+            /** @description HTML page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; not an e-mail address. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; subscriptions are off. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Rate limited. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "atc-status.page.subscribeConfirmPage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML page with a form. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; not a valid link. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "atc-status.page.subscribeConfirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; not a valid link. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "atc-status.page.unsubscribePage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML page with a form. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; not a valid link. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "atc-status.page.unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description HTML page; not a valid link. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
         };
     };
     "atc-status.hooks.webhook-out": {

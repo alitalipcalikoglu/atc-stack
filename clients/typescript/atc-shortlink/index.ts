@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-shortlink's openapi.yaml (17 total).
+ * One operationId-keyed method per operation in atc-shortlink's openapi.yaml (18 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -41,6 +41,7 @@ export function createClient(config: ClientConfig) {
   return {
     "atc-shortlink.health.get": (init: FetchOptions<operations["atc-shortlink.health.get"]>) => client.GET("/health", init),
     "atc-shortlink.info.get": (init: FetchOptions<operations["atc-shortlink.info.get"]>) => client.GET("/v1/info", init),
+    "atc-shortlink.links.batch": (init: FetchOptions<operations["atc-shortlink.links.batch"]>) => client.POST("/v1/links/batch", init),
     "atc-shortlink.links.create": (init: FetchOptions<operations["atc-shortlink.links.create"]>) => client.POST("/v1/links", init),
     "atc-shortlink.links.delete": (init: FetchOptions<operations["atc-shortlink.links.delete"]>) => client.DELETE("/v1/links/{code}", init),
     "atc-shortlink.links.get": (init: FetchOptions<operations["atc-shortlink.links.get"]>) => client.GET("/v1/links/{code}", init),

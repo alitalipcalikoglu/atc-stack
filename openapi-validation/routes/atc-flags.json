@@ -20,7 +20,10 @@
     { "method": "GET", "path": "/v1/evaluate" },
     { "method": "GET", "path": "/v1/snapshot/{env}" },
     { "method": "GET", "path": "/v1/stats" },
-    { "method": "GET", "path": "/metrics" }
+    { "method": "GET", "path": "/metrics" },
+    { "method": "GET", "path": "/v1/changes" },
+    { "method": "POST", "path": "/v1/changes/{id}/approve" },
+    { "method": "POST", "path": "/v1/changes/{id}/reject" }
   ],
   "exclusions": []
 }

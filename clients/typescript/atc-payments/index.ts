@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-payments's openapi.yaml (17 total).
+ * One operationId-keyed method per operation in atc-payments's openapi.yaml (21 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -39,6 +39,10 @@ export function createClient(config: ClientConfig) {
     credentials: config.credentials,
   });
   return {
+    "atc-payments.disputes.accept": (init: FetchOptions<operations["atc-payments.disputes.accept"]>) => client.POST("/v1/disputes/{id}/accept", init),
+    "atc-payments.disputes.evidence": (init: FetchOptions<operations["atc-payments.disputes.evidence"]>) => client.POST("/v1/disputes/{id}/evidence", init),
+    "atc-payments.disputes.get": (init: FetchOptions<operations["atc-payments.disputes.get"]>) => client.GET("/v1/disputes/{id}", init),
+    "atc-payments.disputes.list": (init: FetchOptions<operations["atc-payments.disputes.list"]>) => client.GET("/v1/disputes", init),
     "atc-payments.events.list": (init: FetchOptions<operations["atc-payments.events.list"]>) => client.GET("/v1/provider-events", init),
     "atc-payments.health.get": (init: FetchOptions<operations["atc-payments.health.get"]>) => client.GET("/health", init),
     "atc-payments.info.get": (init: FetchOptions<operations["atc-payments.info.get"]>) => client.GET("/v1/info", init),

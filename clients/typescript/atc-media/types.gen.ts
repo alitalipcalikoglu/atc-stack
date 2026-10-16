@@ -113,7 +113,10 @@ export interface paths {
         };
         /**
          * List files owned by the calling API key
-         * @description Keyset pagination, newest first. `nextCursor` is an opaque, base64url-encoded
+         * @description Admin keys (`ADMIN_KEYS`) list every key's files, optionally narrowed with `owner`; other
+         *     keys always see only their own and `owner` is ignored.
+         *
+         *     Keyset pagination, newest first. `nextCursor` is an opaque, base64url-encoded
          *     `<createdAt>:<id>` token; pass it back as `cursor` to fetch the next page. `null` means no
          *     further pages.
          */
@@ -240,6 +243,46 @@ export interface paths {
          */
         post: operations["atc-media.tickets.create"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/quarantine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List quarantined uploads
+         * @description Newest first, at most 200. The bytes stay on disk until deleted here or purged after `QUARANTINE_DAYS`; they are never served.
+         */
+        get: operations["atc-media.quarantine.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/quarantine/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a quarantined upload
+         * @description Removes the record and its bytes.
+         */
+        delete: operations["atc-media.quarantine.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -408,9 +451,24 @@ export interface components {
             /** @description Content hash of the `original`'s bytes (after metadata-stripping normalisation, when applied). Drives content-addressed dedup. */
             sha256: string;
             visibility: components["schemas"]["Visibility"];
+            /** @description Id of the API key that owns the file. */
+            owner: string;
             /** Format: date-time */
             createdAt: string;
             urls: components["schemas"]["UrlsMap"];
+        };
+        QuarantineItem: {
+            id: string;
+            /** @description Key id that uploaded it. */
+            owner: string;
+            name: string;
+            mime: string | null;
+            size: number;
+            sha256: string;
+            /** @description Malware signature clamd reported. */
+            signature: string;
+            /** Format: date-time */
+            createdAt: string;
         };
         FileList: {
             items: components["schemas"]["FileView"][];
@@ -480,8 +538,31 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
-        /** @description `INVALID_IMAGE` — the sniffed type is a raster image format, but the bytes fail to decode, have no dimensions, or exceed `MAX_IMAGE_PIXELS` (decompression-bomb guard). */
+        /**
+         * @description `INVALID_IMAGE` — the sniffed type is a raster image format, but the bytes fail to decode,
+         *     have no dimensions, or exceed `MAX_IMAGE_PIXELS` (decompression-bomb guard). Or, with
+         *     `CLAMD_HOST` set, `INFECTED` — the virus scan found malware; the upload was moved to the
+         *     quarantine and `details` carries `{quarantineId, signature}`.
+         */
         InvalidImage: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description `SCAN_UNAVAILABLE` — `CLAMD_HOST` is set and clamd could not be asked; nothing was stored. Never returned with `SCAN_FAIL_OPEN=true`. */
+        ScanUnavailable: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description `FORBIDDEN` — this API key is not in `ADMIN_KEYS`. */
+        Forbidden: {
             headers: {
                 [name: string]: unknown;
             };
@@ -689,6 +770,8 @@ export interface operations {
                 limit?: string;
                 /** @description Opaque `nextCursor` value from a previous page. */
                 cursor?: string;
+                /** @description Admin keys only — list this key id's files. */
+                owner?: string;
             };
             header?: never;
             path?: never;
@@ -781,6 +864,7 @@ export interface operations {
             415: components["responses"]["UnsupportedType"];
             422: components["responses"]["InvalidImage"];
             429: components["responses"]["RateLimited"];
+            503: components["responses"]["ScanUnavailable"];
         };
     };
     "atc-media.files.get": {
@@ -1022,6 +1106,72 @@ export interface operations {
             429: components["responses"]["RateLimited"];
         };
     };
+    "atc-media.quarantine.list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Quarantined uploads. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["QuarantineItem"][];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-media.quarantine.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `VALIDATION_FAILED` — malformed id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description `NOT_FOUND` — no such quarantined upload. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
     "atc-media.files.uploadTicketed": {
         parameters: {
             query?: {
@@ -1101,6 +1251,7 @@ export interface operations {
             };
             415: components["responses"]["UnsupportedType"];
             422: components["responses"]["InvalidImage"];
+            503: components["responses"]["ScanUnavailable"];
         };
     };
     "atc-media.files.deliver": {

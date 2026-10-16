@@ -130,7 +130,7 @@ export interface paths {
         get: operations["atc-queue.queues.get"];
         /**
          * Create a queue or change its settings (admin)
-         * @description Omitted fields keep their current value (defaults on create - visibility 30 s, 5 attempts, backoff 5 s doubling to 900 s).
+         * @description Omitted fields keep their current value (defaults on create - visibility 30 s, 5 attempts, backoff 5 s doubling to 900 s). `push` switches the queue to push delivery (needs PUSH_SECRETS_KEY on the server; `secret` is required the first time and kept when omitted later), `push: null` back to pulling. 400 `PUSH_DISABLED` or `INVALID_PUSH_URL`.
          */
         put: operations["atc-queue.queues.upsert"];
         post?: never;
@@ -243,7 +243,7 @@ export interface paths {
         put?: never;
         /**
          * Lease up to `max` due messages, optionally waiting `waitSec` (write)
-         * @description Highest priority first, then oldest due. Each returned message carries a `leaseToken` valid until `leaseUntil`; ack, nack or extend it with that token. A paused queue returns nothing.
+         * @description Highest priority first, then oldest due. Each returned message carries a `leaseToken` valid until `leaseUntil`; ack, nack or extend it with that token. A paused queue returns nothing; a queue in push mode answers 409 `INVALID_STATE`.
          */
         post: operations["atc-queue.messages.pull"];
         delete?: never;
@@ -374,8 +374,17 @@ export interface components {
             maxAttempts?: number;
             backoffBaseSec?: number;
             backoffMaxSec?: number;
-            /** @description Pulls return nothing while paused; enqueue still works. */
+            /** @description Pulls return nothing and nothing is pushed while paused; enqueue still works. */
             paused?: boolean;
+            /** @description Push delivery: every due message is POSTed to `url` as `{ id, queue, attempt, priority, enqueuedAt, body }` with `x-queue-signature: t=<unix>,v1=<hex HMAC-SHA256(secret, "<t>.<body>")>`; a 2xx answer acks it, anything else nacks it (backoff, maxAttempts, dead letters as for pulls). At most `concurrency` deliveries in flight. null = pull mode. */
+            push?: null | {
+                /** @description https (http only with PUSH_ALLOW_HTTP); public hosts only unless PUSH_ALLOW_PRIVATE. */
+                url: string;
+                /** @description Signing secret; stored encrypted */
+                secret?: string;
+                /** @default 1 */
+                concurrency: number;
+            };
         };
         Queue: {
             name?: string;
@@ -385,6 +394,11 @@ export interface components {
             backoffBaseSec?: number;
             backoffMaxSec?: number;
             paused?: boolean;
+            /** @description Push settings without the secret; null in pull mode. */
+            push?: {
+                url?: string;
+                concurrency?: number;
+            } | null;
             createdBy?: string;
             /** Format: date-time */
             createdAt?: string;

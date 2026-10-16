@@ -165,6 +165,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/links/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create many short links
+         * @description Requires the `write` role. 1-500 items, each shaped like `POST /v1/links`. Items are
+         *     independent: each one is created or fails with its own error code, in request order (a
+         *     slug repeated inside the batch fails as `SLUG_TAKEN` after the first). With
+         *     `SAFE_BROWSING_API_KEY` set, all URLs are checked in one lookup. Body limit 2 MiB.
+         */
+        post: operations["atc-shortlink.links.batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/links/{code}": {
         parameters: {
             query?: never;
@@ -921,7 +944,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Bad request — one of `VALIDATION_FAILED`, `INVALID_URL`, `HOST_BLOCKED`, `INVALID_EXPIRY`, or `SLUG_RESERVED` (see description). */
+            /** @description Bad request — one of `VALIDATION_FAILED`, `INVALID_URL`, `HOST_BLOCKED`, `URL_UNSAFE` (listed by Safe Browsing, only with `SAFE_BROWSING_API_KEY`), `INVALID_EXPIRY`, or `SLUG_RESERVED` (see description). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -933,6 +956,64 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             409: components["responses"]["SlugTaken"];
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-shortlink.links.batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    links: components["schemas"]["LinkCreate"][];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-item results. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        created: number;
+                        failed: number;
+                        results: {
+                            index: number;
+                            link?: components["schemas"]["Link"];
+                            error?: {
+                                code: string;
+                                message: string;
+                            };
+                        }[];
+                    };
+                };
+            };
+            /** @description `VALIDATION_FAILED` — the batch itself is malformed (empty, more than 500 items, or an item fails the schema). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description `FST_ERR_CTP_BODY_TOO_LARGE` — body above 2 MiB. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             429: components["responses"]["RateLimited"];
         };
     };
@@ -1019,7 +1100,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description One of `VALIDATION_FAILED`, `INVALID_URL`, or `INVALID_EXPIRY`. */
+            /** @description One of `VALIDATION_FAILED`, `INVALID_URL`, `HOST_BLOCKED`, `URL_UNSAFE`, or `INVALID_EXPIRY`. */
             400: {
                 headers: {
                     [name: string]: unknown;

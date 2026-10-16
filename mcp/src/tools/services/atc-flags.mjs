@@ -110,4 +110,16 @@ export const TOOLS = [
     map: {"path":{"key":"key"},"body":"flat","bodyFields":["description","tags","archived","reshuffle"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
+  operationTool({
+    service: "atc-flags",
+    operation: "atc-flags.changes.list",
+    description: "Change requests of protected environments. Newest first, only environments the key may see. Also returns the protected environments. Read-only.",
+    input: {
+      status: z.enum(["pending", "approved", "rejected"]).optional(),
+      key: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).describe("Lower-case dot/dash/underscore-separated segments.").optional(),
+      limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).optional(),
+    },
+    map: {"query":{"status":"status","key":"key","limit":"limit"},"body":"none"},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }),
 ];

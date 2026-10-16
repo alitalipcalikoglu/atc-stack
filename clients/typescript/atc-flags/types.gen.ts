@@ -194,6 +194,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Change requests of protected environments
+         * @description Newest first, only environments the key may see. Also returns the protected environments.
+         */
+        get: operations["atc-flags.changes.list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/changes/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve and apply a change request
+         * @description Needs a write key and a different actor than the requester (the console names the person in X-Actor; ACTOR_KEYS). A request whose environment changed after it was made is closed as stale (`409 CHANGE_STALE`).
+         */
+        post: operations["atc-flags.changes.approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/changes/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject a change request (or withdraw your own) */
+        post: operations["atc-flags.changes.reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/history": {
         parameters: {
             query?: never;
@@ -234,7 +295,7 @@ export interface paths {
         head?: never;
         /**
          * Patch one flag's state in one environment
-         * @description Environment-scope-gated on `{env}`. Requires a `write`-capable key. `value`/`offValue` are validated against the flag's `kind`; `rules` are validated and normalized by the domain layer (ids deduplicated-checked, emails lower-cased, list sizes bounded) — this is why `INVALID_RULE` is reachable even though the wire-level JSON Schema for `rules` only checks "array, at most 100 items".
+         * @description Environment-scope-gated on `{env}`. Requires a `write`-capable key. `value`/`offValue` are validated against the flag's `kind`; `rules` are validated and normalized by the domain layer (ids deduplicated-checked, emails lower-cased, list sizes bounded) — this is why `INVALID_RULE` is reachable even though the wire-level JSON Schema for `rules` only checks "array, at most 100 items". In a protected environment (`PROTECTED_ENVS`) nothing is applied: the validated patch becomes a change request (`202`) that a different person approves (`POST /v1/changes/{id}/approve`).
          */
         patch: operations["atc-flags.envs.patch"];
         trace?: never;
@@ -250,7 +311,7 @@ export interface paths {
         put?: never;
         /**
          * Copy one environment's state onto another
-         * @description Copies `enabled`, `value`, `offValue`, `percentage` and `rules` from `{env}` (the path, source) onto `to` (the body, destination) for the same flag. Both `{env}` and `to` are environment-scope-gated independently — a key must have access to both, or it gets `403 FORBIDDEN`. Requires a `write`-capable key.
+         * @description Copies `enabled`, `value`, `offValue`, `percentage` and `rules` from `{env}` (the path, source) onto `to` (the body, destination) for the same flag. Both `{env}` and `to` are environment-scope-gated independently — a key must have access to both, or it gets `403 FORBIDDEN`. Requires a `write`-capable key. A copy onto a protected environment becomes a change request (`202`).
          */
         post: operations["atc-flags.envs.copy"];
         delete?: never;
@@ -336,6 +397,24 @@ export interface components {
                 /** @description Present on some errors; shape varies by code. */
                 details?: unknown;
             };
+        };
+        Change: {
+            id?: string;
+            key?: string;
+            env?: string;
+            /** @enum {string} */
+            kind?: "update" | "copy";
+            /** @description The environment patch; for a copy `{ from, fromVersion, state }` — the source as it was when requested, which is what approval applies. */
+            payload?: Record<string, never>;
+            /** @enum {string} */
+            status?: "pending" | "approved" | "rejected";
+            requestedBy?: string;
+            /** Format: date-time */
+            requestedAt?: string;
+            decidedBy?: string | null;
+            /** Format: date-time */
+            decidedAt?: string | null;
+            note?: string | null;
         };
         /** @description Lower-case dot/dash/underscore-separated segments. */
         FlagKey: string;
@@ -1074,6 +1153,141 @@ export interface operations {
             429: components["responses"]["RateLimited"];
         };
     };
+    "atc-flags.changes.list": {
+        parameters: {
+            query?: {
+                status?: "pending" | "approved" | "rejected";
+                key?: components["schemas"]["FlagKey"];
+                limit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["Change"][];
+                        protectedEnvs: string[];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-flags.changes.approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Applied. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change?: components["schemas"]["Change"];
+                        env?: string;
+                        state?: components["schemas"]["EnvironmentState"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description `FORBIDDEN` or `SELF_APPROVAL`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `CHANGE_NOT_FOUND`. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `CHANGE_CLOSED` or `CHANGE_STALE`. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
+    "atc-flags.changes.reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Rejected. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change?: components["schemas"]["Change"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description `CHANGE_NOT_FOUND`. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `CHANGE_CLOSED`. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+        };
+    };
     "atc-flags.history.list": {
         parameters: {
             query?: {
@@ -1156,6 +1370,17 @@ export interface operations {
                     };
                 };
             };
+            /** @description Protected environment — a change request was stored; nothing changed yet. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change: components["schemas"]["Change"];
+                    };
+                };
+            };
             /** @description One of `VALIDATION_FAILED` (malformed request shape), `INVALID_VALUE` (`value`/`offValue` does not match the flag's `kind`), or `INVALID_RULE` (a `rules` entry fails validation). */
             400: {
                 headers: {
@@ -1202,6 +1427,17 @@ export interface operations {
                         /** @description Equal to `to` from the request body. */
                         env: string;
                         state: components["schemas"]["EnvironmentState"];
+                    };
+                };
+            };
+            /** @description Protected destination — a change request was stored. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change: components["schemas"]["Change"];
                     };
                 };
             };

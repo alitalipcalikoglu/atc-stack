@@ -24,7 +24,8 @@
     { "method": "GET", "path": "/v1/namespaces/{ns}/releases" },
     { "method": "GET", "path": "/v1/namespaces/{ns}/releases/{number}" },
     { "method": "GET", "path": "/v1/bundles/{ns}/{locale}" },
-    { "method": "GET", "path": "/v1/stats" }
+    { "method": "GET", "path": "/v1/stats" },
+    { "method": "POST", "path": "/v1/namespaces/{ns}/review" }
   ],
   "exclusions": []
 }

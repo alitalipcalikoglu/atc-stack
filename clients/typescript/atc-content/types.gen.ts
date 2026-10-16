@@ -270,6 +270,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/namespaces/{ns}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ns: components["parameters"]["NsParam"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject draft values
+         * @description Each item is handled on its own and reported in `skipped` when refused: `SELF_REVIEW` (the reviewer wrote the value; actors are compared, so the console's `X-Actor` names count), `CHANGED` (`value` was given and the draft value differs now), `NOT_FOUND`, `INVALID_LOCALE`. Any later change to a value puts it back to `pending`.
+         */
+        post: operations["atc-content.values.review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/namespaces/{ns}/publish": {
         parameters: {
             query?: never;
@@ -283,7 +305,7 @@ export interface paths {
         put?: never;
         /**
          * Snapshot the draft as the next numbered release
-         * @description Refused with `409 UNPUBLISHABLE` (and the offending `details.problems`) while any value's placeholders differ from the default locale's or a value has no default-locale value. Releases beyond `RELEASE_RETENTION` are pruned, oldest first; numbers are never reused.
+         * @description Refused with `409 UNPUBLISHABLE` (and the offending `details.problems`) while any value's placeholders differ from the default locale's, a value has no default-locale value, or, with `PUBLISH_REQUIRES_REVIEW=true`, a value is not approved. Releases beyond `RELEASE_RETENTION` are pruned, oldest first; numbers are never reused.
          */
         post: operations["atc-content.releases.publish"];
         delete?: never;
@@ -425,6 +447,14 @@ export interface components {
             mismatched?: number;
             release?: components["schemas"]["Release"] | null;
             unpublishedChanges?: boolean;
+            /** @description Draft values per locale by review state. */
+            review?: {
+                [key: string]: {
+                    pending?: number;
+                    approved?: number;
+                    rejected?: number;
+                };
+            };
             createdBy?: string;
             /** Format: date-time */
             createdAt?: string;
@@ -444,6 +474,17 @@ export interface components {
             mismatched?: string[];
             updatedBy?: {
                 [key: string]: string;
+            };
+            /** @description Review state per locale. */
+            review?: {
+                [key: string]: {
+                    /** @enum {string} */
+                    state?: "pending" | "approved" | "rejected";
+                    by?: string | null;
+                    /** Format: date-time */
+                    at?: string | null;
+                    note?: string | null;
+                };
             };
             /** Format: date-time */
             createdAt?: string;
@@ -476,7 +517,7 @@ export interface components {
         };
     };
     responses: {
-        /** @description `VALIDATION_FAILED`, `INVALID_LOCALE`, `INVALID_FALLBACK`, `INVALID_VALUE`, `DEFAULT_REQUIRED` or `PLACEHOLDER_MISMATCH`. */
+        /** @description `VALIDATION_FAILED`, `INVALID_LOCALE`, `INVALID_FALLBACK`, `INVALID_VALUE`, `INVALID_MESSAGE` (broken ICU argument: missing `other`, a plural category the locale does not have, unbalanced braces), `DEFAULT_REQUIRED` or `PLACEHOLDER_MISMATCH`. */
         BadRequest: {
             headers: {
                 [name: string]: unknown;
@@ -941,6 +982,10 @@ export interface operations {
                 q?: string;
                 /** @description Only keys without a value in this locale. */
                 missing?: components["schemas"]["Locale"];
+                /** @description Only keys with a value in this review state. */
+                review?: "pending" | "approved" | "rejected";
+                /** @description With `review` */
+                reviewLocale?: components["schemas"]["Locale"];
                 /** @description Default 50 */
                 limit?: string;
                 /** @description `nextCursor` from the previous page. */
@@ -1135,6 +1180,55 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+        };
+    };
+    "atc-content.values.review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ns: components["parameters"]["NsParam"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "approve" | "reject";
+                    note?: string;
+                    items: {
+                        key: components["schemas"]["Key"];
+                        locale: components["schemas"]["Locale"];
+                        /** @description The value the reviewer saw; the item is skipped when the draft differs. */
+                        value?: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Outcome per item. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        updated: number;
+                        skipped: {
+                            key?: string;
+                            locale?: string;
+                            /** @enum {string} */
+                            code?: "SELF_REVIEW" | "CHANGED" | "NOT_FOUND" | "INVALID_LOCALE";
+                            reason?: string;
+                        }[];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     "atc-content.releases.publish": {

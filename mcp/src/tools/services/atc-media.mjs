@@ -8,12 +8,13 @@ export const TOOLS = [
   operationTool({
     service: "atc-media",
     operation: "atc-media.files.list",
-    description: "List files owned by the calling API key. Keyset pagination, newest first. `nextCursor` is an opaque, base64url-encoded `<createdAt>:<id>` token; pass it back as `cursor` to fetch the next page. `null` means no further pages. Read-only.",
+    description: "List files owned by the calling API key. Admin keys (`ADMIN_KEYS`) list every key's files, optionally narrowed with `owner`; other keys always see only their own and `owner` is ignored. Keyset pagination, newest first. `nextCursor` is an opaque, base64url-encoded `<createdAt>:<id>` token; pass it back as `cursor` to fetch the next page. `null` means no further pages. Read-only.",
     input: {
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|100)$", 'u')).describe("Page size, 1-100. Default 20.").optional(),
       cursor: z.string().max(128).describe("Opaque `nextCursor` value from a previous page.").optional(),
+      owner: z.string().regex(new RegExp("^[A-Za-z0-9_.-]{1,64}$", 'u')).describe("Admin keys only — list this key id's files.").optional(),
     },
-    map: {"query":{"limit":"limit","cursor":"cursor"},"body":"none"},
+    map: {"query":{"limit":"limit","cursor":"cursor","owner":"owner"},"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
   operationTool({
@@ -25,6 +26,14 @@ export const TOOLS = [
       ttl: z.string().regex(new RegExp("^\\d{1,7}$", 'u')).describe("Signature lifetime in seconds. Digits only; server-side clamped to a maximum of 604800 (7 days) even if a larger value is supplied. Defaults to `SIGNED_URL_TTL…").optional(),
     },
     map: {"path":{"id":"id"},"query":{"ttl":"ttl"},"body":"none"},
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  }),
+  operationTool({
+    service: "atc-media",
+    operation: "atc-media.quarantine.list",
+    description: "List quarantined uploads. Newest first, at most 200. The bytes stay on disk until deleted here or purged after `QUARANTINE_DAYS`; they are never served. Read-only.",
+    input: {},
+    map: {"body":"none"},
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
 ];

@@ -68,4 +68,14 @@ export const TOOLS = [
     map: {"path":{"code":"code"},"body":"flat","bodyFields":["url","permanent","enabled","expiresAt","maxClicks","tags","note"]},
     annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
   }),
+  operationTool({
+    service: "atc-shortlink",
+    operation: "atc-shortlink.links.batch",
+    description: "Create many short links. Requires the `write` role. 1-500 items, each shaped like this API. Items are independent: each one is created or fails with its own error code, in request order (a slug repeated inside the batch fails as `SLUG_TAKEN` after the first). With `SAFE_BROWSING_API_KEY` set, all URLs are checked in one lookup. Body limit 2 MiB. Safe write: creates, updates, queues or starts work; never deletes anything.",
+    input: {
+      links: z.array(z.object({ url: z.string().min(8).max(8192).describe("Must be an absolute http/https URL with no embedded credentials"), slug: z.string().regex(new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{2,63}$", 'u')).describe("3-64 characters — letters, digits, `_` and `-`, starting with a letter or digit.").optional(), permanent: z.boolean().describe("Defaults to the service's `DEFAULT_PERMANENT` config when omitted.").optional(), expiresAt: z.string().max(40).nullable().describe("ISO 8601 timestamp").optional(), maxClicks: z.number().int().min(1).max(1000000000).nullable().optional(), tags: z.array(z.string().min(1).max(40).regex(new RegExp("^[^,]+$", 'u'))).max(20).optional(), note: z.string().max(500).nullable().optional() }).strict()).min(1).max(500),
+    },
+    map: {"body":"flat","bodyFields":["links"]},
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  }),
 ];

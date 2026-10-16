@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-15",
-  "totalOperations": 608,
+  "generatedAt": "2026-10-16",
+  "totalOperations": 635,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -3830,6 +3830,16 @@
       "exposed": false
     },
     {
+      "service": "atc-content",
+      "operationId": "atc-content.values.review",
+      "method": "POST",
+      "path": "/v1/namespaces/{ns}/review",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
       "service": "atc-export",
       "operationId": "atc-export.exports.cancel",
       "method": "POST",
@@ -3973,6 +3983,36 @@
         "READ_SAFE"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-flags",
+      "operationId": "atc-flags.changes.approve",
+      "method": "POST",
+      "path": "/v1/changes/{id}/approve",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-flags",
+      "operationId": "atc-flags.changes.list",
+      "method": "GET",
+      "path": "/v1/changes",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-flags",
+      "operationId": "atc-flags.changes.reject",
+      "method": "POST",
+      "path": "/v1/changes/{id}/reject",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-flags",
@@ -4699,6 +4739,26 @@
     },
     {
       "service": "atc-media",
+      "operationId": "atc-media.quarantine.delete",
+      "method": "DELETE",
+      "path": "/v1/quarantine/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-media",
+      "operationId": "atc-media.quarantine.list",
+      "method": "GET",
+      "path": "/v1/quarantine",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-media",
       "operationId": "atc-media.tickets.create",
       "method": "POST",
       "path": "/v1/uploads",
@@ -4904,6 +4964,46 @@
         "READ_SAFE"
       ],
       "exposed": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.disputes.accept",
+      "method": "POST",
+      "path": "/v1/disputes/{id}/accept",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.disputes.evidence",
+      "method": "POST",
+      "path": "/v1/disputes/{id}/evidence",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.disputes.get",
+      "method": "GET",
+      "path": "/v1/disputes/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-payments",
+      "operationId": "atc-payments.disputes.list",
+      "method": "GET",
+      "path": "/v1/disputes",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
     },
     {
       "service": "atc-payments",
@@ -5515,6 +5615,16 @@
     },
     {
       "service": "atc-render",
+      "operationId": "atc-render.fonts.list",
+      "method": "GET",
+      "path": "/v1/fonts",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-render",
       "operationId": "atc-render.health.get",
       "method": "GET",
       "path": "/health",
@@ -5534,6 +5644,46 @@
         "OPERATOR"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.jobs.create",
+      "method": "POST",
+      "path": "/v1/renders",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.jobs.get",
+      "method": "GET",
+      "path": "/v1/renders/{id}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.jobs.list",
+      "method": "GET",
+      "path": "/v1/renders",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-render",
+      "operationId": "atc-render.jobs.pdf",
+      "method": "GET",
+      "path": "/v1/renders/{id}/pdf",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-render",
@@ -6105,6 +6255,16 @@
     },
     {
       "service": "atc-shortlink",
+      "operationId": "atc-shortlink.links.batch",
+      "method": "POST",
+      "path": "/v1/links/batch",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-shortlink",
       "operationId": "atc-shortlink.links.create",
       "method": "POST",
       "path": "/v1/links",
@@ -6301,6 +6461,16 @@
     },
     {
       "service": "atc-status",
+      "operationId": "atc-status.incidents.addUpdate",
+      "method": "POST",
+      "path": "/v1/incidents/{id}/updates",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
       "operationId": "atc-status.incidents.get",
       "method": "GET",
       "path": "/v1/incidents/{id}",
@@ -6327,6 +6497,36 @@
       "flags": [
         "READ_SAFE",
         "OPERATOR"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.maintenance.create",
+      "method": "POST",
+      "path": "/v1/maintenance",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.maintenance.delete",
+      "method": "DELETE",
+      "path": "/v1/maintenance/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.maintenance.list",
+      "method": "GET",
+      "path": "/v1/maintenance",
+      "flags": [
+        "READ_SAFE"
       ],
       "exposed": true
     },
@@ -6423,6 +6623,36 @@
     },
     {
       "service": "atc-status",
+      "operationId": "atc-status.page.subscribe",
+      "method": "POST",
+      "path": "/status/subscribe",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.page.subscribeConfirm",
+      "method": "POST",
+      "path": "/status/subscribe/{token}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.page.subscribeConfirmPage",
+      "method": "GET",
+      "path": "/status/subscribe/{token}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
       "operationId": "atc-status.page.summary",
       "method": "GET",
       "path": "/status/summary.json",
@@ -6430,6 +6660,26 @@
         "READ_SAFE"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.page.unsubscribe",
+      "method": "POST",
+      "path": "/status/unsubscribe/{token}",
+      "flags": [
+        "MUTATION"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.page.unsubscribePage",
+      "method": "GET",
+      "path": "/status/unsubscribe/{token}",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-status",
@@ -6471,6 +6721,26 @@
         "READ_SAFE"
       ],
       "exposed": true
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.subscribers.delete",
+      "method": "DELETE",
+      "path": "/v1/subscribers/{id}",
+      "flags": [
+        "DESTRUCTIVE"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-status",
+      "operationId": "atc-status.subscribers.list",
+      "method": "GET",
+      "path": "/v1/subscribers",
+      "flags": [
+        "READ_SAFE"
+      ],
+      "exposed": false
     },
     {
       "service": "atc-webhook-out",
@@ -6886,6 +7156,12 @@
       "excluded": [
         {
           "ops": [
+            "atc-content.values.review"
+          ],
+          "reason": "Approving translations is a reviewer's judgement; four eyes by design."
+        },
+        {
+          "ops": [
             "atc-content.namespaces.delete",
             "atc-content.locales.delete",
             "atc-content.keys.delete"
@@ -6944,9 +7220,17 @@
         "atc-flags.stats.get",
         "atc-flags.evaluate.post",
         "atc-flags.flags.create",
-        "atc-flags.flags.patch"
+        "atc-flags.flags.patch",
+        "atc-flags.changes.list"
       ],
       "excluded": [
+        {
+          "ops": [
+            "atc-flags.changes.approve",
+            "atc-flags.changes.reject"
+          ],
+          "reason": "Approval of a protected-environment change is a second person's decision; an agent must not make it."
+        },
         {
           "ops": [
             "atc-flags.flags.delete"
@@ -7012,9 +7296,16 @@
       "tools": [
         "atc-media.files.list",
         "atc-media.files.get",
-        "atc-media.files.signUrls"
+        "atc-media.files.signUrls",
+        "atc-media.quarantine.list"
       ],
       "excluded": [
+        {
+          "ops": [
+            "atc-media.quarantine.delete"
+          ],
+          "reason": "Deletes the only copy of a rejected upload; irreversible."
+        },
         {
           "ops": [
             "atc-media.files.delete",
@@ -7080,9 +7371,18 @@
         "atc-payments.events.list",
         "atc-payments.stats.get",
         "atc-payments.payments.create",
-        "atc-payments.payments.sync"
+        "atc-payments.payments.sync",
+        "atc-payments.disputes.list",
+        "atc-payments.disputes.get"
       ],
       "excluded": [
+        {
+          "ops": [
+            "atc-payments.disputes.evidence",
+            "atc-payments.disputes.accept"
+          ],
+          "reason": "Evidence goes to the card issuer and accepting concedes the money; both are final."
+        },
         {
           "ops": [
             "atc-payments.refunds.create",
@@ -7193,9 +7493,19 @@
         "atc-render.templates.create",
         "atc-render.templates.update",
         "atc-render.versions.create",
-        "atc-render.render.create"
+        "atc-render.render.create",
+        "atc-render.fonts.list",
+        "atc-render.jobs.list",
+        "atc-render.jobs.get",
+        "atc-render.jobs.create"
       ],
       "excluded": [
+        {
+          "ops": [
+            "atc-render.jobs.pdf"
+          ],
+          "reason": "Returns the PDF bytes; jobs.get reports the outcome."
+        },
         {
           "ops": [
             "atc-render.templates.delete"
@@ -7284,7 +7594,8 @@
         "atc-shortlink.links.getStats",
         "atc-shortlink.stats.get",
         "atc-shortlink.links.create",
-        "atc-shortlink.links.patch"
+        "atc-shortlink.links.patch",
+        "atc-shortlink.links.batch"
       ],
       "excluded": [
         {
@@ -7321,9 +7632,40 @@
         "atc-status.page.summary",
         "atc-status.alerts.list",
         "atc-status.alerts.ack",
-        "atc-status.monitors.upsert"
+        "atc-status.monitors.upsert",
+        "atc-status.maintenance.list",
+        "atc-status.maintenance.create"
       ],
       "excluded": [
+        {
+          "ops": [
+            "atc-status.page.subscribe",
+            "atc-status.page.subscribeConfirmPage",
+            "atc-status.page.subscribeConfirm",
+            "atc-status.page.unsubscribePage",
+            "atc-status.page.unsubscribe"
+          ],
+          "reason": "Public pages for people subscribing by e-mail; the tokens in the links are the credential."
+        },
+        {
+          "ops": [
+            "atc-status.subscribers.list"
+          ],
+          "reason": "Lists subscriber e-mail addresses (personal data)."
+        },
+        {
+          "ops": [
+            "atc-status.maintenance.delete",
+            "atc-status.subscribers.delete"
+          ],
+          "reason": "Irreversible."
+        },
+        {
+          "ops": [
+            "atc-status.incidents.addUpdate"
+          ],
+          "reason": "Publishes text on the public status page and mails subscribers; a human writes it."
+        },
         {
           "ops": [
             "atc-status.hooks.webhook-out"

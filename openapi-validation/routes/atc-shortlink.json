@@ -17,16 +17,16 @@
     { "method": "GET", "path": "/v1/qr" },
     { "method": "GET", "path": "/v1/stats" },
     { "method": "GET", "path": "/{code}/qr" },
-    { "method": "GET", "path": "/{code}" }
+    { "method": "GET", "path": "/{code}" },
+    { "method": "POST", "path": "/v1/links/batch" }
   ],
   "exclusions": [
     {
       "route": "HEAD /{code}",
       "reason": "Fastify auto-generated HEAD variant of the GET redirect route, same handler, no separate registration.",
-      "classification": "framework-generated, not a distinct application route"
-    }
+      "classification": "framework-generated, not a distinct application route" }
   ],
   "notes": [
-    "GET /{code} covers both the redirect and the '+'-suffixed preview page — same route registration, branch on whether the path segment ends in '+'. One OpenAPI path, document both behaviors in the description."
+    "GET /{code} covers both the redirect and the '+'-suffixed preview page \u2014 same route registration, branch on whether the path segment ends in '+'. One OpenAPI path, document both behaviors in the description."
   ]
 }

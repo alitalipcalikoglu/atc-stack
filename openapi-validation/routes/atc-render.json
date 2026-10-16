@@ -15,7 +15,12 @@
     { "method": "GET", "path": "/v1/templates/{name}/versions/{version}" },
     { "method": "POST", "path": "/v1/render" },
     { "method": "POST", "path": "/v1/render/preview" },
-    { "method": "GET", "path": "/v1/stats" }
+    { "method": "GET", "path": "/v1/stats" },
+    { "method": "GET", "path": "/v1/fonts" },
+    { "method": "POST", "path": "/v1/renders" },
+    { "method": "GET", "path": "/v1/renders" },
+    { "method": "GET", "path": "/v1/renders/{id}" },
+    { "method": "GET", "path": "/v1/renders/{id}/pdf" }
   ],
   "exclusions": []
 }

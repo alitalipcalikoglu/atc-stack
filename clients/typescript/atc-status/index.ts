@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-status's openapi.yaml (21 total).
+ * One operationId-keyed method per operation in atc-status's openapi.yaml (32 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -43,9 +43,13 @@ export function createClient(config: ClientConfig) {
     "atc-status.alerts.list": (init: FetchOptions<operations["atc-status.alerts.list"]>) => client.GET("/v1/alerts", init),
     "atc-status.health.get": (init: FetchOptions<operations["atc-status.health.get"]>) => client.GET("/health", init),
     "atc-status.hooks.webhook-out": (init: FetchOptions<operations["atc-status.hooks.webhook-out"]>) => client.POST("/v1/hooks/webhook-out", init),
+    "atc-status.incidents.addUpdate": (init: FetchOptions<operations["atc-status.incidents.addUpdate"]>) => client.POST("/v1/incidents/{id}/updates", init),
     "atc-status.incidents.get": (init: FetchOptions<operations["atc-status.incidents.get"]>) => client.GET("/v1/incidents/{id}", init),
     "atc-status.incidents.list": (init: FetchOptions<operations["atc-status.incidents.list"]>) => client.GET("/v1/incidents", init),
     "atc-status.info.get": (init: FetchOptions<operations["atc-status.info.get"]>) => client.GET("/v1/info", init),
+    "atc-status.maintenance.create": (init: FetchOptions<operations["atc-status.maintenance.create"]>) => client.POST("/v1/maintenance", init),
+    "atc-status.maintenance.delete": (init: FetchOptions<operations["atc-status.maintenance.delete"]>) => client.DELETE("/v1/maintenance/{id}", init),
+    "atc-status.maintenance.list": (init: FetchOptions<operations["atc-status.maintenance.list"]>) => client.GET("/v1/maintenance", init),
     "atc-status.metrics.get": (init: FetchOptions<operations["atc-status.metrics.get"]>) => client.GET("/metrics", init),
     "atc-status.monitors.check": (init: FetchOptions<operations["atc-status.monitors.check"]>) => client.POST("/v1/monitors/{id}/check", init),
     "atc-status.monitors.checks": (init: FetchOptions<operations["atc-status.monitors.checks"]>) => client.GET("/v1/monitors/{id}/checks", init),
@@ -55,11 +59,18 @@ export function createClient(config: ClientConfig) {
     "atc-status.monitors.upsert": (init: FetchOptions<operations["atc-status.monitors.upsert"]>) => client.PUT("/v1/monitors/{id}", init),
     "atc-status.openapi": (init: FetchOptions<operations["atc-status.openapi"]>) => client.GET("/openapi.yaml", init),
     "atc-status.page.get": (init: FetchOptions<operations["atc-status.page.get"]>) => client.GET("/status", init),
+    "atc-status.page.subscribe": (init: FetchOptions<operations["atc-status.page.subscribe"]>) => client.POST("/status/subscribe", init),
+    "atc-status.page.subscribeConfirm": (init: FetchOptions<operations["atc-status.page.subscribeConfirm"]>) => client.POST("/status/subscribe/{token}", init),
+    "atc-status.page.subscribeConfirmPage": (init: FetchOptions<operations["atc-status.page.subscribeConfirmPage"]>) => client.GET("/status/subscribe/{token}", init),
     "atc-status.page.summary": (init: FetchOptions<operations["atc-status.page.summary"]>) => client.GET("/status/summary.json", init),
+    "atc-status.page.unsubscribe": (init: FetchOptions<operations["atc-status.page.unsubscribe"]>) => client.POST("/status/unsubscribe/{token}", init),
+    "atc-status.page.unsubscribePage": (init: FetchOptions<operations["atc-status.page.unsubscribePage"]>) => client.GET("/status/unsubscribe/{token}", init),
     "atc-status.ping.get": (init: FetchOptions<operations["atc-status.ping.get"]>) => client.GET("/v1/ping/{id}/{token}", init),
     "atc-status.ping.post": (init: FetchOptions<operations["atc-status.ping.post"]>) => client.POST("/v1/ping/{id}/{token}", init),
     "atc-status.ready.get": (init: FetchOptions<operations["atc-status.ready.get"]>) => client.GET("/ready", init),
     "atc-status.stats.get": (init: FetchOptions<operations["atc-status.stats.get"]>) => client.GET("/v1/stats", init),
+    "atc-status.subscribers.delete": (init: FetchOptions<operations["atc-status.subscribers.delete"]>) => client.DELETE("/v1/subscribers/{id}", init),
+    "atc-status.subscribers.list": (init: FetchOptions<operations["atc-status.subscribers.list"]>) => client.GET("/v1/subscribers", init),
   } as const;
 }
 
