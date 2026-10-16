@@ -275,4 +275,5 @@ export const CONSOLE_ROLES = /** @type {Record<string, string>} */ ({
   'atc-backup': 'admin', // runs, downloads, verifies, restores and deletes backups
   'atc-status': 'admin', // creates, changes, checks and deletes monitors
   'atc-payments': 'write', // creates, cancels, syncs and refunds payments
+  'atc-export': 'admin', // may also export the personal-data sources (notify recipients, the suppression list)
 });

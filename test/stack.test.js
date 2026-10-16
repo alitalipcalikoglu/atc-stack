@@ -110,6 +110,8 @@ test('setup wires every service: secrets, keys, URLs, console files; second run 
   // The scheduler can call the services a job typically needs, each with the least role; export reads more sources.
   const tk = Object.fromEntries(env('atc-scheduler').TARGET_KEYS.split(',').map((e) => e.split(':')));
   assert.deepEqual([tk['atc-backup'], keys('atc-backup', 'BACKUP_API_KEYS')['atc-scheduler'].role, keys('atc-queue', 'QUEUE_API_KEYS')['atc-scheduler'].role, keys('atc-payments', 'PAYMENTS_API_KEYS')['atc-scheduler'].role], [keys('atc-backup', 'BACKUP_API_KEYS')['atc-scheduler'].secret, 'admin', 'write', 'write']);
+  assert.equal(keys('atc-export', 'EXPORT_API_KEYS')['atc-console'].role, 'admin', 'the console may export personal-data sources; the scheduler stays readwrite');
+  assert.equal(keys('atc-export', 'EXPORT_API_KEYS')['atc-scheduler'].role, 'readwrite');
   const exs = env('atc-export');
   assert.deepEqual([exs.SOURCE_QUEUE_API_KEY, keys('atc-queue', 'QUEUE_API_KEYS')['atc-export'].role, exs.SOURCE_WEBHOOK_OUT_URL.endsWith(':3009'), keys('atc-scheduler', 'SCHEDULER_API_KEYS')['atc-export'].role], [keys('atc-queue', 'QUEUE_API_KEYS')['atc-export'].secret, 'read', true, 'read']);
   const px = env('atc-payments');
