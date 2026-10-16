@@ -36,7 +36,7 @@ validates and reuses safe existing checkouts, runs `npm ci` from every sibling l
 configuration to the existing `setup` implementation, starts through the existing PM2 `up` path,
 and waits (bounded) for all 20 HTTP services to report ready.
 
-The default is the current supported **production release** (`1.31.0`): every sibling is checked
+The default is the current supported **production release** (`1.32.0`): every sibling is checked
 against the immutable tag and exact commit recorded in
 [`installation-manifests/v1.15.0.json`](installation-manifests/v1.15.0.json), selected by the explicit
 [`installation-manifests/supported.json`](installation-manifests/supported.json) pointer.
@@ -53,7 +53,7 @@ stack install:all --ref main --admin-password '<choose-a-strong-password>'
 ```
 
 Use that explicit development mode only when intentionally following moving `main` heads. The
-supported `v1.31.0` release and current development mode both require Console's canonical
+supported `v1.32.0` release and current development mode both require Console's canonical
 `server.mjs` plus adapter-node build; historical manifests remain unchanged and retain their own
 matching runtime snapshots.
 
