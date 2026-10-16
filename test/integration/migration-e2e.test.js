@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { generateKeyPairSync } from 'node:crypto';
+import { generateKeyPairSync, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -197,6 +197,9 @@ async function futureSchemaRefusalE2E({ serviceId, entry, seed, env, assertSenti
 // Positive E2E
 // ==================================================================================================
 
+/** An id in the platform format (`<prefix>_<time><random>`), as the services generate them. @param {string} prefix */
+const platformId = (prefix) => `${prefix}_${Date.now().toString(36)}${randomBytes(8).toString('hex')}`;
+
 test('notify: real one-migration-behind fixture with an existing queued message migrates through a real process, /ready, /v1/info, message still there, backup verified', { skip }, async () => {
   /** @type {string} */ let sentinelId;
   const apiKey = randomSecret();
@@ -205,7 +208,7 @@ test('notify: real one-migration-behind fixture with an existing queued message 
     entry: 'src/api-main.js', // API-only: no worker loop, so the seeded 'queued' message is never claimed/delivered as a side effect of this test.
     checkBackup: true,
     seed: (db) => {
-      sentinelId = `11111111-1111-4111-8111-${Date.now().toString(16).padStart(12, '0')}`;
+      sentinelId = platformId('msg');
       const now = Date.now();
       db.prepare(`
         INSERT INTO messages (id, api_key_id, idempotency_key, channel, payload, status, attempts, max_attempts, next_attempt_at, locked_until, last_error, provider_id, created_at, updated_at, sent_at, owner_token)
@@ -289,7 +292,7 @@ test('webhook-out: real old-schema (v2) fixture with an existing subscription mi
     serviceId: 'atc-webhook-out',
     entry: 'src/api-main.js',
     seed: (db) => {
-      const id = `sub_${randomSecret(8)}`;
+      const id = platformId('sub');
       const now = Date.now();
       db.prepare(`
         INSERT INTO subscriptions (id, name, description, url, events, headers, secret_enc, prev_secret_enc, prev_until, status, consecutive_failures, last_delivery_at, last_status, created_by, created_at, updated_at)
@@ -367,7 +370,7 @@ test('audit: real old-schema (v1) fixture with an existing chained event migrate
     serviceId: 'atc-audit',
     entry: 'src/index.js',
     seed: (db) => {
-      const id = '55555555-5555-4555-8555-555555555555';
+      const id = platformId('evt');
       const now = Date.now();
       const row = {
         id, client_id: null, source: 'harness', action: 'seed.event', outcome: 'success',

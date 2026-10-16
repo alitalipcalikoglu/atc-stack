@@ -174,7 +174,7 @@ export const HAND_TOOLS = [
       "Reads one file's metadata (name, mime, size, dimensions, visibility, URLs) by id. Does not " +
       'return file bytes -- use the `url` fields in the response to fetch content directly. A ' +
       "nonexistent or another key's file id returns a real 404, not an error thrown by this tool.",
-    inputSchema: { id: z.string().uuid() },
+    inputSchema: { id: z.string().regex(/^fil_[0-9a-z]{6,12}[0-9a-f]{16}$/).describe('File id (fil_...).') },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
       const client = await registry.client('atc-media');
@@ -250,7 +250,7 @@ export const HAND_TOOLS = [
     description:
       'Reads one message\'s current delivery state (queued/processing/sent/failed), attempt count ' +
       'and last error, by id. Use this to check on a message created with atc-notify.messages.create.',
-    inputSchema: { id: z.string().uuid() },
+    inputSchema: { id: z.string().regex(/^msg_[0-9a-z]{6,12}[0-9a-f]{16}$/).describe('Message id (msg_...).') },
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     async handler(args, registry) {
       const client = await registry.client('atc-notify');

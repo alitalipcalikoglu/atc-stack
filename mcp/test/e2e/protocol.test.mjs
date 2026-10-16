@@ -300,13 +300,13 @@ test('safe mutation: atc-shortlink.links.create', { skip }, async () => {
   }
 });
 
-test('atc-search.query offset-based pagination against a real (empty) index', { skip }, async () => {
+test('atc-search.query cursor pagination against a real (empty) index', { skip }, async () => {
   const { client } = await connectClient();
   try {
     const result = await callTool(client, 'atc-search.query', { name: 'mcp-e2e-index', q: 'nothing' });
     assert.equal(result.isError, undefined, JSON.stringify(result));
     assert.equal(result.structuredContent.data.total, 0);
-    assert.equal(result.structuredContent.data.offset, 0);
+    assert.deepEqual([result.structuredContent.data.items, result.structuredContent.data.nextCursor], [[], null]);
   } finally {
     await client.close();
   }
@@ -328,7 +328,7 @@ test('atc-ratelimit.check is always peek (never consumes quota), and preserves t
 test('expected error path: atc-media.files.get on a real-shaped but nonexistent id returns a translated, safe upstream error', { skip }, async () => {
   const { client } = await connectClient();
   try {
-    const result = await callTool(client, 'atc-media.files.get', { id: '00000000-0000-0000-0000-000000000000' });
+    const result = await callTool(client, 'atc-media.files.get', { id: 'fil_mv8abcde0000000000000000' });
     assert.equal(result.isError, true);
     assert.equal(result.structuredContent.code, 'UPSTREAM_ERROR');
     assert.equal(result.structuredContent.status, 404);
