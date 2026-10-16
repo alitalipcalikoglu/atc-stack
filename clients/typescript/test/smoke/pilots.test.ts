@@ -185,7 +185,7 @@ test('media pilot: binary upload -> binary download roundtrip -> expected error,
   assert.equal(downloaded.response.headers.get('content-type'), 'image/png');
 
   // 3. expected error: unknown file id -> 404, typed error envelope preserved.
-  const missing = await client['atc-media.files.get']({ params: { path: { id: '00000000-0000-0000-0000-000000000000' } } });
+  const missing = await client['atc-media.files.get']({ params: { path: { id: 'fil_000000000000000000000000' } } });
   assert.equal(missing.response.status, 404);
   assert.equal(missing.error?.error?.code, 'NOT_FOUND');
 });
