@@ -544,7 +544,7 @@ export interface paths {
         put?: never;
         /**
          * Start MFA enrolment for the signed-in user
-         * @description Needs the end user's access token in `X-Access-Token`. Answers a new TOTP secret and its `otpauth://` URL (show it as a QR code); MFA stays off until `POST /v1/auth/mfa/enable` gets a code from the app. Calling it again before enabling replaces the secret. `409 MFA_ALREADY_ENABLED` when MFA is on, `503 MFA_UNAVAILABLE` when the server has no `MFA_SECRETS_KEY`.
+         * @description Needs the end user's access token in `X-Access-Token` and the current password in the body (a stolen token alone must not be able to bind another authenticator; a wrong password is `401 INVALID_CREDENTIALS` and counts toward the sign-in lockout). Answers a new TOTP secret and its `otpauth://` URL (show it as a QR code); MFA stays off until `POST /v1/auth/mfa/enable` gets the password and a code from the app. Calling it again before enabling replaces the secret. `409 MFA_ALREADY_ENABLED` when MFA is on, `503 MFA_UNAVAILABLE` when the server has no `MFA_SECRETS_KEY`.
          */
         post: operations["atc-auth.mfa.setup"];
         delete?: never;
@@ -562,7 +562,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Turn MFA on with a first code; answers the recovery codes once */
+        /** Turn MFA on with the password and a first code; answers the recovery codes once */
         post: operations["atc-auth.mfa.enable"];
         delete?: never;
         options?: never;
@@ -599,7 +599,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Replace the recovery codes (confirmed with a current code) */
+        /** Replace the recovery codes (confirmed with the password and a current code) */
         post: operations["atc-auth.mfa.recoveryCodes"];
         delete?: never;
         options?: never;
@@ -786,7 +786,13 @@ export interface components {
             /** @description Six digits from the app */
             code: string;
         };
-        MfaCodeRequest: {
+        MfaPasswordRequest: {
+            /** @description The user's current password; a wrong one counts toward the sign-in lockout. */
+            password: string;
+        };
+        MfaPasswordAndCodeRequest: {
+            /** @description The user's current password; a wrong one counts toward the sign-in lockout. */
+            password: string;
             code: string;
         };
         MfaDisableRequest: {
@@ -1970,7 +1976,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaPasswordRequest"];
+            };
+        };
         responses: {
             /** @description OK. */
             200: {
@@ -2018,7 +2028,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MfaCodeRequest"];
+                "application/json": components["schemas"]["MfaPasswordAndCodeRequest"];
             };
         };
         responses: {
@@ -2126,7 +2136,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MfaCodeRequest"];
+                "application/json": components["schemas"]["MfaPasswordAndCodeRequest"];
             };
         };
         responses: {

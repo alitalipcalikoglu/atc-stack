@@ -124,6 +124,7 @@ export const POLICY = {
     tools: ['atc-render.templates.list', 'atc-render.templates.get', 'atc-render.versions.get', 'atc-render.stats.get', 'atc-render.templates.create', 'atc-render.templates.update', 'atc-render.versions.create', 'atc-render.render.create', 'atc-render.fonts.list', 'atc-render.jobs.list', 'atc-render.jobs.get', 'atc-render.jobs.create'],
     excluded: [
       { ops: ['atc-render.jobs.pdf'], reason: 'Returns the PDF bytes; jobs.get reports the outcome.' },
+      { ops: ['atc-render.jobs.cancel'], reason: 'Irreversible, like the scheduler and export cancels.' },
       { ops: ['atc-render.templates.delete'], reason: 'Irreversible.' },
       { ops: ['atc-render.render.preview'], reason: 'Returns the PDF bytes; render.create stores the document and returns a reference instead.' },
     ],

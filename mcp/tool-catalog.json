@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-16",
-  "totalOperations": 650,
+  "totalOperations": 651,
   "note": "Every canonical operation, classified. `exposed` marks the operations an MCP tool calls; `policy` (from mcp/tool-policy.mjs) lists the tools per service and the reason each excluded write operation stays out. src/tools/ is the only place a tool is registered; tool-catalog.reconcile.mjs checks policy, tools and catalog agree.",
   "entries": [
     {
@@ -5827,6 +5827,17 @@
     },
     {
       "service": "atc-render",
+      "operationId": "atc-render.jobs.cancel",
+      "method": "POST",
+      "path": "/v1/renders/{id}/cancel",
+      "flags": [
+        "MUTATION",
+        "HIGH_RISK"
+      ],
+      "exposed": false
+    },
+    {
+      "service": "atc-render",
       "operationId": "atc-render.jobs.create",
       "method": "POST",
       "path": "/v1/renders",
@@ -7685,6 +7696,12 @@
             "atc-render.jobs.pdf"
           ],
           "reason": "Returns the PDF bytes; jobs.get reports the outcome."
+        },
+        {
+          "ops": [
+            "atc-render.jobs.cancel"
+          ],
+          "reason": "Irreversible, like the scheduler and export cancels."
         },
         {
           "ops": [

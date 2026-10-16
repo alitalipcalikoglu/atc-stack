@@ -141,7 +141,7 @@ export interface paths {
         put?: never;
         /**
          * Create a flag
-         * @description Creates the flag and seeds identical initial state in every configured environment (`enabled`, `value`, `offValue` default per `kind`, `percentage` 100, no rules). Requires a `write`-capable key.
+         * @description Creates the flag and seeds identical initial state in every configured environment (`enabled`, `value`, `offValue` default per `kind`, `percentage` 100, no rules), except that a `PROTECTED_ENVS` environment always starts disabled: turning it on there is a reviewed change. Requires a `write`-capable key.
          */
         post: operations["atc-flags.flags.create"];
         delete?: never;
@@ -403,8 +403,8 @@ export interface components {
             key?: string;
             env?: string;
             /** @enum {string} */
-            kind?: "update" | "copy";
-            /** @description The environment patch; for a copy `{ from, fromVersion, state }` — the source as it was when requested, which is what approval applies. */
+            kind?: "update" | "copy" | "flag";
+            /** @description The environment patch; for a copy `{ from, fromVersion, state }` — the source as it was when requested, which is what approval applies; for a flag-level change `{ archived? , reshuffle?, delete? }`, applied to every environment on approval. */
             payload?: Record<string, never>;
             /** @enum {string} */
             status?: "pending" | "approved" | "rejected";
@@ -1082,6 +1082,17 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description With `PROTECTED_ENVS` the deletion waits for another person's approval (a `flag` change on the first protected environment); the flag is still there. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change: components["schemas"]["Change"];
+                    };
+                };
+            };
             /** @description Deleted. No body. */
             204: {
                 headers: {
@@ -1127,6 +1138,17 @@ export interface operations {
                 content: {
                     "application/json": {
                         flag: components["schemas"]["Flag"];
+                    };
+                };
+            };
+            /** @description With `PROTECTED_ENVS`, `archived` and `reshuffle` touch every environment and so wait for another person like a change to the first protected environment; nothing changed yet. `description` and `tags` alone still apply at once. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change: components["schemas"]["Change"];
                     };
                 };
             };
@@ -1220,8 +1242,17 @@ export interface operations {
                     };
                 };
             };
+            /** @description `ACTOR_REQUIRED`: a key in ACTOR_KEYS sent no X-Actor. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             401: components["responses"]["Unauthorized"];
-            /** @description `FORBIDDEN` or `SELF_APPROVAL`. */
+            /** @description `FORBIDDEN` or `SELF_APPROVAL` (the same person, through any key, cannot approve their own request). */
             403: {
                 headers: {
                     [name: string]: unknown;

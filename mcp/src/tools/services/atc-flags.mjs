@@ -83,7 +83,7 @@ export const TOOLS = [
   operationTool({
     service: "atc-flags",
     operation: "atc-flags.flags.create",
-    description: "Create a flag. Creates the flag and seeds identical initial state in every configured environment (`enabled`, `value`, `offValue` default per `kind`, `percentage` 100, no rules). Requires a `write`-capable key. Safe write: creates, updates, queues or starts work; never deletes anything.",
+    description: "Create a flag. Creates the flag and seeds identical initial state in every configured environment (`enabled`, `value`, `offValue` default per `kind`, `percentage` 100, no rules), except that a `PROTECTED_ENVS` environment always starts disabled: turning it on there is a reviewed change. Requires a `write`-capable key. Safe write: creates, updates, queues or starts work; never deletes anything.",
     input: {
       IdempotencyKey: z.string().regex(new RegExp("^[A-Za-z0-9._:-]{8,255}$", 'u')).describe("Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the…").optional(),
       key: z.string().max(80).regex(new RegExp("^[a-z0-9]+([.\\-_][a-z0-9]+)*$", 'u')).describe("Lower-case dot/dash/underscore-separated segments."),

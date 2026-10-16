@@ -127,7 +127,7 @@ export interface paths {
          * @description Inserts the message and returns immediately (`202` for a newly-created message, `200` when the request replays an existing `Idempotency-Key`); actual delivery happens later, out of band, via the worker process. `channel` is always `email`; the body's `data` is additionally validated, at request time, against the named template's own JSON Schema (`GET /v1/templates` lists the templates this instance ships with, each with its schema).
          *     **Idempotency**: the `Idempotency-Key` header, when given, scopes one logical send per API key for as long as the message row lives (not only 24 h as on other POSTs). Reusing a key with the identical channel and payload replays the original row (`200`, `Idempotent-Replayed: true`); reusing it with a different channel or payload is `409 IDEMPOTENCY_MISMATCH` — the key is not a slot to overwrite.
          *     **State machine**: `queued -> processing -> sent | failed`. A `failed` message is retryable exactly once per call via `POST /v1/messages/{id}/retry` (full attempt-budget reset, not automatic); there is no cancel/abort endpoint. Automatic retries use exponential backoff with jitter (`BACKOFF_BASE_MS`, default 5000ms; `BACKOFF_CAP_MS`, default 3600000ms) up to `MAX_ATTEMPTS` attempts (default 8) before a message is settled as `failed`.
-         *     **Suppressions**: suppressed addresses are removed from `to`/`cc`/`bcc` and listed in the response's `suppressed`; when no `to` address is left the answer is `422 RECIPIENTS_SUPPRESSED`. The worker checks again right before sending.
+         *     **Suppressions**: suppressed addresses are removed from `to`/`cc`/`bcc` and listed in the response's `suppressed`; when no `to` address is left the answer is `422 RECIPIENTS_SUPPRESSED`. The worker checks again right before sending. With `transactional: true` only bounced and operator-suppressed addresses are removed; `unsubscribe` and `complaint` entries do not block.
          *     **Quotas**: `DAILY_SEND_LIMIT` / `KEY_DAILY_LIMIT` (recipients per key per UTC day) and `RECIPIENT_HOURLY_LIMIT` (mails per address per hour, default 20) answer `429 QUOTA_EXCEEDED` with `retry-after` and `details[0].scope` (`key` or `recipient`). Idempotent replays do not count.
          */
         post: operations["atc-notify.messages.create"];
@@ -441,6 +441,8 @@ export interface components {
             replyTo?: string;
             /** @description Add one-click `List-Unsubscribe` headers (RFC 8058). Needs `PUBLIC_BASE_URL` + `UNSUBSCRIBE_SECRET`, exactly one `to` and no cc/bcc (`400` otherwise). Use for newsletters, not for account mail. */
             unsubscribe?: boolean;
+            /** @description Account mail the user must be able to receive (password reset, verification, security notices): an address that unsubscribed or complained still gets it; bounced and operator-suppressed addresses still do not. Needs a `readwrite` or `admin` key (`403` otherwise) and cannot be combined with `unsubscribe` (`400`). */
+            transactional?: boolean;
             /** @description Validated server-side against the named template's own JSON Schema (see the `if`/`then` branches below, one per template, and `GET /v1/templates` for the same schemas at runtime). `locale` defaults to `tr` when omitted on every template. */
             data: Record<string, never>;
         } & (unknown & unknown & unknown);

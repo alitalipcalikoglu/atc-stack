@@ -279,6 +279,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/renders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a queued render job
+         * @description Only a `queued` job can be cancelled; a running one finishes (`409 INVALID_STATE`). The job stays listed as `cancelled` until retention removes it.
+         */
+        post: operations["atc-render.jobs.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/renders/{id}/pdf": {
         parameters: {
             query?: never;
@@ -322,7 +342,7 @@ export interface components {
         Job: {
             id: components["schemas"]["JobId"];
             /** @enum {string} */
-            status: "queued" | "running" | "succeeded" | "failed";
+            status: "queued" | "running" | "succeeded" | "failed" | "cancelled";
             template: string;
             version: number;
             filename: string;
@@ -1071,7 +1091,7 @@ export interface operations {
     "atc-render.jobs.list": {
         parameters: {
             query?: {
-                status?: "queued" | "running" | "succeeded" | "failed";
+                status?: "queued" | "running" | "succeeded" | "failed" | "cancelled";
                 /** @description 1-200, default 50. */
                 limit?: string;
                 /** @description Opaque `nextCursor` from the previous page. */
@@ -1171,6 +1191,53 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             /** @description `JOB_NOT_FOUND` (unknown, purged, or another key's job). */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    "atc-render.jobs.cancel": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
+            };
+            path: {
+                id: components["schemas"]["JobId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The cancelled job. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        job: components["schemas"]["Job"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description `JOB_NOT_FOUND` (unknown, purged, or another key's job). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description `INVALID_STATE`: the job is not queued. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

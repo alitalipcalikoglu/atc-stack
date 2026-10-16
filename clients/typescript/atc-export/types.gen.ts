@@ -264,6 +264,8 @@ export interface components {
         Source: {
             id?: string;
             label?: string;
+            /** @description Rows are personal data of people outside the platform (recipient addresses, the suppression list); only an `admin` export key may export this source (`403 FORBIDDEN` otherwise). */
+            personal?: boolean;
             formats?: ("csv" | "ndjson")[];
             columns?: string[];
             filters?: {

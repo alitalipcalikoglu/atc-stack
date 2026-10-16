@@ -107,7 +107,7 @@ export const TOOLS = [
     operation: "atc-render.jobs.list",
     description: "The calling key's render jobs, newest first. Read-only.",
     input: {
-      status: z.enum(["queued", "running", "succeeded", "failed"]).optional(),
+      status: z.enum(["queued", "running", "succeeded", "failed", "cancelled"]).optional(),
       limit: z.string().regex(new RegExp("^([1-9]|[1-9][0-9]|1[0-9][0-9]|200)$", 'u')).describe("1-200, default 50.").optional(),
       cursor: z.string().regex(new RegExp("^rnd_[0-9a-z]{6,12}[0-9a-f]{16}$", 'u')).describe("Platform id format: `rnd_<time><random>`.").describe("Opaque `nextCursor` from the previous page.").optional(),
     },

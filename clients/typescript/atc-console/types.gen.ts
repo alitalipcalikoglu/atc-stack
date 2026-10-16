@@ -8223,6 +8223,15 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description With the flags service's `PROTECTED_ENVS`, the deletion became an approval request; the change is relayed and the flag is still there. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassThrough"];
+                };
+            };
             /** @description Deleted. console discards flags' response body. */
             204: {
                 headers: {

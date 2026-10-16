@@ -589,8 +589,6 @@ export interface components {
         };
     };
     parameters: {
-        /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
-        IdempotencyKeyHeader: string;
         FileId: components["schemas"]["FileId"];
         /** @description Defaults to `private` when omitted. */
         UploadVisibility: components["schemas"]["Visibility"];
@@ -986,10 +984,7 @@ export interface operations {
     "atc-media.files.restore": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Optional. Repeats of this POST with the same key (per API key, 24 h) replay the first 2xx answer with `Idempotent-Replayed: true` instead of running again; the same key with another method, path or body is `409 IDEMPOTENCY_MISMATCH`, while the first still runs `409 IDEMPOTENCY_IN_PROGRESS`. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKeyHeader"];
-            };
+            header?: never;
             path: {
                 id: components["parameters"]["FileId"];
             };

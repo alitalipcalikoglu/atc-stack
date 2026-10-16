@@ -20,7 +20,8 @@
     { "method": "POST", "path": "/v1/renders" },
     { "method": "GET", "path": "/v1/renders" },
     { "method": "GET", "path": "/v1/renders/{id}" },
-    { "method": "GET", "path": "/v1/renders/{id}/pdf" }
+    { "method": "GET", "path": "/v1/renders/{id}/pdf" },
+    { "method": "POST", "path": "/v1/renders/{id}/cancel" }
   ],
   "exclusions": []
 }

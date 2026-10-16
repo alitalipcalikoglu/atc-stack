@@ -25,7 +25,7 @@ export interface ClientConfig {
 }
 
 /**
- * One operationId-keyed method per operation in atc-render's openapi.yaml (20 total).
+ * One operationId-keyed method per operation in atc-render's openapi.yaml (21 total).
  * Each call returns openapi-fetch's own { data, error, response } union -- status, headers and
  * the raw Response are always reachable via .response; nothing throws on a non-2xx by default.
  * No retry, no timeout, no polling: this is a transport, not a workflow SDK. Pass an AbortSignal
@@ -42,6 +42,7 @@ export function createClient(config: ClientConfig) {
     "atc-render.fonts.list": (init: FetchOptions<operations["atc-render.fonts.list"]>) => client.GET("/v1/fonts", init),
     "atc-render.health.get": (init: FetchOptions<operations["atc-render.health.get"]>) => client.GET("/health", init),
     "atc-render.info.get": (init: FetchOptions<operations["atc-render.info.get"]>) => client.GET("/v1/info", init),
+    "atc-render.jobs.cancel": (init: FetchOptions<operations["atc-render.jobs.cancel"]>) => client.POST("/v1/renders/{id}/cancel", init),
     "atc-render.jobs.create": (init: FetchOptions<operations["atc-render.jobs.create"]>) => client.POST("/v1/renders", init),
     "atc-render.jobs.get": (init: FetchOptions<operations["atc-render.jobs.get"]>) => client.GET("/v1/renders/{id}", init),
     "atc-render.jobs.list": (init: FetchOptions<operations["atc-render.jobs.list"]>) => client.GET("/v1/renders", init),
